@@ -1,0 +1,1737 @@
+Proyecto de desarrollo de sistema de IA basado en alquileres de pisos¶
+Este proyecto se centra en la exploración, limpieza y preparación de datos de alquileres en la provincia de Madrid. Se aplican técnicas de análisis exploratorio (EDA), tratamiento de valores atípicos y nulos, y preprocesamiento para la posterior construcción de modelos de regresión y clasificación con Scikit-learn siguendo la metodología CRISP-DM para garantizar un flujo estructurado.
+
+Importación de bibliotecas y configuración inicial
+!pip install --upgrade \
+    folium==0.19.4 \
+    geopy==2.4.1 \
+    matplotlib==3.10.0 \
+    numpy==1.26.4 \
+    pandas==2.2.3 \
+    scikit-learn==1.5.0 \
+    scipy==1.13.0 \
+    seaborn==0.13.2 \
+    requests==2.32.3
+Collecting folium==0.19.4
+  Downloading folium-0.19.4-py2.py3-none-any.whl.metadata (3.8 kB)
+Requirement already satisfied: geopy==2.4.1 in /usr/local/lib/python3.10/dist-packages (2.4.1)
+Collecting matplotlib==3.10.0
+  Downloading matplotlib-3.10.0-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (11 kB)
+Requirement already satisfied: numpy==1.26.4 in /usr/local/lib/python3.10/dist-packages (1.26.4)
+Requirement already satisfied: pandas==2.2.3 in /usr/local/lib/python3.10/dist-packages (2.2.3)
+Collecting scikit-learn==1.5.0
+  Downloading scikit_learn-1.5.0-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (11 kB)
+Collecting scipy==1.13.0
+  Downloading scipy-1.13.0-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (60 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 60.6/60.6 kB 2.4 MB/s eta 0:00:00
+Collecting seaborn==0.13.2
+  Downloading seaborn-0.13.2-py3-none-any.whl.metadata (5.4 kB)
+Requirement already satisfied: requests==2.32.3 in /usr/local/lib/python3.10/dist-packages (2.32.3)
+Requirement already satisfied: branca>=0.6.0 in /usr/local/lib/python3.10/dist-packages (from folium==0.19.4) (0.8.1)
+Requirement already satisfied: jinja2>=2.9 in /usr/local/lib/python3.10/dist-packages (from folium==0.19.4) (3.1.4)
+Requirement already satisfied: xyzservices in /usr/local/lib/python3.10/dist-packages (from folium==0.19.4) (2024.9.0)
+Requirement already satisfied: geographiclib<3,>=1.52 in /usr/local/lib/python3.10/dist-packages (from geopy==2.4.1) (2.0)
+Requirement already satisfied: contourpy>=1.0.1 in /usr/local/lib/python3.10/dist-packages (from matplotlib==3.10.0) (1.3.1)
+Requirement already satisfied: cycler>=0.10 in /usr/local/lib/python3.10/dist-packages (from matplotlib==3.10.0) (0.12.1)
+Requirement already satisfied: fonttools>=4.22.0 in /usr/local/lib/python3.10/dist-packages (from matplotlib==3.10.0) (4.55.3)
+Requirement already satisfied: kiwisolver>=1.3.1 in /usr/local/lib/python3.10/dist-packages (from matplotlib==3.10.0) (1.4.7)
+Requirement already satisfied: packaging>=20.0 in /usr/local/lib/python3.10/dist-packages (from matplotlib==3.10.0) (24.2)
+Requirement already satisfied: pillow>=8 in /usr/local/lib/python3.10/dist-packages (from matplotlib==3.10.0) (11.0.0)
+Requirement already satisfied: pyparsing>=2.3.1 in /usr/local/lib/python3.10/dist-packages (from matplotlib==3.10.0) (3.2.0)
+Requirement already satisfied: python-dateutil>=2.7 in /usr/local/lib/python3.10/dist-packages (from matplotlib==3.10.0) (2.9.0.post0)
+Requirement already satisfied: mkl_fft in /usr/local/lib/python3.10/dist-packages (from numpy==1.26.4) (1.3.8)
+Requirement already satisfied: mkl_random in /usr/local/lib/python3.10/dist-packages (from numpy==1.26.4) (1.2.4)
+Requirement already satisfied: mkl_umath in /usr/local/lib/python3.10/dist-packages (from numpy==1.26.4) (0.1.1)
+Requirement already satisfied: mkl in /usr/local/lib/python3.10/dist-packages (from numpy==1.26.4) (2025.0.1)
+Requirement already satisfied: tbb4py in /usr/local/lib/python3.10/dist-packages (from numpy==1.26.4) (2022.0.0)
+Requirement already satisfied: mkl-service in /usr/local/lib/python3.10/dist-packages (from numpy==1.26.4) (2.4.1)
+Requirement already satisfied: pytz>=2020.1 in /usr/local/lib/python3.10/dist-packages (from pandas==2.2.3) (2025.1)
+Requirement already satisfied: tzdata>=2022.7 in /usr/local/lib/python3.10/dist-packages (from pandas==2.2.3) (2025.1)
+Requirement already satisfied: joblib>=1.2.0 in /usr/local/lib/python3.10/dist-packages (from scikit-learn==1.5.0) (1.4.2)
+Requirement already satisfied: threadpoolctl>=3.1.0 in /usr/local/lib/python3.10/dist-packages (from scikit-learn==1.5.0) (3.5.0)
+Requirement already satisfied: charset-normalizer<4,>=2 in /usr/local/lib/python3.10/dist-packages (from requests==2.32.3) (3.4.1)
+Requirement already satisfied: idna<4,>=2.5 in /usr/local/lib/python3.10/dist-packages (from requests==2.32.3) (3.10)
+Requirement already satisfied: urllib3<3,>=1.21.1 in /usr/local/lib/python3.10/dist-packages (from requests==2.32.3) (2.3.0)
+Requirement already satisfied: certifi>=2017.4.17 in /usr/local/lib/python3.10/dist-packages (from requests==2.32.3) (2025.1.31)
+Requirement already satisfied: MarkupSafe>=2.0 in /usr/local/lib/python3.10/dist-packages (from jinja2>=2.9->folium==0.19.4) (3.0.2)
+Requirement already satisfied: six>=1.5 in /usr/local/lib/python3.10/dist-packages (from python-dateutil>=2.7->matplotlib==3.10.0) (1.17.0)
+Requirement already satisfied: intel-openmp>=2024 in /usr/local/lib/python3.10/dist-packages (from mkl->numpy==1.26.4) (2024.2.0)
+Requirement already satisfied: tbb==2022.* in /usr/local/lib/python3.10/dist-packages (from mkl->numpy==1.26.4) (2022.0.0)
+Requirement already satisfied: tcmlib==1.* in /usr/local/lib/python3.10/dist-packages (from tbb==2022.*->mkl->numpy==1.26.4) (1.2.0)
+Requirement already satisfied: intel-cmplr-lib-rt in /usr/local/lib/python3.10/dist-packages (from mkl_umath->numpy==1.26.4) (2024.2.0)
+Requirement already satisfied: intel-cmplr-lib-ur==2024.2.0 in /usr/local/lib/python3.10/dist-packages (from intel-openmp>=2024->mkl->numpy==1.26.4) (2024.2.0)
+Downloading folium-0.19.4-py2.py3-none-any.whl (110 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 110.5/110.5 kB 3.8 MB/s eta 0:00:00
+Downloading matplotlib-3.10.0-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (8.6 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 8.6/8.6 MB 70.5 MB/s eta 0:00:00:00:010:01
+Downloading scikit_learn-1.5.0-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (13.3 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 13.3/13.3 MB 66.4 MB/s eta 0:00:00:00:010:01
+Downloading scipy-1.13.0-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (38.6 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 38.6/38.6 MB 36.9 MB/s eta 0:00:00:00:0100:01
+Downloading seaborn-0.13.2-py3-none-any.whl (294 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 294.9/294.9 kB 13.7 MB/s eta 0:00:00
+Installing collected packages: scipy, matplotlib, seaborn, scikit-learn, folium
+  Attempting uninstall: scipy
+    Found existing installation: scipy 1.13.1
+    Uninstalling scipy-1.13.1:
+      Successfully uninstalled scipy-1.13.1
+  Attempting uninstall: matplotlib
+    Found existing installation: matplotlib 3.7.5
+    Uninstalling matplotlib-3.7.5:
+      Successfully uninstalled matplotlib-3.7.5
+  Attempting uninstall: seaborn
+    Found existing installation: seaborn 0.12.2
+    Uninstalling seaborn-0.12.2:
+      Successfully uninstalled seaborn-0.12.2
+  Attempting uninstall: scikit-learn
+    Found existing installation: scikit-learn 1.2.2
+    Uninstalling scikit-learn-1.2.2:
+      Successfully uninstalled scikit-learn-1.2.2
+  Attempting uninstall: folium
+    Found existing installation: folium 0.19.2
+    Uninstalling folium-0.19.2:
+      Successfully uninstalled folium-0.19.2
+Successfully installed folium-0.19.4 matplotlib-3.10.0 scikit-learn-1.5.0 scipy-1.13.0 seaborn-0.13.2
+# Cargar las librerías necesarias
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+import re
+import folium
+from folium.plugins import MarkerCluster
+from geopy.distance import geodesic
+from sklearn.preprocessing import (MinMaxScaler, RobustScaler, LabelEncoder, OneHotEncoder)
+from sklearn.compose import ColumnTransformer
+from sklearn.model_selection import train_test_split, cross_val_score, GridSearchCV
+from sklearn.linear_model import LinearRegression, LogisticRegression
+from sklearn.ensemble import (RandomForestRegressor, RandomForestClassifier, GradientBoostingRegressor,
+                              GradientBoostingClassifier)
+from sklearn.svm import SVC
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.metrics import (mean_squared_error, r2_score, accuracy_score, precision_score, recall_score, f1_score,
+                             roc_auc_score, jaccard_score, mean_absolute_error)
+from sklearn.pipeline import Pipeline
+from sklearn.impute import SimpleImputer
+import warnings
+
+# Configuraciones
+%matplotlib inline
+sns.set_theme(style="whitegrid", palette="viridis", font_scale=1.1)
+warnings.simplefilter("ignore", RuntimeWarning)
+
+# Repositorio
+# https://github.com/asier-ortiz/module-2-notebooks
+
+# Otros
+#
+# Utilicé un script para intentar rellenar los datos faltantes en las columnas de geolocalización y generar las columnas de
+# las coordenadas (latitud y longitud) automáticamente mediante la API de Google Maps
+# Se puede inspeccionar el código en el siguiente enlace:
+#
+# https://github.com/asier-ortiz/module-2-notebooks/blob/main/scripts/madrid_rent_geolocation.py
+Funciones
+def clean_floor_column(df):
+    """
+    Limpia la columna 'floor' asegurando consistencia en los valores
+    """
+
+    # Mostrar valores únicos antes del saneamiento
+    print("\nValores únicos en 'floor' antes del saneamiento:")
+    print(df["floor"].unique())
+
+    # Diccionario de conversión de valores ordinales
+    ordinal_mapping = {f"{i}th": i for i in range(1, 101)}
+    ordinal_mapping.update({"ground": 0, "1st": 1, "2nd": 2, "3rd": 3})
+
+    # Convertir valores de la columna
+    cleaned_floors = []
+    for value in df["floor"]:
+        if pd.isna(value):
+            cleaned_floors.append(pd.NA)
+            continue
+
+        value = str(value).lower().strip()
+
+        # Intentar convertir directamente si es un número
+        try:
+            num_value = int(value.replace(",", ""))  # Para valores con comas como "1,200"
+            if 0 <= num_value <= 100:  # Limitar a un rango razonable de pisos
+                cleaned_floors.append(num_value)
+            else:
+                cleaned_floors.append(pd.NA)  # Si el número es muy alto lo dejo como NA
+        except ValueError:
+            cleaned_floors.append(ordinal_mapping.get(value, pd.NA))  # Mapear valores ordinales o NA si no se reconoce
+
+    # Asignar la columna limpia al dataframe
+    df["floor"] = cleaned_floors
+
+    # Mostrar valores únicos después del saneamiento
+    print("\nValores únicos en 'floor' después del saneamiento:")
+    print(df["floor"].unique())
+
+    return df
+
+
+def is_within_madrid(lat, lng):
+    """
+    Verifica si una ubicación está dentro de un radio determinado desde el centro de Madrid
+    """
+
+    madrid_center = (40.4168, -3.7038)
+    radius_km = 60
+
+    if pd.isna(lat) or pd.isna(lng):
+        return False
+
+    distance = geodesic((lat, lng), madrid_center).km  # Calcula la distancia al centro de Madrid
+    return distance <= radius_km  # Devuelve true si está dentro del radio, false si está fuera
+
+
+def calculate_distance(lat, lon):
+    """
+    Calcula la distancia en km entre la vivienda y el centro de Madrid
+    """
+
+    city_center_coords = (40.416775, -3.703790)
+
+    if np.isnan(lat) or np.isnan(lon):
+        return np.nan
+    return geodesic((lat, lon), city_center_coords).kilometers
+
+
+def extract_subdistrict(location):
+    """
+    Extrae el subdistrito de la columna 'location' después de la palabra 'Subdistrict'
+    """
+
+    if pd.isna(location) or not isinstance(location, str):
+        return None
+
+    match = re.search(r"Subdistrict\s([^,]+)", location)
+    return match.group(1).strip() if match else None
+
+
+def evaluate_models(X_train, X_test, y_train, y_test, task="regression", optimize=False, param_grids=None):
+    """
+    Evalúa modelos de regresión o clasificación con múltiples métricas y permite optimización de hiperparámetros.
+    """
+
+    if task == "regression":
+
+        models = {
+            'Linear Regression': LinearRegression(),
+            'Random Forest Regressor': RandomForestRegressor(n_estimators=100, random_state=42),
+            'Gradient Boosting Regressor': GradientBoostingRegressor(n_estimators=100, learning_rate=0.1,
+                                                                     random_state=42)
+        }
+        default_param_grids = {
+            'Random Forest Regressor': {"n_estimators": [100, 200, 300], "max_depth": [None, 10, 20]},
+            'Gradient Boosting Regressor': {"n_estimators": [100, 200], "learning_rate": [0.01, 0.1, 0.2]},
+        }
+
+    elif task == "classification":
+
+        models = {
+            'Logistic Regression': LogisticRegression(max_iter=1000, random_state=42),
+            'Decision Tree': DecisionTreeClassifier(random_state=42),
+            'Random Forest Classifier': RandomForestClassifier(n_estimators=100, random_state=42),
+            'Gradient Boosting Classifier': GradientBoostingClassifier(random_state=42),
+            'KNN Classifier': KNeighborsClassifier(n_neighbors=5),
+            'SVM Classifier': SVC(kernel='rbf', probability=True, random_state=42)
+        }
+        default_param_grids = {
+            'Random Forest Classifier': {"n_estimators": [100, 200], "max_depth": [None, 10, 20]},
+            'Gradient Boosting Classifier': {"n_estimators": [100, 200], "learning_rate": [0.01, 0.1, 0.2]},
+            'SVM Classifier': {"C": [0.1, 1, 10], "kernel": ["linear", "rbf"]}
+        }
+
+    else:
+        raise ValueError("El parámetro 'task' debe ser 'regression' o 'classification'")
+
+    param_grids = param_grids if param_grids else default_param_grids
+
+    results = []
+
+    for model_name, model in models.items():
+
+        # Optimización con hiperparámetros si el parámetro 'optimize' está en true
+        if optimize and model_name in param_grids:
+            grid_search = GridSearchCV(model, param_grids[model_name], cv=5,
+                                       scoring="r2" if task == "regression" else "accuracy", n_jobs=-1)
+            grid_search.fit(X_train, y_train)
+            model = grid_search.best_estimator_
+            best_params = grid_search.best_params_
+
+        else:
+            model.fit(X_train, y_train)
+            best_params = None
+
+        y_pred = model.predict(X_test)
+
+        if task == "regression":
+            mse = mean_squared_error(y_test, y_pred)
+            rmse = np.sqrt(mse)
+            mae = mean_absolute_error(y_test, y_pred)
+            mape = np.mean(np.abs((y_test - y_pred) / y_test)) * 100
+            r2 = r2_score(y_test, y_pred)
+
+            cv_scores = cross_val_score(model, X_train, y_train, cv=5, scoring="r2")
+            mean_cv = cv_scores.mean()
+            std_cv = cv_scores.std()
+
+            results.append({
+                "Modelo": model_name,
+                "MSE": mse,
+                "RMSE": rmse,
+                "MAE": mae,
+                "MAPE (%)": mape,
+                "R2": r2,
+                "Mean CV R2": mean_cv,
+                "Std CV R2": std_cv,
+                "Best Params": best_params
+            })
+
+        elif task == "classification":
+            accuracy = accuracy_score(y_test, y_pred)
+            precision = precision_score(y_test, y_pred, average="weighted", zero_division=0)
+            recall = recall_score(y_test, y_pred, average="weighted", zero_division=0)
+            f1 = f1_score(y_test, y_pred, average="weighted")
+            jaccard = jaccard_score(y_test, y_pred, average="weighted")
+            roc_auc = roc_auc_score(y_test, y_pred)
+
+            cv_scores = cross_val_score(model, X_train, y_train, cv=5, scoring="accuracy")
+            mean_cv = cv_scores.mean()
+            std_cv = cv_scores.std()
+
+            results.append({
+                "Modelo": model_name,
+                "Accuracy": accuracy,
+                "Precision": precision,
+                "Recall": recall,
+                "F1-score": f1,
+                "Jaccard": jaccard,
+                "ROC AUC": roc_auc,
+                "Mean CV Accuracy": mean_cv,
+                "Std CV Accuracy": std_cv,
+                "Best Params": best_params
+            })
+
+    return pd.DataFrame(results).sort_values(by="Accuracy" if task == "classification" else "R2", ascending=False)
+1 - Carga de datos y revisión del dataset
+1.1 - Carga del dataset
+# Ruta del dataset en Kaggle
+dataset_path = "/kaggle/input/madrid-rental-listings-with-geolocation/madrid_rent_with_geolocation.csv"
+
+# Cargar el dataset
+df = pd.read_csv(dataset_path)
+
+# Ref. https://www.kaggle.com/datasets/mapecode/madrid-province-rent-data
+1.2 - Inspección de la estructura del dataset
+# Mostrar las primeras filas del dataset
+print("Primeras filas del dataset:")
+display(df.head())
+Primeras filas del dataset:
+web_id	url	title	type	price	deposit	private_owner	professional_name	floor_built	floor_area	...	storeroom	swimming_pool	garden_area	location	district	subdistrict	postalcode	last_update	lat	lng
+0	99440018	https://www.idealista.com/en/inmueble/99440018/	Studio flat for rent in luis cabrera	Studio	650	1.0	False	Madrid en Propiedad	30	NaN	...	False	False	False	luis cabrera, Subdistrict Prosperidad, Distric...	Chamartín	Prosperidad	28002.0	7 November	40.444750	-3.671574
+1	99440827	https://www.idealista.com/en/inmueble/99440827/	Flat / apartment for rent in calle de Pastora ...	Flat	1750	NaN	False	PUBLICASA MADRID	148	NaN	...	False	True	False	Calle de Pastora Imperio, Subdistrict Castilla...	Chamartín	Castilla	28036.0	7 November	40.481725	-3.674384
+2	97689853	https://www.idealista.com/en/inmueble/97689853/	Flat / apartment for rent in calle de Gabriel ...	Flat	1490	NaN	False	roomless	65	55.0	...	False	False	False	Calle de Gabriel Lobo, 20, Subdistrict El Viso...	Chamartín	El Viso	28002.0	5 November	40.443449	-3.679917
+3	97689852	https://www.idealista.com/en/inmueble/97689852/	Flat / apartment for rent in calle de Gabriel ...	Flat	900	NaN	False	roomless	50	40.0	...	False	False	False	Calle de Gabriel Lobo, 20, Subdistrict El Viso...	Chamartín	El Viso	28002.0	5 November	40.443449	-3.679917
+4	99399876	https://www.idealista.com/en/inmueble/99399876/	Flat / apartment for rent in El Viso	Flat	950	NaN	False	Spotahome	28	24.0	...	False	False	False	, Subdistrict El Viso, District Chamartín, Mad...	Chamartín	El Viso	NaN	6 November	40.449021	-3.686681
+5 rows × 34 columns
+
+# Mostrar las últimas filas del dataset
+print("Últimas filas del dataset:")
+display(df.tail())
+Últimas filas del dataset:
+web_id	url	title	type	price	deposit	private_owner	professional_name	floor_built	floor_area	...	storeroom	swimming_pool	garden_area	location	district	subdistrict	postalcode	last_update	lat	lng
+9224	99283228	https://www.idealista.com/en/inmueble/99283228/	Flat / apartment for rent in calle Jerez de lo...	Flat	950	1.0	False	EL PORTAL, GESTIÓN INMOBILIARIA	64	NaN	...	False	False	False	Calle Jerez de los Caballeros, 5, Subdistrict ...	Barajas	Casco Histórico de Barajas	28042.0	23 October	40.470719	-3.579658
+9225	99377540	https://www.idealista.com/en/inmueble/99377540/	Flat / apartment for rent in Alameda de Osuna	Flat	1800	1.0	False	Engel & Völkers Madrid	138	118.0	...	True	False	False	, Subdistrict Alameda de Osuna, District Baraj...	Barajas	Alameda de Osuna	28042.0	5 November	40.456178	-3.594880
+9226	95831170	https://www.idealista.com/en/inmueble/95831170/	Flat / apartment for rent in Góndola	Flat	1350	1.0	False	Alquilar y Vender Madrid	114	104.0	...	False	True	False	Góndola, Subdistrict Alameda de Osuna, Distric...	Barajas	Alameda de Osuna	28042.0	3 November	40.453432	-3.589196
+9227	99405352	https://www.idealista.com/en/inmueble/99405352/	Flat / apartment for rent in calle Timón	Flat	850	NaN	False	Redpiso	64	51.0	...	False	False	False	Calle Timón, Subdistrict Timón, District Baraj...	Barajas	Timón	28042.0	3 November	40.472818	-3.585470
+9228	2139592	https://www.idealista.com/en/inmueble/2139592/	Flat / apartment for rent in calle Bariloche, 1	Flat	950	1.0	True	NaN	70	NaN	...	True	True	False	Calle Bariloche, 1, Urb. puerta coronales, Sub...	Barajas	Campo de las Naciones-Corralejos	28042.0	3 November	40.467742	-3.590706
+5 rows × 34 columns
+
+# Obtener información general sobre el dataset, incluyendo tipos de datos y valores nulos
+print("Información general del dataset:")
+display(df.info())
+Información general del dataset:
+<class 'pandas.core.frame.DataFrame'>
+RangeIndex: 9229 entries, 0 to 9228
+Data columns (total 34 columns):
+ #   Column             Non-Null Count  Dtype  
+---  ------             --------------  -----  
+ 0   web_id             9229 non-null   int64  
+ 1   url                9229 non-null   object 
+ 2   title              9229 non-null   object 
+ 3   type               9229 non-null   object 
+ 4   price              9229 non-null   int64  
+ 5   deposit            5407 non-null   float64
+ 6   private_owner      9229 non-null   bool   
+ 7   professional_name  7622 non-null   object 
+ 8   floor_built        9229 non-null   int64  
+ 9   floor_area         3938 non-null   float64
+ 10  floor              8908 non-null   object 
+ 11  year_built         2893 non-null   float64
+ 12  orientation        4411 non-null   object 
+ 13  bedrooms           9229 non-null   int64  
+ 14  bathrooms          9229 non-null   int64  
+ 15  second_hand        9229 non-null   bool   
+ 16  lift               9229 non-null   bool   
+ 17  garage_included    9229 non-null   bool   
+ 18  furnished          9229 non-null   bool   
+ 19  equipped_kitchen   9229 non-null   bool   
+ 20  fitted_wardrobes   9229 non-null   bool   
+ 21  air_conditioning   9229 non-null   bool   
+ 22  terrace            9229 non-null   bool   
+ 23  balcony            9229 non-null   bool   
+ 24  storeroom          9229 non-null   bool   
+ 25  swimming_pool      9229 non-null   bool   
+ 26  garden_area        9229 non-null   bool   
+ 27  location           9229 non-null   object 
+ 28  district           9229 non-null   object 
+ 29  subdistrict        8528 non-null   object 
+ 30  postalcode         7047 non-null   float64
+ 31  last_update        9229 non-null   object 
+ 32  lat                9229 non-null   float64
+ 33  lng                9229 non-null   float64
+dtypes: bool(13), float64(6), int64(5), object(10)
+memory usage: 1.6+ MB
+None
+# Mostrar el número de filas y columnas en el dataset
+print("Número de filas y columnas en el dataset:")
+print(df.shape)
+Número de filas y columnas en el dataset:
+(9229, 34)
+# Identificar las columnas numéricas y categóricas
+numerical_columns = df.select_dtypes(include=['number']).columns.tolist()
+categorical_columns = df.select_dtypes(include=['object', 'category']).columns.tolist()
+# Mostrar las columnas numéricas identificadas
+print("Columnas numéricas:")
+print(numerical_columns)
+Columnas numéricas:
+['web_id', 'price', 'deposit', 'floor_built', 'floor_area', 'year_built', 'bedrooms', 'bathrooms', 'postalcode', 'lat', 'lng']
+# Mostrar las columnas categóricas identificadas
+print("Columnas categóricas:")
+print(categorical_columns)
+Columnas categóricas:
+['url', 'title', 'type', 'professional_name', 'floor', 'orientation', 'location', 'district', 'subdistrict', 'last_update']
+# Contar valores únicos en variables categóricas
+print("Valores únicos en variables categóricas:")
+df[categorical_columns].nunique()
+Valores únicos en variables categóricas:
+url                  9229
+title                5826
+type                   10
+professional_name    1580
+floor                 198
+orientation             4
+location             5576
+district              121
+subdistrict           175
+last_update           236
+dtype: int64
+# Mostrar valores únicos de algunas columnas categóricas para revisar su diversidad
+relevant_categorical_columns = ['type', 'floor', 'orientation', 'district', 'subdistrict']
+
+print("Valores únicos en variables categóricas relevantes:")
+for col in relevant_categorical_columns:
+    print(f"\n{col}: {df[col].nunique()} valores únicos")
+    print(df[col].unique()[:10])
+Valores únicos en variables categóricas relevantes:
+
+type: 10 valores únicos
+['Studio' 'Flat' 'Penthouse' 'Duplex' 'Detached' 'Semi-detached'
+ 'Terraced' 'Estate' 'House' 'Village']
+
+floor: 198 valores únicos
+['4th' '5th' '1st' 'ground' '2nd' '3rd' '130' '80' '9th' '8th']
+
+orientation: 4 valores únicos
+[nan 'east' 'south' 'west' 'north']
+
+district: 121 valores únicos
+['Chamartín' 'Fuencarral' 'Retiro' 'Chamberí' 'Villa de Vallecas'
+ 'Arganzuela' 'Madrid' 'Europolis' 'Villalba Pueblo'
+ 'Navalquejigo - Los Arroyos']
+
+subdistrict: 175 valores únicos
+['Prosperidad' 'Castilla' 'El Viso' 'Ciudad Jardín' 'Nueva España'
+ 'Bernabéu-Hispanoamérica' 'Las Tablas' 'Tres Olivos - Valverde' 'Pilar'
+ 'Arroyo del Fresno']
+# Mostrar el número de valores nulos por columna
+print(df.isnull().sum())
+web_id                  0
+url                     0
+title                   0
+type                    0
+price                   0
+deposit              3822
+private_owner           0
+professional_name    1607
+floor_built             0
+floor_area           5291
+floor                 321
+year_built           6336
+orientation          4818
+bedrooms                0
+bathrooms               0
+second_hand             0
+lift                    0
+garage_included         0
+furnished               0
+equipped_kitchen        0
+fitted_wardrobes        0
+air_conditioning        0
+terrace                 0
+balcony                 0
+storeroom               0
+swimming_pool           0
+garden_area             0
+location                0
+district                0
+subdistrict           701
+postalcode           2182
+last_update             0
+lat                     0
+lng                     0
+dtype: int64
+# Resumen estadístico de las variables numéricas para analizar su distribución y posibles valores atípicos
+print("Resumen estadístico de las variables numéricas:")
+display(df.describe())
+Resumen estadístico de las variables numéricas:
+web_id	price	deposit	floor_built	floor_area	year_built	bedrooms	bathrooms	postalcode	lat	lng
+count	9.229000e+03	9229.000000	5407.000000	9229.000000	3938.000000	2893.000000	9229.000000	9229.000000	7047.000000	9229.000000	9229.000000
+mean	9.133077e+07	1937.995883	1.470686	110.285405	94.357288	1975.491531	2.259508	1.787518	28082.985242	40.426010	-3.732080
+std	2.016654e+07	1615.063308	0.622239	87.183901	72.822703	34.928909	1.332689	1.077126	844.886921	0.981450	1.995190
+min	3.902730e+05	400.000000	1.000000	0.000000	0.000000	1800.000000	0.000000	1.000000	9615.000000	-34.466315	-121.885253
+25%	9.578928e+07	1000.000000	1.000000	60.000000	54.000000	1960.000000	1.000000	1.000000	28009.000000	40.416849	-3.708399
+50%	9.891848e+07	1400.000000	1.000000	85.000000	75.000000	1978.000000	2.000000	2.000000	28023.000000	40.433604	-3.692916
+75%	9.929904e+07	2300.000000	2.000000	127.000000	110.000000	2003.000000	3.000000	2.000000	28043.000000	40.457380	-3.672436
+max	9.944594e+07	25000.000000	6.000000	990.000000	995.000000	2022.000000	25.000000	20.000000	95045.000000	56.263920	21.824312
+1.3 - Comprobación de relaciones potenciales
+# Genero la matriz de correlación para analizar la relación entre las variables numéricas
+print("Matriz de correlación entre variables numéricas:")
+correlation_matrix = df[numerical_columns].corr()
+display(correlation_matrix)
+Matriz de correlación entre variables numéricas:
+web_id	price	deposit	floor_built	floor_area	year_built	bedrooms	bathrooms	postalcode	lat	lng
+web_id	1.000000	0.011329	-0.048291	0.013207	0.047059	-0.033324	0.042937	0.016238	0.018280	-0.009975	0.024043
+price	0.011329	1.000000	0.059232	0.700145	0.728005	0.019199	0.515126	0.693651	-0.014259	0.005015	0.003283
+deposit	-0.048291	0.059232	1.000000	0.109606	0.054622	0.030535	0.064656	0.114684	0.012570	-0.016269	-0.024474
+floor_built	0.013207	0.700145	0.109606	1.000000	0.913232	0.104845	0.729301	0.803921	0.027334	0.008706	-0.004488
+floor_area	0.047059	0.728005	0.054622	0.913232	1.000000	0.070795	0.735387	0.772292	0.089611	0.066827	0.002896
+year_built	-0.033324	0.019199	0.030535	0.104845	0.070795	1.000000	0.047959	0.112018	0.037942	0.033688	0.000876
+bedrooms	0.042937	0.515126	0.064656	0.729301	0.735387	0.047959	1.000000	0.738524	0.044543	0.001816	-0.010116
+bathrooms	0.016238	0.693651	0.114684	0.803921	0.772292	0.112018	0.738524	1.000000	0.027967	0.008952	-0.004725
+postalcode	0.018280	-0.014259	0.012570	0.027334	0.089611	0.037942	0.044543	0.027967	1.000000	-0.037367	-0.586523
+lat	-0.009975	0.005015	-0.016269	0.008706	0.066827	0.033688	0.001816	0.008952	-0.037367	1.000000	0.491615
+lng	0.024043	0.003283	-0.024474	-0.004488	0.002896	0.000876	-0.010116	-0.004725	-0.586523	0.491615	1.000000
+# Identificar relaciones relevantes para modelado
+
+# Basándonos en la matriz de correlación, seleccionamos las variables con mayor impacto en 'price'
+# Las variables con correlación más fuerte con 'price' son:
+# - floor_built (0.70)
+# - floor_area (0.72)
+# - bedrooms (0.51)
+# - bathrooms (0.69)
+# Otras variables tienen correlaciones insignificantes (<0.01) y no se consideran para modelado
+
+key_relationships = ['price', 'floor_built', 'floor_area', 'bedrooms', 'bathrooms']
+print("Relaciones clave para la predicción de price:")
+display(df[key_relationships].corr())
+Relaciones clave para la predicción de price:
+price	floor_built	floor_area	bedrooms	bathrooms
+price	1.000000	0.700145	0.728005	0.515126	0.693651
+floor_built	0.700145	1.000000	0.913232	0.729301	0.803921
+floor_area	0.728005	0.913232	1.000000	0.735387	0.772292
+bedrooms	0.515126	0.729301	0.735387	1.000000	0.738524
+bathrooms	0.693651	0.803921	0.772292	0.738524	1.000000
+# Se selecciona balcony como variable de clasificación
+# Se muestra la frecuencia de los valores presentes en 'balcony' para entender su distribución
+print("Frecuencia de valores en la variable balcony:")
+df['balcony'].value_counts()
+Frecuencia de valores en la variable balcony:
+balcony
+False    7579
+True     1650
+Name: count, dtype: int64
+2 - Limpieza y validación de los datos
+2.1 - Eliminación de columnas irrelevantes
+# Se eliminan columnas que no aportan información útil para el análisis de 'price' y 'balcony'
+columns_to_drop = [
+    'web_id',  # Identificador único para cada anuncio, no aporta valor analítico
+    'url',  # Enlace a la página del anuncio, irrelevante para el modelado
+    'title',  # Contiene información redundante, ya que 'type' y 'location' están en otras columnas
+    'last_update',
+    # Indica la fecha de última actualización del anuncio, pero sin un formato uniforme no aporta valor predictivo
+]
+
+# Eliminamos las columnas del dataframe
+df.drop(columns=columns_to_drop, inplace=True)
+
+# Mostramos el nuevo número de columnas para verificar la eliminación
+print("Columnas eliminadas:", columns_to_drop)
+print("Número de columnas tras la eliminación:", df.shape[1])
+Columnas eliminadas: ['web_id', 'url', 'title', 'last_update']
+Número de columnas tras la eliminación: 30
+2.2 - Manejo de duplicados
+# Conteo de filas duplicadas considerando todas las columnas
+duplicates_total = df.duplicated().sum()
+print(f"Número de filas completamente duplicadas: {duplicates_total}")
+Número de filas completamente duplicadas: 62
+# Seleccionar columnas clave para identificar duplicados parciales excluyendo IDs o metadatos
+#
+# Para detectar duplicados, se consideran las columnas que describen las características estructurales de la vivienda,
+# evitando aquellas que son únicas para cada anuncio o irrelevantes para el análisis
+#
+# Columnas no incluidas:
+# 'web_id' y 'url': Son identificadores únicos de cada anuncio, por lo que no sirven para detectar duplicados
+#
+# 'title': Contiene información redundante sobre el tipo de vivienda y ubicación, pero en formato texto libre, lo que
+# lo hace inconsistente para la comparación
+#
+# 'professional_name': El nombre de la agencia no influye en si un anuncio es duplicado o no
+#
+# 'last_update': Fecha de actualización del anuncio con valores inconsistentes (por ejemplo, "2 months" vs. "5 November"),
+#  lo que impide su uso para identificar duplicados
+#
+# 'location': Contiene el nombre de la calle y en algunos casos el número, pero ya disponemos de `district` y `subdistrict`
+#  que son más estructurados. Además, las direcciones pueden estar escritas de forma diferente en anuncios duplicados
+#
+# Se consideran sólo características clave de la vivienda como 'price', 'bedrooms', 'floor_area', 'year_built', etc...,
+# ya que un mismo inmueble puede aparecer varias veces con ligeras variaciones en el título, la agencia inmobiliaria o la fecha de publicación
+
+duplicate_columns = ['type', 'price', 'deposit', 'floor_built', 'floor_area',
+                     'year_built', 'bedrooms', 'bathrooms', 'second_hand',
+                     'lift', 'garage_included', 'furnished', 'equipped_kitchen',
+                     'fitted_wardrobes', 'air_conditioning', 'terrace', 'balcony',
+                     'storeroom', 'swimming_pool', 'garden_area', 'district', 'subdistrict',
+                     'postalcode', 'lat', 'lng']
+
+# Contar filas que tienen duplicación en estas columnas
+duplicates_partial = df.duplicated(subset=duplicate_columns).sum()
+print(f"Número de filas duplicadas considerando sólo columnas clave: {duplicates_partial}")
+Número de filas duplicadas considerando sólo columnas clave: 158
+# Eliminar filas completamente duplicadas
+df.drop_duplicates(inplace=True)
+print(f"Dataset después de eliminar duplicados completos: {df.shape}")
+Dataset después de eliminar duplicados completos: (9167, 30)
+# Eliminar duplicados enbase a columnas clave, manteniendo la primera aparición
+df.drop_duplicates(subset=duplicate_columns, keep='first', inplace=True)
+print(f"Dataset después de eliminar duplicados parciales: {df.shape}")
+Dataset después de eliminar duplicados parciales: (9071, 30)
+2.3 - Eliminación de columnas con alto porcentaje de valores nulos
+# Calcular el porcentaje de valores nulos en cada columna
+null_percentage = df.isnull().mean() * 100
+
+# Mostrar el porcentaje de nulos de mayor a menor
+print("Porcentaje de valores nulos por columna:")
+print(null_percentage.sort_values(ascending=False))
+Porcentaje de valores nulos por columna:
+year_built           68.360710
+floor_area           57.060964
+orientation          52.166244
+deposit              41.417705
+postalcode           23.613714
+professional_name    17.649653
+subdistrict           7.694852
+floor                 3.538750
+garden_area           0.000000
+balcony               0.000000
+storeroom             0.000000
+swimming_pool         0.000000
+type                  0.000000
+location              0.000000
+district              0.000000
+air_conditioning      0.000000
+lat                   0.000000
+terrace               0.000000
+furnished             0.000000
+fitted_wardrobes      0.000000
+equipped_kitchen      0.000000
+price                 0.000000
+garage_included       0.000000
+lift                  0.000000
+second_hand           0.000000
+bathrooms             0.000000
+bedrooms              0.000000
+floor_built           0.000000
+private_owner         0.000000
+lng                   0.000000
+dtype: float64
+#  floor_area (57%) -> Muy relevante para el precio. Lo mantengo e imputo en un paso posterior aunque tenga un alto porcentaje de nulos
+#  deposit (41%) -> No es muy relevante para el precio. Pese a ello, lo mantengo e imputo en un paso posterior aunque tenga un alto porcentaje de nulos
+#  postalcode (25%) -> Porcentaje de nulos moderadamente alto. Lo mantengo e imputo en un paso posterior
+
+# Defino las columnas a eliminar
+columns_to_drop = [
+    'year_built',  # Muchos nulos (68%). Difícil de imputar correctamente
+    'orientation',  # Muchos nulos (52%). Difícil de imputar correctamente
+]
+
+# Elimino las columnas del DataFrame
+df.drop(columns=columns_to_drop, inplace=True)
+
+# Muestro las columnas eliminadas y el nuevo número de columnas
+print("Columnas eliminadas por alto porcentaje de valores nulos:", columns_to_drop)
+print("Número de columnas después de la eliminación:", df.shape[1])
+Columnas eliminadas por alto porcentaje de valores nulos: ['year_built', 'orientation']
+Número de columnas después de la eliminación: 28
+2.4 - Saneamiento de valores en columnas categóricas
+# Homogeneización de la columna 'type' para asegurar consistencia en los valores
+print("Valores únicos en 'type' antes del saneamiento:", df['type'].unique(), "\n")
+
+# Elimino espacios en blanco y capitalizo los valores
+df['type'] = df['type'].str.strip().str.title()
+
+print("Valores únicos en 'type' después del saneamiento:", df['type'].unique())
+Valores únicos en 'type' antes del saneamiento: ['Studio' 'Flat' 'Penthouse' 'Duplex' 'Detached' 'Semi-detached'
+ 'Terraced' 'Estate' 'House' 'Village'] 
+
+Valores únicos en 'type' después del saneamiento: ['Studio' 'Flat' 'Penthouse' 'Duplex' 'Detached' 'Semi-Detached'
+ 'Terraced' 'Estate' 'House' 'Village']
+# Limpieza a la columna 'floor' para estandarizar valores, corregir inconsistencias y pasar los datos a numérico mediante la función 'clear_floor_column'
+df = clean_floor_column(df)
+Valores únicos en 'floor' antes del saneamiento:
+['4th' '5th' '1st' 'ground' '2nd' '3rd' '130' '80' '9th' '8th' '6th' '7th'
+ '70' '97' '20th' nan '10th' '4' '13th' '56' '380' '3' '147' '14th' '12th'
+ '11th' '175' '2' '55' '54' '40' '65' '179' '204' '191' '105' '45' '1'
+ '180' '427' '157' '230' '280' '500' '1,200' '60' '767' '100' '313' '240'
+ '575' '340' '102' '444' '124' '91' '81' '18th' '53' '30' '16th' '15th'
+ '35' '23rd' '600' '86' '58' '220' '76' '74' '60th' '139' '197' '185' '62'
+ '17th' '352' '342' '370' '89' '43' '75' '141' '120' '353' '88' '50' '152'
+ '244' '59' '101' '82' '140' '170' '42' '213' '450' '815' '222' '330'
+ '390' '871' '272' '246' '200' '160' '150' 'floor' '69' '19th' '30th'
+ '26th' '95' '332' '22nd' '260' '63' '110' '360' '300' '350' '571' '670'
+ '800' '252' '132' '57' '85' '195' '344' '227' '324' '511' '546' '144'
+ '108' '48' '235' '190' '93' '68' '39' '21st' '322' '400' '27th' '154'
+ '145' '137' '1,000' '107' '49' '38' '336' '405' '187' '118' '172' '127'
+ '250' '358' '650' '290' '625' '79' '225' '135' '83' '700' '168' '270'
+ '111' '98' '131' '114' '302' '308' '363' '61' '90' '72' '151' '215' '77'
+ '84' '210' '286' '320' '474' '309' '285' '121' '78' '231' '1,190' '295'
+ '325' '103' '138']
+
+Valores únicos en 'floor' después del saneamiento:
+[4 5 1 0 2 3 <NA> 80 9 8 6 7 70 97 20 10 13 56 14 12 11 55 54 40 65 45 60
+ 100 91 81 18 53 30 16 15 35 86 58 76 74 62 17 89 43 75 88 50 59 82 42 69
+ 19 26 95 63 57 85 48 93 68 39 27 49 38 79 83 98 61 90 72 77 84 78]
+# Homogeneización básica de 'district' y 'subdistrict':
+# Estas columnas solo se utilizarán en el análisis exploratorio de datos (EDA),
+# por lo que aplico una limpieza mínima para garantizar consistencia:
+# Convertimos los valores a minúsculas para evitar diferencias por mayúsculas/minúsculas
+# Eliminamos espacios en blanco adicionales para garantizar uniformidad
+# Reemplazamos valores NaN en formato string por valores NaN reales
+# No realizamos agrupaciones de nombres similares, ya que no afectarán al modelo
+
+# Asegurar que sean de tipo 'object' antes de limpiar (evita problemas si son 'category')
+df['district'] = df['district'].astype(str).str.strip().str.lower()
+df['subdistrict'] = df['subdistrict'].astype(str).str.strip().str.lower()
+
+# Reemplazar valores 'nan' string por NaN reales de manera robusta
+df['district'] = df['district'].replace('nan', pd.NA).fillna(pd.NA)
+df['subdistrict'] = df['subdistrict'].replace('nan', pd.NA).fillna(pd.NA)
+
+# Mostramos los valores únicos después del saneamiento
+print("Valores únicos en 'district' después del saneamiento:")
+display(df['district'].unique())
+print("\n")
+
+print("Valores únicos en 'subdistrict' después del saneamiento:")
+display(df['subdistrict'].unique())
+Valores únicos en 'district' después del saneamiento:
+array(['chamartín', 'fuencarral', 'retiro', 'chamberí',
+       'villa de vallecas', 'arganzuela', 'madrid', 'europolis',
+       'villalba pueblo', 'navalquejigo - los arroyos', 'montecillo',
+       'rozas centro', 'centro', 'sector s', 'casco antiguo',
+       'centro - casco histórico', 'zona monte el pilar',
+       'molino de la hoz', 'zona norte', 'los llanos - valle pardo',
+       'golf - el carralero', 'casa amarilla', 'valdecabañas',
+       'las matas- peñascales', 'el pinar- punta galea', 'cerro alarcón',
+       'el burgo', 'valdepastores - las encinas', 'zona avenida europa',
+       'zona prado de somosaguas - la finca', 'zaburdón - monte escorial',
+       'el bosque', 'villanueva de la cañada', 'somosaguas',
+       'zona estación', 'la navata', 'urbanizaciones',
+       'abantos - carmelitas', 'castillo - campodón', 'ibiza - san pedro',
+       'las lomas', 'villalba estación', 'zona carretera del plantío',
+       'parquelagos - puente nuevo', 'el olivar de mirabal',
+       'el cantizal', 'valdemorillo pueblo', 'los peñascales',
+       'zona pueblo', 'marazuela- el torreón',
+       'zona polideportivo colonia', 'parque de la coruña - las suertes',
+       'sector b', 'viñas viejas', 'carlos ruiz',
+       'villafranca del castillo', 'suroeste', 'noreste',
+       'coslada pueblo', 'ensanche', 'juan de austria',
+       'san isidro - los almendros', 'sureste', 'las sedas - el olivar',
+       'casco histórico', 'venecia - nueva alcalá', 'pryconsa',
+       'parque roma - coronas', 'chorrillo', 'la garena', 'val',
+       'ciudad 70', 'el puerto', 'rinconada', 'noroeste', 'tetuán',
+       'san blas', 'moncloa', 'usera', 'ciudad lineal', 'latina',
+       'vicálvaro', 'carabanchel', 'puente de vallecas', 'moratalaz',
+       'barrio de salamanca', 'villaverde', 'hortaleza', 'barajas',
+       'la pizarra', 'zona centro', 'los satélites - roza martín',
+       'parque empresarial', 'pino alto - navarredonda',
+       'jardín de los reyes - parque real', 'valleaguado - la cañada',
+       'el pilar - bripac', 'barrio de la estación', 'los robles',
+       'la chopera', 'mojadillas - parque de las infantas - el paraiso',
+       'los valles', 'raya del palancar - guadamonte',
+       'los ángeles - jarandilla', 'parque boadilla', 'colonia',
+       'los negrales', 'pinar de las rozas', 'reyes católicos',
+       'la espinilla - parque blanco', 'montserrat - parque empresarial',
+       'yucatán- las cornisas', 'fontenebro - altavista',
+       'las zorreras - monte encinar', 'el barral ferial', 'espartales',
+       'el guijo - colonia españa - colonia san antonio',
+       'pinosol - el alcor - peralejo', 'zona iglesia - estación',
+       'urb. este - montepríncipe', 'centro comercial - hospital'],
+      dtype=object)
+
+Valores únicos en 'subdistrict' después del saneamiento:
+array(['prosperidad', 'castilla', 'el viso', 'ciudad jardín',
+       'nueva españa', 'bernabéu-hispanoamérica', 'las tablas',
+       'tres olivos - valverde', 'pilar', 'arroyo del fresno',
+       'fuentelarreina', 'la paz', 'montecarmelo', 'peñagrande',
+       'mirasierra', 'el pardo', 'adelfas', 'jerónimos', 'ibiza',
+       'estrella', 'pacífico', 'niño jesús', 'vallehermoso',
+       'nuevos ministerios-ríos rosas', 'almagro', 'arapiles',
+       'trafalgar', 'gaztambide', 'ensanche de vallecas - la gavia',
+       'casco histórico de vallecas', 'palos de moguer', 'legazpi',
+       'acacias', 'chopera', 'delicias', 'imperial', <NA>, 'europolis',
+       'montecillo', 'zona estación', 'centro', 'molino de la hoz',
+       'fuencarral-el pardo', 'tetuán', 'las matas- peñascales',
+       'el pinar- punta galea', 'vallecas', 'el burgo',
+       'zona avenida europa', 'la finca', 'somosaguas', 'prado largo',
+       'montealina', 'monteclaro', 'el cantizal',
+       'el peñalar - arroyo de trofas - montealegre',
+       'salud y alegría - el lago', 'zona pueblo', 'alto de la jabonería',
+       'marazuela- el torreón', 'casco antiguo', 'zona norte',
+       'valdeacederas', 'bellas vistas', 'ventilla-almenara',
+       'berruguete', 'cuatro caminos', 'cuzco-castillejos', 'simancas',
+       'canillejas', 'arcos', 'rosas', 'amposta', 'rejas', 'salvador',
+       'hellín', 'argüelles', 'aravaca', 'casa de campo', 'valdezarza',
+       'ciudad universitaria', 'valdemarín', 'pradolongo',
+       '12 de octubre-orcasur', 'orcasitas', 'moscardó', 'san fermín',
+       'almendrales', 'colina', 'san pascual', 'ventas', 'quintana',
+       'costillares', 'concepción', 'pueblo nuevo', 'san juan bautista',
+       'los cármenes', 'puerta del ángel', 'lucero', 'campamento',
+       'águilas', 'cuatro vientos', 'aluche',
+       'valdebernardo - valderrivas', 'el cañaveral', 'ambroz',
+       'casco histórico de vicálvaro', 'buena vista', 'abrantes',
+       'san isidro', 'comillas', 'opañel', 'pau de carabanchel',
+       'puerta bonita', 'vista alegre', 'palomeras sureste', 'portazgo',
+       'san diego', 'numancia', 'entrevías', 'palomeras bajas',
+       'vinateros', 'pavones', 'marroquina', 'media legua', 'guindalera',
+       'lista', 'goya', 'recoletos', 'castellana', 'fuente del berro',
+       'san cristóbal', 'villaverde alto', 'butarque', 'los rosales',
+       'virgen del cortijo - manoteras', 'canillas', 'sanchinarro',
+       'conde orgaz-piovera', 'valdebebas - valdefuentes', 'palomas',
+       'pinar del rey', 'apóstol santiago', 'palacio', 'chueca-justicia',
+       'sol', 'malasaña-universidad', 'lavapiés-embajadores',
+       'huertas-cortes', 'alameda de osuna', 'casco histórico de barajas',
+       'campo de las naciones-corralejos', 'timón', 'santa eugenia',
+       'la cabaña', 'prado de somosaguas', 'el caño- maracaibo',
+       'parque empresarial', 'san blas-canillejas', 'hortaleza',
+       'zona auditorio', 'el plantío', 'zofío', 'los ángeles',
+       'aeropuerto', 'la chopera', 'villaverde', 'pinar de las rozas',
+       'ciudad lineal', 'fontarrón', 'yucatán- las cornisas', 'el monte',
+       'atalaya', 'horcajo', 'carabanchel', 'puente de vallecas'],
+      dtype=object)
+2.5 - Saneamiento de valores en columnas numéricas
+# Convierto a NaN los valores negativos donde no pueden existir
+not_neg_columns = ['price', 'deposit', 'floor_area', 'floor_built', 'floor', 'bedrooms', 'bathrooms']
+for col in not_neg_columns:
+    df.loc[df[col] < 0, col] = pd.NA
+# Convierto a NaN los valores 0 en columnas donde no tiene sentido
+not_zero_columns = ['price', 'floor_area', 'floor_built']
+for col in not_zero_columns:
+    df.loc[df[col] == 0, col] = pd.NA
+# Mostrar valores negativos restantes
+for col in not_neg_columns:
+    neg_count = (df[col] < 0).sum()
+    print(f" {neg_count} valores negativos restantes en '{col}'.")
+ 0 valores negativos restantes en 'price'.
+ 0 valores negativos restantes en 'deposit'.
+ 0 valores negativos restantes en 'floor_area'.
+ 0 valores negativos restantes en 'floor_built'.
+ 0 valores negativos restantes en 'floor'.
+ 0 valores negativos restantes en 'bedrooms'.
+ 0 valores negativos restantes en 'bathrooms'.
+# Mostrar valores 0 restantes en las columnas afectadas
+print("\nValores 0 restantes en columnas afectadas:")
+for col in not_zero_columns:
+    zero_count = (df[col] == 0).sum()
+    print(f" - {col}: {zero_count} valores con valor 0")
+Valores 0 restantes en columnas afectadas:
+ - price: 0 valores con valor 0
+ - floor_area: 0 valores con valor 0
+ - floor_built: 0 valores con valor 0
+# Mostrar cuántos valores nulos quedaron en cada columna numérica saneada
+print("\nValores nulos después del saneamiento:")
+print(df[not_neg_columns].isna().sum())
+Valores nulos después del saneamiento:
+price             0
+deposit        3757
+floor_area     5177
+floor_built       9
+floor           543
+bedrooms          0
+bathrooms         0
+dtype: int64
+2.6 - Saneamiento de valores de geolocalización
+# Filtrar los registros fuera de Madrid
+df["valid_location"] = df.apply(lambda row: is_within_madrid(row["lat"], row["lng"]), axis=1)
+# Mostrar cuántos registros serán eliminados
+outliers_count = df[~df["valid_location"]].shape[0]
+print(f"Número de registros fuera de la Comunidad de Madrid a eliminar: {outliers_count}")
+Número de registros fuera de la Comunidad de Madrid a eliminar: 13
+# Eliminar los registros fuera de Madrid
+df = df[df["valid_location"]].drop(columns=["valid_location"]).reset_index(drop=True)
+# Confirmar el nuevo tamaño del dataset
+print(f"Dataset después de eliminar ubicaciones incorrectas: {df.shape}")
+Dataset después de eliminar ubicaciones incorrectas: (9058, 28)
+2.7 - Imputación de valores nulos
+2.7.1 - Análisis de valores nulos por columna
+# Filtrar columnas con valores nulos mayores a 0
+null_values = df.isnull().sum()
+null_values = null_values[null_values > 0]
+
+# Mostrar resultados
+print("Número de valores nulos por columna:")
+print(null_values)
+Número de valores nulos por columna:
+deposit              3752
+professional_name    1598
+floor_built             9
+floor_area           5169
+floor                 542
+subdistrict           696
+postalcode           2138
+dtype: int64
+# Filtrar columnas con porcentaje de nulos mayor a 0
+null_percentage = df.isnull().mean() * 100
+null_percentage = null_percentage[null_percentage > 0]
+
+# Mostrar resultados
+print("Porcentaje de valores nulos por columna:")
+print(null_percentage)
+Porcentaje de valores nulos por columna:
+deposit              41.421947
+professional_name    17.641864
+floor_built           0.099360
+floor_area           57.065577
+floor                 5.983661
+subdistrict           7.683815
+postalcode           23.603444
+dtype: float64
+2.7.2 - Subdistrict
+# Intento extraer 'subdistrict' desde 'location' donde sea posible
+df.loc[df["subdistrict"].isna(), "subdistrict"] = df.loc[df["subdistrict"].isna(), "location"].apply(
+    extract_subdistrict)
+
+# Trato los casos donde 'district' en realidad es un 'subdistrict'
+
+# Filtroo las filas donde 'subdistrict' sigue siendo NaN
+df_missing_subdistrict = df[df["subdistrict"].isna()].copy()
+
+# Muevo 'district' a 'subdistrict' en estas filas (parece estar en la columna incorrecta)
+df_missing_subdistrict["subdistrict"] = df_missing_subdistrict["district"]
+
+# Extraigo el distrito real desde 'location' (lo que aparece después de "District ...")
+df_missing_subdistrict["district"] = df_missing_subdistrict["location"].str.extract(r"District ([^,]+)")
+
+# Actualizo el DataFrame con los valores corregidos
+df.update(df_missing_subdistrict)
+
+# Relleno valores nulos de 'subdistrict' con la moda dentro de cada 'district'
+df["subdistrict"] = df.groupby("district")["subdistrict"].transform(
+    lambda x: x.fillna(x.mode()[0] if not x.mode().empty else pd.NA))
+
+# Reviso si aún quedan valores nulos en 'subdistrict'
+missing_subdistrict_count = df["subdistrict"].isna().sum()
+print(f"Valores nulos en 'subdistrict' después de la corrección: {missing_subdistrict_count}")
+
+# Muesto los 'districts' donde aún hay valores nulos en 'subdistrict'
+if missing_subdistrict_count > 0:
+    print("Distritos con valores nulos en 'subdistrict':")
+    print(df["district"].loc[df["subdistrict"].isna()].value_counts())
+Valores nulos en 'subdistrict' después de la corrección: 0
+2.7.2 - Postlcode
+# Imputo el código postal usando el más común dentro de cada subdistrito
+df["postalcode"] = df.groupby("subdistrict")["postalcode"].transform(
+    lambda x: x.fillna(x.mode()[0] if not x.mode().empty else pd.NA)
+)
+
+# Para los valores que son aún nulos, uso el código postal más común dentro de cada distrito
+df["postalcode"] = df.groupby("district")["postalcode"].transform(
+    lambda x: x.fillna(x.mode()[0] if not x.mode().empty else pd.NA)
+)
+
+# Muesto cuántos valores nulos quedan después de la imputación
+missing_postalcode = df["postalcode"].isna().sum()
+print(f"Valores nulos en 'postalcode' después de la imputación: {missing_postalcode}")
+Valores nulos en 'postalcode' después de la imputación: 3
+# Borro las filas donde 'postalcode' sigue siendo nulo, ya que son sólo 3 por lo que eliminarlas no afectará la calidad del dataset
+df = df.dropna(subset=["postalcode"])
+
+# A partir de aquí 'location' ya no es necesaria en el dataset. La eliminamo para reducir memoria
+df.drop(columns=["location"], inplace=True)
+
+# Muestro cuántos valores nulos quedan después de la imputación
+missing_postalcode = df["postalcode"].isna().sum()
+print(f"Valores nulos en 'postalcode' después de la imputación: {missing_postalcode}")
+Valores nulos en 'postalcode' después de la imputación: 0
+2.7.3 - Deposit
+# Cálculo de estadísticas descriptivas de 'deposit'
+# Se analiza tendencia central y dispersión para decidir la mejor estrategia de imputación.
+print("Moda:", df['deposit'].mode()[0])
+print("Mediana:", df['deposit'].median())
+print("Media:", df['deposit'].mean())
+print("Varianza:", df['deposit'].var())
+print("Desviación estándar:", df['deposit'].std())
+print("Rango:", df['deposit'].max() - df['deposit'].min())
+Moda: 1.0
+Mediana: 1.0
+Media: 1.4670060331825037
+Varianza: 0.38473054041240085
+Desviación estándar: 0.6202665075694486
+Rango: 5.0
+# Frecuencia absoluta
+print(df['deposit'].value_counts())
+
+# Frecuencia en porcentaje
+print(df['deposit'].value_counts(normalize=True) * 100)
+deposit
+1.0    3155
+2.0    1843
+3.0     291
+4.0      11
+6.0       3
+5.0       1
+Name: count, dtype: int64
+deposit
+1.0    59.483409
+2.0    34.747360
+3.0     5.486425
+4.0     0.207391
+6.0     0.056561
+5.0     0.018854
+Name: proportion, dtype: float64
+# Correlaciones
+print(df.select_dtypes(include=['number']).corr()['deposit'].sort_values(ascending=False))
+deposit        1.000000
+bathrooms      0.117059
+floor_built    0.111096
+lat            0.069204
+bedrooms       0.063411
+price          0.060711
+floor_area     0.055127
+postalcode     0.026393
+lng           -0.079595
+Name: deposit, dtype: float64
+# Análisis de la dispersión de 'deposit' mediante percentiles e IQR para detectar posibles valores atípicos
+print("Percentil 25:", df['deposit'].quantile(0.25))
+print("Percentil 50 (Mediana):", df['deposit'].quantile(0.50))
+print("Percentil 75:", df['deposit'].quantile(0.75))
+print("IQR:", df['deposit'].quantile(0.75) - df['deposit'].quantile(0.25))
+Percentil 25: 1.0
+Percentil 50 (Mediana): 1.0
+Percentil 75: 2.0
+IQR: 1.0
+# Imputación de valores nulos en 'deposit'
+#
+# La mayoría de los valores en 'deposit' son 1 (59% de los casos), seguido de 2 (35%).
+# Dado que la media (1.47) está sesgada por unos pocos valores más altos y la mediana también es 1,
+# imputo los valores nulos con la moda (1), ya que refleja mejor la tendencia real de los datos
+df['deposit'] = df['deposit'].fillna(1)
+# Verifico a ver si quedan valores nulos en 'deposit' después de la imputación
+missing_deposit = df["deposit"].isna().sum()
+print(f"Valores nulos en 'deposit' después de la imputación: {missing_deposit}")
+Valores nulos en 'deposit' después de la imputación: 0
+2.7.4 - Floor Built
+# Dado que los valores nulos representan solo el 0.1% de la columna, imputo con la mediana para mantener la distribución sin sesgos y evitar la influencia de valores atípicos
+median_floor_built = df['floor_built'].median()
+df['floor_built'] = df['floor_built'].fillna(median_floor_built)
+
+# Verifico si quedan valores nulos en 'floor_built'
+missing_floor_built = df["floor_built"].isna().sum()
+print(f"Valores nulos en 'floor_built' después de la imputación: {missing_floor_built}")
+Valores nulos en 'floor_built' después de la imputación: 0
+2.7.5 - Floor Area
+# correlación con price (0.72), bedrooms (0.51), bathrooms (0.69) y floor_built (0.70)
+
+# Figure con 2 filas y 3 columnas
+fig, axes = plt.subplots(2, 3, figsize=(18, 10))
+
+# Paleta de colores
+# scatter_color = "lightblue"
+# line_color = "navy"
+
+# Histplot de floor_area
+ax = sns.histplot(df['floor_area'].dropna(), bins=30, kde=True, color="lightblue", edgecolor="black", ax=axes[0, 0])
+
+for line in ax.lines:
+    line.set_color("navy")
+    line.set_linewidth(2)
+
+axes[0, 0].set_title("Distribución de Floor Area")
+
+# Scatterplots
+sns.regplot(x=df['price'], y=df['floor_area'], ax=axes[0, 1],
+            scatter_kws={'alpha': 0.5, 'color': "lightblue"}, line_kws={"color": "navy"})
+axes[0, 1].set_title("Floor Area vs Price")
+
+sns.regplot(x=df['bedrooms'], y=df['floor_area'], ax=axes[0, 2],
+            scatter_kws={'alpha': 0.5, 'color': "lightblue"}, line_kws={"color": "navy"})
+axes[0, 2].set_title("Floor Area vs Bedrooms")
+
+sns.regplot(x=df['bathrooms'], y=df['floor_area'], ax=axes[1, 0],
+            scatter_kws={'alpha': 0.5, 'color': "lightblue"}, line_kws={"color": "navy"})
+axes[1, 0].set_title("Floor Area vs Bathrooms")
+
+sns.regplot(x=df['floor_built'], y=df['floor_area'], ax=axes[1, 1],
+            scatter_kws={'alpha': 0.5, 'color': "lightblue"}, line_kws={"color": "navy"})
+axes[1, 1].set_title("Floor Area vs Floor Built")
+
+# Matriz de correlación
+corr_matrix = df[['floor_area', 'price', 'bedrooms', 'bathrooms', 'floor_built']].corr()
+sns.heatmap(corr_matrix, annot=True, cmap="coolwarm", fmt=".2f", linewidths=0.5, ax=axes[1, 2])
+axes[1, 2].set_title("Matriz de Correlación")
+
+plt.tight_layout()
+plt.show()
+
+# Escojo utilizar regresión lineal múltiple para imputar 'floor_area' porque presenta una fuerte correlación con price (0.73), bedrooms (0.74), bathrooms (0.79) y floor_built (0.92)
+# Los scatterplots tb muestran una relación lineal clara entre floor_area, price y floor_built, lo que indica que pueden predecirlo de manera precisa
+# Además la distribución de floor_area está sesgada a la derecha, por lo que usar métodos como la mediana podrían no funcionar bien con los valores más altos
+
+# Variables predictoras y variable dependiente
+predictors = ['price', 'bedrooms', 'bathrooms', 'floor_built']
+target = 'floor_area'
+
+# División del dataset
+df_train = df.dropna(subset=[target])  # Filas sin nulos en floor_area (para entrenar)
+df_missing = df[df[target].isna()]  # Filas con nulos en floor_area (para predecir)
+
+# Preparación de los datos para el modelo
+X_train = df_train[predictors]
+y_train = df_train[target]
+
+# Entrenamiento del Modelo
+model = LinearRegression()
+model.fit(X_train, y_train)
+
+# Evaluación
+y_pred_train = model.predict(X_train)
+r2 = r2_score(y_train, y_pred_train)
+mae = mean_absolute_error(y_train, y_pred_train)
+rmse = np.sqrt(mean_squared_error(y_train, y_pred_train))
+mape = np.mean(np.abs((y_train - y_pred_train) / y_train)) * 100
+
+print(f"R2: {r2:.3f}")
+print(f"MAE: {mae:.2f}")
+print(f"RMSE: {rmse:.2f}")
+print(f"MAPE: {mape:.2f}%")
+
+# Predicción e imputación de valores nulos
+if not df_missing.empty:
+    X_missing = df_missing[predictors]
+    df.loc[df[target].isna(), target] = model.predict(X_missing).astype('float32')
+R2: 0.872
+MAE: 9.48
+RMSE: 26.15
+MAPE: 10.22%
+# Verifico si hay inconsistencias (casos en donde floor_area sea mayor que floor_built) y los marco como nulos
+df.loc[df["floor_area"] > df["floor_built"], "floor_area"] = np.nan
+# Imputo floor_area con el 75% de floor_built si se quedó alguno nulo
+df["floor_area"] = df["floor_area"].fillna(df["floor_built"] * 0.75)
+# Evaluación del modelo para imputar 'floor_area'
+# Acierta bastante -> 87,2%
+# El error promedio es bastante razonable, se equivoca sólo en unos 9,48 m2
+# Hay algunos valores que se alejan más de lo esperado (seguramente outliers) -> Error medio de 26,14 m2
+# El error porcentual del 10,22%, bastante preciso pero con margen de mejra
+# Conclusión: El modelo predice bien 'floor_area' y los valores inconsistentes ya están corregidos
+
+# Verifico si quedan valores nulos
+missing_floor_area = df["floor_area"].isna().sum()
+print(f"Valores nulos en 'floor_area' después de la imputación: {missing_floor_area}")
+Valores nulos en 'floor_area' después de la imputación: 0
+2.7.6 - Floor
+# Mostrar los valores únicos en la columna 'type'
+print("Valores únicos en 'type':")
+df["type"].unique()
+Valores únicos en 'type':
+array(['Studio', 'Flat', 'Penthouse', 'Duplex', 'Detached',
+       'Semi-Detached', 'Terraced', 'Estate', 'House', 'Village'],
+      dtype=object)
+# Lista de tipos de vivienda que deberían tener floor = 0 si está vacío
+low_floor_types = ["detached", "semi-detached", "terraced", "estate", "house", "village"]
+
+# Convertir 'type' a minúsculas para evitar problemas
+df["type"] = df["type"].str.lower().str.strip()
+
+# Asignar floor = 0 si es uno de los tipos de vivienda seleccionados y está vacío
+df.loc[df["type"].isin(low_floor_types) & df["floor"].isna(), "floor"] = 0
+# Asegurar que 'floor' es numérico antes de imputar
+df["floor"] = pd.to_numeric(df["floor"], errors="coerce")
+# Imputar valores nulos de 'floor' con la moda de su 'subdistrict'
+df["floor"] = df.groupby("subdistrict")["floor"].transform(
+    lambda x: x.fillna(x.mode().iloc[0] if not x.mode().empty else np.nan))
+# Si quedan valores nulos, imputar con la moda global de la columna 'floor'
+if df["floor"].isna().sum() > 0:
+    df["floor"] = df["floor"].fillna(df["floor"].mode().iloc[0])
+# Verificar si quedan valores nulos después de la imputación
+missing_floor = df["floor"].isna().sum()
+print(f"Valores nulos en 'floor' después de la imputación: {missing_floor}")
+Valores nulos en 'floor' después de la imputación: 0
+2.8 - Creación de variables derivadas
+2.8.1 - Properties by agency
+# Conteo de agencias
+print("Valores únicos en 'professional_name':", df["professional_name"].nunique())
+# Conteo de valores nulos. Lo que indica que son propietarios privados y no una agencia
+print("Valores nulos en 'professional_name':", df["professional_name"].isna().sum())
+Valores únicos en 'professional_name': 1576
+Valores nulos en 'professional_name': 1597
+# Creo la columna 'properties_by_agency' contando cuántas propiedades tiene cada agencia
+df["properties_by_agency"] = df.groupby("professional_name")["professional_name"].transform("count")
+# Asigno 1 a 'properties_by_agency' si es un propietario privado
+df.loc[df["private_owner"] == True, "properties_by_agency"] = 1
+# Borro las columnas 'professional_name' y 'private_owner' ya que ahora son redundantes
+df.drop(columns=["professional_name", "private_owner"], inplace=True)
+# Verifico los resultados
+print("Valores únicos en 'properties_by_agency':", df["properties_by_agency"].nunique())
+display(df[["properties_by_agency"]].sample(10))
+Valores únicos en 'properties_by_agency': 52
+properties_by_agency
+5778	6.0
+5449	1.0
+1033	29.0
+541	28.0
+6863	44.0
+6538	1.0
+6091	165.0
+9029	1.0
+5953	2.0
+8161	2.0
+# Verifico si quedan valores nulos en 'properties_by_agency'
+missing_properties = df["properties_by_agency"].isna().sum()
+print(f"Valores nulos en 'properties_by_agency': {missing_properties}")
+Valores nulos en 'properties_by_agency': 0
+2.8.2 - Distance to center
+# Calculo la distancia al centro de la ciudad de cada fila mediante la función 'calculate_distance'
+df["distance_to_center"] = df.apply(lambda row: calculate_distance(row["lat"], row["lng"]), axis=1)
+# Verifico los resultados
+print("Estadísticas de 'distance_to_center':")
+print(df["distance_to_center"].describe())
+Estadísticas de 'distance_to_center':
+count    9055.000000
+mean        6.046529
+std         7.130178
+min         0.029303
+25%         2.050932
+50%         3.863813
+75%         7.351879
+max        48.368903
+Name: distance_to_center, dtype: float64
+# Compruebo si hay valores nulos en 'distance_to_center'
+missing_distance = df["distance_to_center"].isna().sum()
+print(f"Valores nulos en 'distance_to_center': {missing_distance}")
+Valores nulos en 'distance_to_center': 0
+# Muestra aleatoria para ver cómo queda la nueva columna
+display(df[["lat", "lng", "distance_to_center"]].sample(10))
+lat	lng	distance_to_center
+7679	40.446417	-3.692176	3.435922
+2887	40.450984	-3.650143	5.928752
+1578	40.409674	-3.699044	0.885472
+497	40.392879	-3.699333	2.680312
+271	40.404192	-3.677784	2.612468
+4339	40.461031	-3.864142	14.465359
+1856	40.443267	-3.675321	3.806569
+974	40.469228	-3.783476	8.923596
+4351	40.504130	-3.881216	17.904204
+725	40.529773	-3.383496	29.919614
+2.8.3 - Price per m2
+# Calculo el precio por metro cuadrado
+df["price_per_m2"] = df["price"] / df["floor_area"]
+# Muesto los resultados
+print("Estadísticas de 'price_per_m2':")
+display(df["price_per_m2"].describe())
+Estadísticas de 'price_per_m2':
+count    9055.000000
+mean       22.380315
+std        15.138028
+min         3.761749
+25%        14.975632
+50%        19.097052
+75%        25.641026
+max       769.230769
+Name: price_per_m2, dtype: float64
+# Compruevo si hay valores nulos o valores infinitos en 'price_per_m2'
+missing_price_m2 = df["price_per_m2"].isna().sum()
+infinite_price_m2 = np.isinf(df["price_per_m2"]).sum()
+print(f"Valores nulos en 'price_per_m2': {missing_price_m2}")
+print(f"Valores infinitos en 'price_per_m2': {infinite_price_m2}")
+Valores nulos en 'price_per_m2': 0
+Valores infinitos en 'price_per_m2': 0
+# Muestra aleatoria para ver cómo queda la nueva columna
+display(df[["price", "floor_area", "price_per_m2"]].sample(10))
+price	floor_area	price_per_m2
+2138	2250.0	150.758255	14.924556
+5873	2650.0	162.000000	16.358025
+3730	2500.0	146.379425	17.078903
+5632	1350.0	100.000000	13.500000
+159	1200.0	80.000000	15.000000
+2962	950.0	62.666283	15.159667
+4528	1100.0	90.000000	12.222222
+5968	1580.0	100.000000	15.800000
+76	1650.0	42.395004	38.919680
+1589	850.0	30.000000	28.333333
+2.9 - Conversión y optimización de tipos de datos
+# Ajuste de los tipos de datos para reducir el consumo de memoria
+
+# Columnas enteras
+df['price'] = df['price'].astype('Int32')
+df['floor_built'] = df['floor_built'].astype('Int16')
+df['floor'] = df['floor'].astype('Int8')
+df['bedrooms'] = df['bedrooms'].astype('Int8')
+df['bathrooms'] = df['bathrooms'].astype('Int8')
+df['deposit'] = df['deposit'].astype('Int8')
+df["properties_by_agency"] = df["properties_by_agency"].astype("Int16")
+
+# Columnas flotantes
+df['floor_area'] = df['floor_area'].astype('float32')
+df['lat'] = df['lat'].astype('float64')  # Mantengo la precisión alta para las coordenadas
+df['lng'] = df['lng'].astype('float64')
+df["distance_to_center"] = df["distance_to_center"].astype("float32")
+df["price_per_m2"] = df["price_per_m2"].astype("float32")
+
+# Columnas booleanas
+bool_columns = ['second_hand', 'lift', 'garage_included', 'furnished', 'equipped_kitchen',
+                'fitted_wardrobes', 'air_conditioning', 'terrace', 'balcony',
+                'storeroom', 'swimming_pool', 'garden_area']
+for col in bool_columns:
+    df[col] = df[col].astype('bool')
+
+# Columnas categóricas
+categorical_columns = ['type', 'district', 'subdistrict']
+for col in categorical_columns:
+    df[col] = df[col].astype('category')
+
+# Revisión de los cambios
+print("Tipos de datos después de la conversión:")
+print(df.dtypes)
+Tipos de datos después de la conversión:
+type                    category
+price                      Int32
+deposit                     Int8
+floor_built                Int16
+floor_area               float32
+floor                       Int8
+bedrooms                    Int8
+bathrooms                   Int8
+second_hand                 bool
+lift                        bool
+garage_included             bool
+furnished                   bool
+equipped_kitchen            bool
+fitted_wardrobes            bool
+air_conditioning            bool
+terrace                     bool
+balcony                     bool
+storeroom                   bool
+swimming_pool               bool
+garden_area                 bool
+district                category
+subdistrict             category
+postalcode               float64
+lat                      float64
+lng                      float64
+properties_by_agency       Int16
+distance_to_center       float32
+price_per_m2             float32
+dtype: object
+3 - Análisis Exploratorio de Datos (EDA)
+3.1 - Univariantes
+3.1.1 - Distribución de las variables numéricas
+# Labels en castellano para los gráficos
+column_labels = {
+    "floor_area": "Superficie útil (m2)",
+    "floor_built": "Superficie construida (m2)",
+    "deposit": "Depósito (meses)",
+    "properties_by_agency": "Propiedades por agencia",
+    "price": "Precio (€)",
+    "bedrooms": "Número de habitaciones",
+    "bathrooms": "Número de baños",
+    "price_per_m2": "Precio por m2 (€)",
+    "distance_to_center": "Distancia al centro (km)"
+}
+
+# Listado de columnas numéricas a analizar
+numerical_columns = column_labels.keys()
+
+for col in numerical_columns:
+    column_data = df[col]
+
+    plt.figure(figsize=(14, 5))
+
+    # Histogramas
+    plt.subplot(1, 2, 1)
+    ax = sns.histplot(column_data, bins=30, kde=True, color="skyblue", edgecolor="black", alpha=0.7)
+
+    for line in ax.lines:
+        line.set_color("darkblue")
+        line.set_linewidth(2)
+
+    plt.axvline(np.mean(column_data), color='red', linestyle='dashed', linewidth=2,
+                label=f'Media: {np.mean(column_data):.2f}')
+    plt.axvline(np.median(column_data), color='darkgreen', linestyle="dotted", linewidth=3,
+                label=f'Mediana: {np.median(column_data):.2f}')
+
+    plt.title(f"Distribución de {column_labels[col]}")
+    plt.xlabel(column_labels[col])
+    plt.ylabel("Frecuencia")
+    plt.legend()
+
+    # Boxplots
+    plt.subplot(1, 2, 2)
+    sns.boxplot(x=column_data, color="skyblue", boxprops=dict(edgecolor="navy"))
+    plt.title(f"Boxplot de {column_labels[col]}")
+    plt.xlabel(column_labels[col])
+
+    plt.show()
+
+
+
+
+
+
+
+
+
+3.1.2 - Viviendas en alquiler por distrito
+# Conteo del número de propiedades por distrito, ordenadas de menor a mayor
+district_counts = df["district"].value_counts().sort_values()
+
+plt.figure(figsize=(14, 26))
+
+# Gráfico de barras con los distritos en el eje Y y el número de propiedades en el eje X
+ax = sns.barplot(x=district_counts.values, y=district_counts.index, hue=district_counts.index, palette="viridis",
+                 alpha=0.8, legend=False, dodge=False)
+
+# Uso escala logarítmica en el eje X para que la diferencia entre distritos con muchas y pocas propiedades sea más visible
+plt.xscale("log")
+
+# Muestro el número de propiedades dentro de cada barra para facilitar la lectura del gráfico
+for index, value in enumerate(district_counts.values):
+    ax.text(value + 0.05, index, str(value), va="center", fontsize=10, color="black")
+
+plt.xlabel("Número de viviendas en alquiler (Escala Log)", fontsize=14)
+plt.ylabel("Distrito", fontsize=14)
+plt.title("Número de viviendas en alquiler por distrito", fontsize=16, fontweight="bold")
+
+plt.subplots_adjust(left=0.35)
+
+ax.set_yticks(np.arange(len(district_counts)))
+ax.set_yticklabels(district_counts.index, fontsize=12)
+
+plt.grid(axis="x", linestyle="--", alpha=0.5)
+
+plt.show()
+
+3.2 - Bivariantes
+fig, axes = plt.subplots(2, 2, figsize=(14, 12))
+
+# Labels en castellano para los gráficos
+scatter_data = [
+    ("floor_area", "Superficie útil (m2)", axes[0, 0]),
+    ("bedrooms", "Número de Habitaciones", axes[0, 1]),
+    ("bathrooms", "Número de Baños", axes[1, 0]),
+    ("distance_to_center", "Distancia al Centro (km)", axes[1, 1]),
+]
+
+# Scatterplots
+for var, label, ax in scatter_data:
+    sns.regplot(x=df[var], y=df["price"], scatter_kws={"alpha": 0.5, "color": "skyblue"},
+                line_kws={"color": "navy", "linewidth": 2}, ax=ax)
+    ax.set_title(f"Precio vs {label}", fontsize=12, fontweight="bold")
+    ax.set_xlabel(label, fontsize=11)
+    ax.set_ylabel("Precio (€)", fontsize=11)
+    ax.grid(alpha=0.3)
+
+plt.tight_layout(rect=(0, 0, 1, 0.96))
+plt.show()
+
+3.3 - Multivariantes
+3.3.1 - Matriz de correlación
+# Selecciono sólo las columnas numéricas relevantes
+corr_columns = ["price", "floor_area", "bedrooms", "bathrooms", "price_per_m2", "distance_to_center"]
+corr_matrix = df[corr_columns].corr()
+
+plt.figure(figsize=(10, 6))
+
+# Heatmap
+sns.heatmap(corr_matrix, annot=True, fmt=".2f", cmap="coolwarm", linewidths=0.5, cbar=True, vmin=-1,
+            vmax=1)  # Nota (vmin y vmax) fija el rango de correlación de -1 a 1
+plt.title("Matriz de Correlación", fontsize=14, fontweight="bold")
+plt.xticks(rotation=45, ha="right")
+plt.yticks(rotation=0)
+plt.show()
+
+3.3.2 - Visualización geoespacial
+# Ref. https://python-visualization.github.io/folium/latest/user_guide.html
+
+# Coordenadas del centro de Madrid
+madrid_center = [40.4168, -3.7038]
+
+# Instancio el mapa
+madrid_map = folium.Map(location=madrid_center, zoom_start=11, tiles="cartodbpositron")
+
+# Instancio un MaerkerCluster para agrupar las viviendas ya que hay demasiadas para mostrarlas de una sola vez
+marker_cluster = MarkerCluster().add_to(madrid_map)
+
+# Cuartiles para determinar los colores de los markers según el precio de la vivienda
+q1 = df["price"].quantile(0.25)
+q3 = df["price"].quantile(0.75)
+
+# Agrego los markers agrupados por clusters
+for idx, row in df.iterrows():
+    if pd.notna(row["lat"]) and pd.notna(row["lng"]):
+
+        #  DEfino el color del marcador según el precio
+        if row["price"] <= q1:
+            color = "green"  # Barato
+        elif row["price"] >= q3:
+            color = "red"  # Caro
+        else:
+            color = "orange"  # Medio
+
+        # Redondeo las cifras de los labels para evitar que salgan muchos decimales
+        price = f"{row['price']:.0f}"
+        price_per_m2 = f"{row['price_per_m2']:.2f}"
+        floor_area = f"{row['floor_area']:.0f}"
+        bedrooms = int(row["bedrooms"])
+        bathrooms = int(row["bathrooms"])
+        distance_to_center = f"{row['distance_to_center']:.2f}"
+
+        # Popup
+        popup_text = (
+            f"<div style='text-align: center; font-size: 12px;'>"
+            f"<b>Precio</b><br>{price}€<br><br>"
+            f"<b>Precio m²</b><br>{price_per_m2} €/m²<br><br>"
+            f"<b>Superficie</b><br>{floor_area} m²<br><br>"
+            f"<b>Habitaciones</b><br>{bedrooms}<br><br>"
+            f"<b>Baños</b><br>{bathrooms}<br><br>"
+            f"<b>Centro a</b><br>{distance_to_center} km<br><br>"
+            f"<b>Distrito</b><br>{row['district'].capitalize() if pd.notna(row['district']) else 'Desconocido'}<br><br>"
+            f"<b>Subdistrito</b><br>{row['subdistrict'].capitalize() if pd.notna(row['subdistrict']) else 'Desconocido'}"
+            f"</div>"
+        )
+
+        # Agrego el marcador
+        (folium.Marker(location=[row["lat"], row["lng"]], popup=popup_text,
+                       icon=folium.Icon(color=color, icon="home")).add_to(marker_cluster))
+
+# Layer circular para mostrar centro de Madrid
+folium.Circle(location=madrid_center, radius=2_000, color="navy", fill=True, fill_color="navy", fill_opacity=0.3,
+              popup="Centro de Madrid").add_to(madrid_map)
+
+# Ajusto los límites del mapa para que aparezcan todos los marcadores
+bounds = [[df["lat"].min(), df["lng"].min()], [df["lat"].max(), df["lng"].max()]]
+madrid_map.fit_bounds(bounds)
+
+# Muestro el mapa
+madrid_map
+Make this Notebook Trusted to load map: File -> Trust Notebook
+4 - Preparación de los datos para el modelado
+4.1 - Tratamiento de outliers
+# price -> Tiene una distribución altamente asimétrica con valores que llegan hasta 25_000€
+# Aplico una transformación logarítmica para reducir la asimetría
+df["price"] = np.log1p(df["price"])
+
+# price_per_m2: Tiene valores extremos debido a viviendas muy pequeñas y costosas
+# Aplico una transformación logarítmica para estabilizar la varianza
+df["price_per_m2"] = np.log1p(df["price_per_m2"])
+
+# bedrooms: Algunas viviendas cuentan con hasta 25 dormitorios, lo que parecen errores o valores muy irreales
+# Establezco un límite superior de máx. 8 dormitorios
+df["bedrooms"] = df["bedrooms"].clip(upper=8)  # No sé si debería quitar también viviendas con 0 dormitorios
+
+# bathrooms: Hay viviendas con hasta 15 baños, lo cual no es nada común
+# Establezco un límite superior de máx. 6 baños
+df["bathrooms"] = df["bathrooms"].clip(upper=6)
+4.2 - Identificar columnas por tipo de transformación
+# One-Hot Encoding para variables nominales
+categorical_nominal = ["type", "district", "subdistrict"]
+
+# Label Encoding para la variable binaria
+categorical_binary = ["balcony"]
+
+# Variables numéricas a escalar
+numerical_features = ["floor_area", "floor_built", "deposit", "properties_by_agency", "bedrooms", "bathrooms",
+                      "distance_to_center", "price_per_m2"]
+
+# MinMaxScaler para valores normales
+minmax_features = ["floor_built", "properties_by_agency", "bedrooms", "bathrooms", "distance_to_center"]
+
+# RobustScaler para valores extremos
+robust_features = ["deposit", "price_per_m2"]
+4.3 - Codificar la variable binaria 'balcony' con LabelEncoder
+label_encoder = LabelEncoder()
+df["balcony"] = label_encoder.fit_transform(df["balcony"])
+4.4 - Separar las variables predictoras y objetivo
+X = df.drop(columns=["price", "balcony"])  # Elimino las columnas objetivo antes de dividir
+y_price = df["price"]  # Target para regresión
+y_balcony = df["balcony"]  # Target para clasificación
+4.5 - Dividir los datos en entrenamiento y prueba
+X_train_reg, X_test_reg, y_train_reg, y_test_reg = train_test_split(X, y_price, test_size=0.2, random_state=42)
+X_train_cls, X_test_cls, y_train_cls, y_test_cls = train_test_split(X, y_balcony, test_size=0.2, random_state=42,
+                                                                    stratify=y_balcony)  # Nota: el parámetro 'stratify' es para evitar el desbalance de la proporción los valroes de 'balcony' en los conjuntos de entrenamiento y prueba
+4.6 - Crear transformadores para el preprocesamiento de X
+ohe_encoder = OneHotEncoder(handle_unknown="ignore", sparse_output=False)
+minmax_scaler = MinMaxScaler()
+robust_scaler = RobustScaler()
+4.7 - Crear un ColumnTransformer para aplicar las transformaciones sobre X
+column_transformer = ColumnTransformer([
+    ("onehot", ohe_encoder, categorical_nominal),
+    ("minmax", minmax_scaler, minmax_features),
+    ("robust", robust_scaler, robust_features),
+])
+
+column_transformer
+  ColumnTransformer?i
+onehot
+
+ OneHotEncoder?
+minmax
+
+ MinMaxScaler?
+robust
+
+ RobustScaler?
+4.8 - Aplicar la transformación sobre los datos de entrenamiento y prueba en X
+column_transformer.fit(X)
+
+X_train_reg = column_transformer.transform(X_train_reg)
+X_test_reg = column_transformer.transform(X_test_reg)
+
+X_train_cls = column_transformer.transform(X_train_cls)
+X_test_cls = column_transformer.transform(X_test_cls)
+4.9 - Verificar las dimensiones después del preprocesamiento
+print(f"X_train_reg: {X_train_reg.shape}, X_test_reg: {X_test_reg.shape}")
+print(f"X_train_cls: {X_train_cls.shape}, X_test_cls: {X_test_cls.shape}")
+X_train_reg: (7244, 394), X_test_reg: (1811, 394)
+X_train_cls: (7244, 394), X_test_cls: (1811, 394)
+5 - Modelado
+5.1 - Evaluación de modelos de Regresión para 'price'
+# Evaluación de modelos sin optimización de hiperparámetros
+results_no_opt_reg = evaluate_models(X_train_reg, X_test_reg, y_train_reg, y_test_reg, task="regression",
+                                     optimize=False)
+
+# Evaluación de modelos con optimización de hiperparámetros
+results_opt_reg = evaluate_models(X_train_reg, X_test_reg, y_train_reg, y_test_reg, task="regression", optimize=True)
+5.2 - Evaluación de Modelos de Clasificación para 'balcony'
+# Evaluación de modelos sin optimización de hiperparámetros
+results_no_opt_cls = evaluate_models(X_train_cls, X_test_cls, y_train_cls, y_test_cls, task="classification",
+                                     optimize=False)
+
+# Evaluación de modelos con optimización de hiperparámetros
+results_opt_cls = evaluate_models(X_train_cls, X_test_cls, y_train_cls, y_test_cls, task="classification",
+                                  optimize=True)
+5.3 - Preprocesamiento mínimo para comparación
+# Cargo el dataset original
+df = pd.read_csv(dataset_path)
+
+# Elimino columnas que no son variables predictoras
+columns_to_drop = ["web_id", "url", "title", "location", "last_update", "professional_name"]
+df.drop(columns=columns_to_drop, inplace=True, errors="ignore")
+
+# Separación de variables
+X = df.drop(columns=["price", "balcony"])
+y_price = df["price"]
+y_balcony = df["balcony"]
+
+# Identifico variables categóricas y numéricas
+categorical_features = X.select_dtypes(include=["object", "category"]).columns.tolist()
+numerical_features = X.select_dtypes(include=["number"]).columns.tolist()
+
+# Instancio el ColumnTransformer y le aplico un pipeline con los scalers, imputers y encoders
+ct = ColumnTransformer([
+    ("num_impute", Pipeline([
+        ("imputer", SimpleImputer(strategy="mean")),
+        ("scaler", MinMaxScaler())
+    ]), numerical_features),
+
+    ("cat_impute_encode", Pipeline([
+        ("imputer", SimpleImputer(strategy="most_frequent")),
+        ("onehot", OneHotEncoder(handle_unknown="ignore", sparse_output=False))
+    ]), categorical_features)
+])
+
+# Separo los conjuntos de entrenamiento y prueba
+X_train_reg, X_test_reg, y_train_reg, y_test_reg = train_test_split(X, y_price, test_size=0.2, random_state=42)
+X_train_cls, X_test_cls, y_train_cls, y_test_cls = train_test_split(X, y_balcony, test_size=0.2, random_state=42,
+                                                                    stratify=y_balcony)
+
+# Aplico las transformaciones
+X_train_reg = ct.fit_transform(X_train_reg)
+X_test_reg = ct.transform(X_test_reg)
+X_train_cls = ct.fit_transform(X_train_cls)
+X_test_cls = ct.transform(X_test_cls)
+
+# Evalúo los modelos de regresión
+results_no_preproc_reg = evaluate_models(X_train_reg, X_test_reg, y_train_reg, y_test_reg, task="regression",
+                                         optimize=False)
+
+# Evalúo los modelos de clasificación
+results_no_preproc_cls = evaluate_models(X_train_cls, X_test_cls, y_train_cls, y_test_cls, task="classification",
+                                         optimize=False)
+5.4 - Resultados
+# Concateno los resultados de regresión
+df_results_reg = pd.concat([
+    results_no_opt_reg.assign(Type="Regression", Preprocessing="Custom", Optimization="No"),
+    results_opt_reg.assign(Type="Regression", Preprocessing="Custom", Optimization="Yes"),
+    results_no_preproc_reg.assign(Type="Regression", Preprocessing="Minimum", Optimization="No")
+], ignore_index=True)
+
+# Concateno los resultados de clasificación
+df_results_cls = pd.concat([
+    results_no_opt_cls.assign(Type="Classification", Preprocessing="Custom", Optimization="No"),
+    results_opt_cls.assign(Type="Classification", Preprocessing="Custom", Optimization="Yes"),
+    results_no_preproc_cls.assign(Type="Classification", Preprocessing="Minimum", Optimization="No")
+], ignore_index=True)
+
+# Muestro los resultados
+print("\nComparación de Modelos para price (Regresión):")
+display(df_results_reg)
+
+print("\nComparación de Modelos para balcony (Clasificación):")
+display(df_results_cls)
+Comparación de Modelos para price (Regresión):
+Modelo	MSE	RMSE	MAE	MAPE (%)	R2	Mean CV R2	Std CV R2	Best Params	Type	Preprocessing	Optimization
+0	Random Forest Regressor	6.428499e-03	8.017792e-02	5.461417e-02	7.430611e-01	9.813841e-01	9.759192e-01	4.947821e-03	None	Regression	Custom	No
+1	Gradient Boosting Regressor	8.011016e-03	8.950428e-02	6.658802e-02	9.005131e-01	9.768013e-01	9.721747e-01	4.358687e-03	None	Regression	Custom	No
+2	Linear Regression	5.448757e+21	7.381570e+10	2.991958e+09	3.903998e+10	-1.577875e+22	-2.420753e+22	2.756972e+22	None	Regression	Custom	No
+3	Random Forest Regressor	6.382314e-03	7.988939e-02	5.456478e-02	7.424110e-01	9.815178e-01	9.761239e-01	5.142786e-03	{'max_depth': 20, 'n_estimators': 200}	Regression	Custom	Yes
+4	Gradient Boosting Regressor	7.002409e-03	8.368040e-02	6.159661e-02	8.344726e-01	9.797221e-01	9.753495e-01	4.654320e-03	{'learning_rate': 0.2, 'n_estimators': 200}	Regression	Custom	Yes
+5	Linear Regression	5.448757e+21	7.381570e+10	2.991958e+09	3.903998e+10	-1.577875e+22	-2.420753e+22	2.756972e+22	None	Regression	Custom	Yes
+6	Random Forest Regressor	5.021001e+05	7.085902e+02	3.700903e+02	1.847145e+01	8.060061e-01	7.905830e-01	3.719871e-02	None	Regression	Minimum	No
+7	Gradient Boosting Regressor	5.290244e+05	7.273407e+02	4.285803e+02	2.264894e+01	7.956035e-01	7.674323e-01	2.847976e-02	None	Regression	Minimum	No
+8	Linear Regression	8.822152e+24	2.970211e+12	3.353267e+11	2.070020e+10	-3.408571e+18	-2.025606e+21	2.195116e+21	None	Regression	Minimum	No
+Comparación de Modelos para balcony (Clasificación):
+Modelo	Accuracy	Precision	Recall	F1-score	Jaccard	ROC AUC	Mean CV Accuracy	Std CV Accuracy	Best Params	Type	Preprocessing	Optimization
+0	Random Forest Classifier	0.824959	0.789843	0.824959	0.790808	0.702102	0.580821	0.819575	0.003192	None	Classification	Custom	No
+1	Gradient Boosting Classifier	0.822198	0.777301	0.822198	0.768648	0.688245	0.539473	0.822336	0.003208	None	Classification	Custom	No
+2	SVM Classifier	0.818332	0.738516	0.818332	0.743606	0.673749	0.504664	0.819850	0.002688	None	Classification	Custom	No
+3	Logistic Regression	0.817228	0.744762	0.817228	0.747734	0.674999	0.510001	0.819575	0.002508	None	Classification	Custom	No
+4	KNN Classifier	0.810050	0.771929	0.810050	0.781551	0.688218	0.575342	0.801216	0.006610	None	Classification	Custom	No
+5	Decision Tree	0.760353	0.763790	0.760353	0.762040	0.648024	0.600351	0.749174	0.014379	None	Classification	Custom	No
+6	Random Forest Classifier	0.824959	0.786995	0.824959	0.767425	0.689222	0.536347	0.824130	0.002415	{'max_depth': 20, 'n_estimators': 200}	Classification	Custom	Yes
+7	Gradient Boosting Classifier	0.822198	0.777301	0.822198	0.768648	0.688245	0.539473	0.822336	0.003208	{'learning_rate': 0.1, 'n_estimators': 100}	Classification	Custom	Yes
+8	SVM Classifier	0.821645	0.808918	0.821645	0.743330	0.675603	0.504279	0.820265	0.000321	{'C': 0.1, 'kernel': 'linear'}	Classification	Custom	Yes
+9	Logistic Regression	0.817228	0.744762	0.817228	0.747734	0.674999	0.510001	0.819575	0.002508	None	Classification	Custom	Yes
+10	KNN Classifier	0.810050	0.771929	0.810050	0.781551	0.688218	0.575342	0.801216	0.006610	None	Classification	Custom	Yes
+11	Decision Tree	0.760353	0.763790	0.760353	0.762040	0.648024	0.600351	0.749174	0.014379	None	Classification	Custom	Yes
+12	Random Forest Classifier	0.833153	0.806115	0.833153	0.787410	0.705014	0.565337	0.828118	0.005140	None	Classification	Minimum	No
+13	Gradient Boosting Classifier	0.823944	0.781266	0.823944	0.766144	0.688217	0.533653	0.826357	0.003080	None	Classification	Minimum	No
+14	SVM Classifier	0.823944	0.829775	0.823944	0.748047	0.679420	0.508761	0.821753	0.000929	None	Classification	Minimum	No
+15	Logistic Regression	0.823402	0.780542	0.823402	0.758616	0.684132	0.522655	0.824055	0.002444	None	Classification	Minimum	No
+16	KNN Classifier	0.806067	0.753961	0.806067	0.766518	0.677953	0.544105	0.811324	0.004432	None	Classification	Minimum	No
+17	Decision Tree	0.763272	0.759599	0.763272	0.761399	0.649732	0.589170	0.757550	0.005004	None	Classification	Minimum	No
