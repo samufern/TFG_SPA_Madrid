@@ -1,0 +1,4 @@
+column,standard,rule
+price,price,parsed_numeric_eur_month
+floor_area,surface_m2,parsed_numeric_m2
+derived,price_m2,price / surface_m2
