@@ -1,0 +1,7 @@
+{
+  "date_col": "last_update",
+  "temporal_ok": true,
+  "test_size": 0.2,
+  "gap_days": 7,
+  "assumed_year": 2025
+}
