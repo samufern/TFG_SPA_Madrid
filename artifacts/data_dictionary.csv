@@ -1,4 +1,5 @@
 column,standard,rule
 price,price,parsed_numeric_eur_month
 floor_area,surface_m2,parsed_numeric_m2
+floor_built,surface_m2,fallback_fillna_floor_built
 derived,price_m2,price / surface_m2

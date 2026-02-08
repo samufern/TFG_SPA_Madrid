@@ -1,1 +1,1 @@
-La columna last_update solo trae dia/mes; se asume anio 2025 para ordenar temporalmente.
+La columna last_update solo trae dia/mes; se asume anio 2026 para ordenar temporalmente.
