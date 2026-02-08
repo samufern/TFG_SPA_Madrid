@@ -11,7 +11,7 @@ Contexto del origen:
 
 Supuestos y riesgos:
 - Posibles duplicados entre fuentes; se deduplica por id/fingerprint.
-- Temporalidad sin anio; se asume 2025 para ordenar y se documenta la limitacion.
+- Temporalidad sin año; se asume 2025 para ordenar y se documenta la limitacion.
 - Coordenadas/superficie pueden contener errores; se aplican filtros y parseo robusto.
 
 Implicaciones para limpieza/validacion:
