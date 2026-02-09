@@ -467,5 +467,82 @@ def make_time_splits(
         return train_idx, test_idx, cv_folds
     return train_idx, test_idx
 
+# ---------------------------------------------------------------------------
+#  Visualizacion de mapas
+# ---------------------------------------------------------------------------
+
+def plot_maps(
+    df,
+    lat_col: str,
+    lon_col: str,
+    value_col: Optional[str] = None,
+    title: Optional[str] = None,
+    use_folium: bool = True,
+) -> Any:
+    """Genera un mapa interactivo (Folium) o estatico (Matplotlib) de los datos.
+
+    Si Folium esta disponible, crea un mapa web interactivo con zoom,
+    click en marcadores y clustering automatico de puntos cercanos.
+    Como alternativa, usa Matplotlib para generar un scatter plot estatico.
+
+    Para datasets grandes (>2000 puntos), se muestra una muestra aleatoria
+    para mantener un rendimiento fluido.
+
+    Args:
+        df: DataFrame con columnas de coordenadas y opcionalmente un valor.
+        lat_col: Nombre de la columna de latitud.
+        lon_col: Nombre de la columna de longitud.
+        value_col: Columna para colorear los puntos (por ejemplo, "price").
+        title: Titulo del mapa (opcional).
+        use_folium: Si True, intenta usar Folium (por defecto True).
+
+    Returns:
+        Objeto Map de Folium (si disponible), o None si usa Matplotlib.
+    """
+    import importlib.util
+
+    if use_folium and importlib.util.find_spec("folium"):
+        import folium
+        from folium.plugins import MarkerCluster
+
+        center_lat = df[lat_col].median()
+        center_lon = df[lon_col].median()
+        m = folium.Map(location=[center_lat, center_lon], zoom_start=12,
+                       tiles="CartoDB positron")
+        cluster = MarkerCluster()
+
+        # Limitar a 2000 puntos para rendimiento
+        sample = df.sample(min(len(df), 2000), random_state=100432070) if len(df) > 2000 else df
+        for _, row in sample.iterrows():
+            popup = f"{value_col}: {row.get(value_col, '')}" if value_col else ""
+            folium.CircleMarker(
+                location=[row[lat_col], row[lon_col]],
+                radius=3, color="steelblue", fill=True, popup=popup,
+            ).add_to(cluster)
+        cluster.add_to(m)
+
+        if title:
+            folium.map.Marker(
+                [center_lat, center_lon],
+                icon=folium.DivIcon(html=f"<b>{title}</b>"),
+            ).add_to(m)
+        return m
+
+    # Fallback: grafico estatico con Matplotlib
+    import matplotlib.pyplot as plt
+
+    plt.figure(figsize=(8, 6))
+    if value_col and value_col in df.columns:
+        plt.scatter(df[lon_col], df[lat_col], c=df[value_col], s=5, cmap="viridis", alpha=0.6)
+        plt.colorbar(label=value_col)
+    else:
+        plt.scatter(df[lon_col], df[lat_col], s=5, alpha=0.6)
+    plt.xlabel("lon")
+    plt.ylabel("lat")
+    if title:
+        plt.title(title)
+    plt.tight_layout()
+    plt.show()
+    return None
 
 
