@@ -1,1 +1,1 @@
-La columna last_update solo trae dia/mes; se asume anio 2026 para ordenar temporalmente.
+NB01 split: la columna last_update solo trae dia/mes; se asume anio 2025 (snapshot fijo) para ordenar temporalmente.
