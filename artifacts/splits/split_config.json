@@ -3,11 +3,11 @@
   "temporal_ok": true,
   "parse_method": "assumed_year",
   "test_size": 0.2,
-  "gap_days": 7,
+  "gap_days": 1,
   "assumed_year": 2025,
   "assumed_year_source": "fixed_project_default",
   "n_rows": 8797,
-  "n_train": 3419,
+  "n_train": 6431,
   "n_holdout": 1772,
-  "n_purged_by_gap": 3606
+  "n_purged_by_gap": 594
 }

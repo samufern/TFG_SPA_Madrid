@@ -1,5 +1,3 @@
-column,standard,rule
-price,price,parsed_numeric_eur_month
-floor_area,surface_m2,parsed_numeric_m2
-floor_built,surface_m2,fallback_fillna_floor_built
-derived,price_m2,price / surface_m2
+version https://git-lfs.github.com/spec/v1
+oid sha256:3a2c138ee01091d912d7f95e4bba7f513a4ce60ceabe02e35cb964459c052bf7
+size 185

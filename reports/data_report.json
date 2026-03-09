@@ -1,0 +1,40 @@
+{
+  "n_rows_raw": 9229,
+  "n_rows_clean": 8797,
+  "n_duplicates_removed": 0,
+  "outlier_pct": {
+    "price": 5.81,
+    "surface_m2": 7.17,
+    "surface_m2_zero": 7,
+    "price_m2_invalid": 9
+  },
+  "price_stats": {
+    "count": 8797.0,
+    "mean": 1978.815959986359,
+    "std": 1637.5684974353117,
+    "min": 450.0,
+    "25%": 1040.0,
+    "50%": 1450.0,
+    "75%": 2370.0,
+    "max": 25000.0
+  },
+  "surface_stats": {
+    "count": 8790.0,
+    "mean": 104.23310580204779,
+    "std": 85.07054983228228,
+    "min": 3.0,
+    "25%": 57.0,
+    "50%": 80.0,
+    "75%": 120.0,
+    "max": 995.0
+  },
+  "price_m2_stats": {
+    "count": 8788,
+    "mean": 20.73,
+    "median": 18.12,
+    "min": 3.65,
+    "max": 120.0,
+    "pct_null": 0.1,
+    "n_outliers_removed": 9
+  }
+}
