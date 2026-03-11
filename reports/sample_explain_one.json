@@ -1,0 +1,11 @@
+{
+  "prediction": 2188.402570368327,
+  "top_drivers": {
+    "log_surface_m2": -149.84829024992587,
+    "terrace_density_1km": 113.4097108584947,
+    "lat": -82.00363999175062,
+    "bathrooms": 80.44251510029109,
+    "surface_m2": 67.00001404641696
+  },
+  "text": "Prediccion: 2188.4 EUR/mes\n  - log_surface_m2: baja el precio (-149.8 EUR/mes)\n  - densidad de terrazas: sube el precio (+113.4 EUR/mes)\n  - lat: baja el precio (-82.0 EUR/mes)\n  - bathrooms: sube el precio (+80.4 EUR/mes)\n  - surface_m2: sube el precio (+67.0 EUR/mes)"
+}
