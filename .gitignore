@@ -1,0 +1,2 @@
+# Ignore generated artifacts by default.
+artifacts/**
