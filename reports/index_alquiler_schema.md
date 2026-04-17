@@ -1,0 +1,96 @@
+# Schema del Indice de Alquiler de Vivienda (MITMA/MIVAU)
+
+## Fuente
+- Fichero: Sistema_Indice_Alquiler_Vivienda.xlsx
+- Hoja utilizada: SeccionesCensales
+- Total filas: 33662, columnas: 83
+
+## Columnas detectadas
+- CPRO
+- CUDMUN
+- CUSEC
+- BI_ALVHEPCO_TVC_15
+- BI_ALVHEPCO_TVU_15
+- ALQM2mes_LV_M_VC_15
+- ALQM2mes_LV_25_VC_15
+- ALQM2mes_LV_75_VC_15
+- ALQM2mes_LV_M_VU_15
+- ALQM2mes_LV_25_VU_15
+- ALQM2mes_LV_75_VU_15
+- ALQTBID12_M_VC_15
+- ALQTBID12_25_VC_15
+- ALQTBID12_75_VC_15
+- ALQTBID12_M_VU_15
+- ALQTBID12_25_VU_15
+- ALQTBID12_75_VU_15
+- SLVM2_M_VC_15
+- SLVM2_25_VC_15
+- SLVM2_75_VC_15
+- SLVM2_M_VU_15
+- SLVM2_25_VU_15
+- SLVM2_75_VU_15
+- BI_ALVHEPCO_TVC_16
+- BI_ALVHEPCO_TVU_16
+- ALQM2mes_LV_M_VC_16
+- ALQM2mes_LV_25_VC_16
+- ALQM2mes_LV_75_VC_16
+- ALQM2mes_LV_M_VU_16
+- ALQM2mes_LV_25_VU_16
+- ALQM2mes_LV_75_VU_16
+- ALQTBID12_M_VC_16
+- ALQTBID12_25_VC_16
+- ALQTBID12_75_VC_16
+- ALQTBID12_M_VU_16
+- ALQTBID12_25_VU_16
+- ALQTBID12_75_VU_16
+- SLVM2_M_VC_16
+- SLVM2_25_VC_16
+- SLVM2_75_VC_16
+- SLVM2_M_VU_16
+- SLVM2_25_VU_16
+- SLVM2_75_VU_16
+- BI_ALVHEPCO_TVC_17
+- BI_ALVHEPCO_TVU_17
+- ALQM2mes_LV_M_VC_17
+- ALQM2mes_LV_25_VC_17
+- ALQM2mes_LV_75_VC_17
+- ALQM2mes_LV_M_VU_17
+- ALQM2mes_LV_25_VU_17
+- ALQM2mes_LV_75_VU_17
+- ALQTBID12_M_VC_17
+- ALQTBID12_25_VC_17
+- ALQTBID12_75_VC_17
+- ALQTBID12_M_VU_17
+- ALQTBID12_25_VU_17
+- ALQTBID12_75_VU_17
+- SLVM2_M_VC_17
+- SLVM2_25_VC_17
+- SLVM2_75_VC_17
+- SLVM2_M_VU_17
+- SLVM2_25_VU_17
+- SLVM2_75_VU_17
+- BI_ALVHEPCO_TVC_18
+- BI_ALVHEPCO_TVU_18
+- ALQM2mes_LV_M_VC_18
+- ALQM2mes_LV_25_VC_18
+- ALQM2mes_LV_75_VC_18
+- ALQM2mes_LV_M_VU_18
+- ALQM2mes_LV_25_VU_18
+- ALQM2mes_LV_75_VU_18
+- ALQTBID12_M_VC_18
+- ALQTBID12_25_VC_18
+- ALQTBID12_75_VC_18
+- ALQTBID12_M_VU_18
+- ALQTBID12_25_VU_18
+- ALQTBID12_75_VU_18
+- SLVM2_M_VC_18
+- SLVM2_25_VC_18
+- SLVM2_75_VC_18
+- SLVM2_M_VU_18
+- SLVM2_25_VU_18
+- SLVM2_75_VU_18
+
+## Uso en el proyecto
+- Benchmark/contexto historico para comparar precios actuales vs referencia oficial.
+- NO se usa como feature del modelo supervisado (solo comparador/narrativa).
+- Limitacion temporal: datos hasta 2018; el microdato es 2025.
