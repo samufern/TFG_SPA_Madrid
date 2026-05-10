@@ -1,6 +1,18 @@
 {
-  "model__learning_rate": 0.1,
-  "model__l2_leaf_reg": 10,
-  "model__iterations": 300,
-  "model__depth": 8
+  "model__iterations": 4997,
+  "model__depth": 8,
+  "model__learning_rate": 0.29915045507974913,
+  "model__l2_leaf_reg": 0.015088745786191366,
+  "model__random_strength": 14.983514265381537,
+  "model__min_data_in_leaf": 17,
+  "model__border_count": 56,
+  "model__od_wait": 73,
+  "model__model_size_reg": 8.254333438517223,
+  "model__leaf_estimation_iterations": 15,
+  "model__rsm": 0.6101741207485138,
+  "model__grow_policy": "Depthwise",
+  "model__bootstrap_type": "MVS",
+  "model__subsample": 0.9686170013692436,
+  "model__sampling_frequency": "PerTree",
+  "model__od_type": "Iter"
 }

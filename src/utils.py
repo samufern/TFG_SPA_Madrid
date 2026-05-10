@@ -1205,7 +1205,17 @@ try:
 
         def __init__(self, iterations=300, depth=6, learning_rate=0.1,
                      l2_leaf_reg=3, random_seed=100432070, loss_function="MAE",
-                     verbose=False):
+                     verbose=False,
+                     # Hiperparametros adicionales explorados por Optuna en NB05.
+                     # Se exponen como atributos para que sklearn.set_params los acepte.
+                     # Valor None => no se pasa a CatBoost (usa su default).
+                     random_strength=None, min_data_in_leaf=None, border_count=None,
+                     od_wait=None, od_type=None, model_size_reg=None,
+                     leaf_estimation_iterations=None, rsm=None,
+                     grow_policy=None, bootstrap_type=None,
+                     subsample=None, sampling_frequency=None,
+                     bagging_temperature=None, boosting_type=None,
+                     max_leaves=None, leaf_estimation_method=None):
             self.iterations = iterations
             self.depth = depth
             self.learning_rate = learning_rate
@@ -1213,10 +1223,32 @@ try:
             self.random_seed = random_seed
             self.loss_function = loss_function
             self.verbose = verbose
+            self.random_strength = random_strength
+            self.min_data_in_leaf = min_data_in_leaf
+            self.border_count = border_count
+            self.od_wait = od_wait
+            self.od_type = od_type
+            self.model_size_reg = model_size_reg
+            self.leaf_estimation_iterations = leaf_estimation_iterations
+            self.rsm = rsm
+            self.grow_policy = grow_policy
+            self.bootstrap_type = bootstrap_type
+            self.subsample = subsample
+            self.sampling_frequency = sampling_frequency
+            self.bagging_temperature = bagging_temperature
+            self.boosting_type = boosting_type
+            self.max_leaves = max_leaves
+            self.leaf_estimation_method = leaf_estimation_method
 
         def _make_cb(self):
-            """Crea una instancia limpia de CatBoostRegressor con los params actuales."""
-            return _CatBoostRegressor(
+            """Crea una instancia limpia de CatBoostRegressor con los params actuales.
+
+            Solo se pasan los hiperparametros opcionales cuando no son None: asi
+            evitamos invalidaciones cruzadas de CatBoost (p. ej. `subsample` solo
+            es valido con bootstrap_type Bernoulli/MVS/Poisson; `bagging_temperature`
+            solo con bootstrap_type Bayesian).
+            """
+            base = dict(
                 iterations=self.iterations, depth=self.depth,
                 learning_rate=self.learning_rate,
                 l2_leaf_reg=self.l2_leaf_reg,
@@ -1224,6 +1256,26 @@ try:
                 loss_function=self.loss_function,
                 verbose=self.verbose,
             )
+            optional = {
+                "random_strength": self.random_strength,
+                "min_data_in_leaf": self.min_data_in_leaf,
+                "border_count": self.border_count,
+                "od_wait": self.od_wait,
+                "od_type": self.od_type,
+                "model_size_reg": self.model_size_reg,
+                "leaf_estimation_iterations": self.leaf_estimation_iterations,
+                "rsm": self.rsm,
+                "grow_policy": self.grow_policy,
+                "bootstrap_type": self.bootstrap_type,
+                "subsample": self.subsample,
+                "sampling_frequency": self.sampling_frequency,
+                "bagging_temperature": self.bagging_temperature,
+                "boosting_type": self.boosting_type,
+                "max_leaves": self.max_leaves,
+                "leaf_estimation_method": self.leaf_estimation_method,
+            }
+            base.update({k: v for k, v in optional.items() if v is not None})
+            return _CatBoostRegressor(**base)
 
         def fit(self, X, y, **kw):
             """Entrena el modelo CatBoost con los datos proporcionados."""
