@@ -1,0 +1,295 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Metodología · RentSamu</title>
+<meta name="description" content="Pipeline técnico completo de RentSamu: enriquecimiento de 16 fuentes externas, ensemble CatBoost top-5, validación cruzada espacial y temporal, conformal quantile regression." />
+<meta name="theme-color" content="#FBFAF7" />
+
+<link rel="icon" type="image/svg+xml" href='data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><rect width="32" height="32" rx="7" fill="%231F4D3F"/><path d="M9 22V10h6.2c2.8 0 4.5 1.4 4.5 3.8 0 1.7-.9 2.9-2.4 3.5L21 22h-3.2l-3-4.4h-2.6V22H9z" fill="%23FBFAF7"/></svg>' />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="styles.css" />
+
+<style>
+/* Compact docs layout overrides */
+.docs-main{max-width:900px;margin-inline:auto;padding:clamp(2rem,5vw,4rem) var(--gutter)}
+.docs-main h1{margin-bottom:.5rem}
+.docs-main h2{margin-top:3rem;font-size:clamp(1.6rem,3vw,2.1rem)}
+.docs-main h3{margin-top:2rem;margin-bottom:.6rem;font-family:var(--sans);font-size:1.1rem;font-weight:600}
+.docs-main p{font-size:1.02rem;color:var(--ink-2);line-height:1.65;margin-block:.7rem}
+.docs-main code{font-family:var(--mono);font-size:.86em;background:var(--surface-2);padding:.1em .4em;border-radius:4px;color:var(--ink)}
+.docs-main ul, .docs-main ol{padding-left:1.4rem;margin-block:.7rem}
+.docs-main li{margin-block:.3rem;color:var(--ink-2);line-height:1.55}
+.docs-main table{width:100%;border-collapse:collapse;margin-block:1.2rem;font-size:.9rem}
+.docs-main th, .docs-main td{text-align:left;padding:.55rem .8rem;border-bottom:1px solid var(--line)}
+.docs-main thead th{background:var(--surface-2);font-family:var(--mono);font-size:.74rem;text-transform:uppercase;letter-spacing:.1em;color:var(--ink-2);font-weight:500}
+.docs-main td:not(:first-child){font-family:var(--mono);color:var(--ink)}
+.callout{margin-block:1.5rem;padding:1.2rem 1.4rem;background:var(--surface);border-left:3px solid var(--accent);border-radius:6px}
+.callout p{margin-block:.2rem;color:var(--ink)}
+.docs-toc{
+  position:sticky;top:80px;background:var(--surface);border:1px solid var(--line);border-radius:10px;
+  padding:1rem 1.2rem;margin-bottom:2rem;font-size:.86rem;
+}
+.docs-toc strong{display:block;margin-bottom:.5rem;font-family:var(--mono);font-size:.74rem;text-transform:uppercase;letter-spacing:.1em;color:var(--ink-3)}
+.docs-toc a{display:block;color:var(--ink-2);padding:.2rem 0;transition:color .2s}
+.docs-toc a:hover{color:var(--accent)}
+</style>
+</head>
+<body>
+
+<header class="site-header" id="siteHeader">
+  <div class="container nav">
+    <a href="index.html" class="brand" aria-label="RentSamu — inicio">
+      <span class="brand-mark"><span>R</span></span>
+      <span>RentSamu</span>
+    </a>
+    <nav class="nav-links" aria-label="Navegación principal">
+      <a href="index.html#como-funciona">Cómo funciona</a>
+      <a href="index.html#demo">Demo</a>
+      <a href="index.html#oportunidades">Oportunidades</a>
+      <a href="index.html#mapa">Mapa</a>
+      <a href="metodologia.html" aria-current="page">Metodología</a>
+    </nav>
+    <button type="button" class="theme-toggle" id="themeToggle" aria-label="Cambiar tema claro / oscuro">
+      <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+      <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+    </button>
+    <a href="index.html#acceso" class="btn btn--primary btn--sm nav-cta">Solicitar acceso</a>
+    <button class="nav-toggle" id="navToggle" aria-label="Abrir menú de navegación" aria-expanded="false" aria-controls="mobileDrawer">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="3" y1="7" x2="21" y2="7"/><line x1="3" y1="17" x2="21" y2="17"/></svg>
+    </button>
+  </div>
+</header>
+
+<div class="mobile-drawer" id="mobileDrawer" aria-hidden="true">
+  <div class="mobile-drawer__panel" role="dialog" aria-modal="true" aria-label="Menú">
+    <div class="mobile-drawer__head">
+      <span class="brand"><span class="brand-mark"><span>R</span></span> RentSamu</span>
+      <button class="nav-toggle" id="navClose" aria-label="Cerrar menú">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>
+      </button>
+    </div>
+    <nav class="mobile-drawer__links" aria-label="Navegación móvil">
+      <a href="index.html#como-funciona">Cómo funciona</a>
+      <a href="index.html#demo">Demo</a>
+      <a href="index.html#oportunidades">Oportunidades</a>
+      <a href="index.html#mapa">Mapa</a>
+      <a href="metodologia.html">Metodología</a>
+    </nav>
+    <a href="index.html#acceso" class="btn btn--primary mobile-drawer__cta">Solicitar acceso</a>
+  </div>
+</div>
+
+<main class="docs-main">
+
+  <span class="eyebrow">Documento técnico</span>
+  <h1>Metodología completa</h1>
+  <p class="lead" style="font-size:1.18rem;color:var(--ink-2);margin-block:1rem 2rem">Pipeline reproducible que va desde la captura del anuncio hasta el ranking mensual de oportunidades. Documentamos cada decisión, las métricas reales sobre holdout y los esquemas de validación utilizados.</p>
+
+  <nav class="docs-toc" aria-label="Tabla de contenidos">
+    <strong>Índice</strong>
+    <a href="#datos">1. Datos &middot; origen y limpieza</a>
+    <a href="#enriquecimiento">2. Enriquecimiento &middot; 16 fuentes externas</a>
+    <a href="#features">3. Selección de variables</a>
+    <a href="#modelo">4. Modelo &middot; ensemble CatBoost</a>
+    <a href="#validacion">5. Validación cruzada</a>
+    <a href="#intervalos">6. Intervalos &middot; CQR</a>
+    <a href="#oportunidades">7. Ranking de oportunidades</a>
+    <a href="#limites">8. Limitaciones del modelo</a>
+  </nav>
+
+  <h2 id="datos">1. Datos · origen y limpieza</h2>
+  <p>El dataset base se construye a partir del flujo público de anuncios de <strong>Idealista</strong> con geolocalización. Partimos de 9.229 registros raw y, tras la limpieza, conservamos <strong>8.797 inmuebles válidos</strong>.</p>
+  <h3>Reglas de limpieza aplicadas</h3>
+  <ul>
+    <li>Eliminación de registros con <code>price &lt; 400 €</code> o <code>price &gt; 25.000 €</code> (5,81 % outliers).</li>
+    <li>Filtrado por superficie útil entre 12 y 990 m² (7,17 % outliers).</li>
+    <li>Cálculo de <code>price_m2 = price / surface_m2</code>. Eliminados 9 outliers de €/m² inválidos.</li>
+    <li>Imputación geográfica para los huecos en lat/lng mediante el centroide del distrito.</li>
+  </ul>
+
+  <table>
+    <thead><tr><th>Métrica</th><th>Valor</th></tr></thead>
+    <tbody>
+      <tr><td>n_rows_raw</td><td>9.229</td></tr>
+      <tr><td>n_rows_clean</td><td>8.797</td></tr>
+      <tr><td>Precio mediano</td><td>1.450 €</td></tr>
+      <tr><td>Precio P10 / P90</td><td>850 € / 3.550 €</td></tr>
+      <tr><td>€/m² mediano</td><td>18,12 €/m²</td></tr>
+      <tr><td>Train / Holdout (gap 1d)</td><td>6.431 / 1.772</td></tr>
+    </tbody>
+  </table>
+
+  <h2 id="enriquecimiento">2. Enriquecimiento · 16 fuentes externas</h2>
+  <p>Cada inmueble se enriquece con 16 variables externas que aportan el contexto urbano y socioeconómico de su entorno. El impacto medible del enriquecimiento sobre el modelo base es de <strong>−5,2 % MAE</strong> (315,26 → 298,87 €).</p>
+
+  <h3>Fuentes y variables</h3>
+  <table>
+    <thead><tr><th>Fuente</th><th>Variables aportadas</th><th>Cobertura</th></tr></thead>
+    <tbody>
+      <tr><td>INE</td><td>renta_persona, edad_media, tamano_hogar, pct_unipersonal</td><td>68,5 %</td></tr>
+      <tr><td>GTFS Metro</td><td>dist_metro_m</td><td>100 %</td></tr>
+      <tr><td>BiciMAD</td><td>dist_bicimad_m, bicimad_density_1km</td><td>100 %</td></tr>
+      <tr><td>EMT</td><td>emt_density_500m</td><td>100 %</td></tr>
+      <tr><td>Catastro</td><td>locales_density_1km, terrace_density_1km</td><td>100 %</td></tr>
+      <tr><td>Ayuntamiento VUT</td><td>vut_distance_nearest, vut_count_1_0km, vut_count_district</td><td>67,5 %</td></tr>
+      <tr><td>Ruido (mapa estratégico)</td><td>noise_ld_db</td><td>65,0 %</td></tr>
+      <tr><td>Calidad del aire</td><td>air_no2_nearest</td><td>100 %</td></tr>
+      <tr><td>Parques municipales</td><td>green_area_m2</td><td>67,5 %</td></tr>
+      <tr><td>Densidad asociaciones</td><td>Asociaciones (4 tipos)</td><td>100 %</td></tr>
+    </tbody>
+  </table>
+
+  <h2 id="features">3. Selección de variables</h2>
+  <p>Partimos de 49 variables candidatas tras el enriquecimiento. La selección final se hace por <strong>consenso entre tres métodos independientes</strong>:</p>
+  <ol>
+    <li><strong>SelectKBest</strong> con <code>f_regression</code> (filtro estadístico).</li>
+    <li><strong>SHAP TreeExplainer</strong> sobre el modelo CatBoost base (importancia explicada).</li>
+    <li><strong>Permutation noise probe</strong> (comparación con variables de ruido aleatorio).</li>
+  </ol>
+  <p>La regla final es <em>consensus 3-of-3</em>: solo se conservan las features que pasan los tres filtros con sus umbrales (SKB p&lt;0,01, SHAP &gt;5 %, permutation &gt; ruido).</p>
+
+  <div class="callout">
+    <p><strong>Top 5 drivers globales</strong> (SHAP importance bruta sobre target <code>price</code>):</p>
+    <ol style="margin-top:.5rem">
+      <li><code>log_surface_m2</code> &mdash; 187,24</li>
+      <li><code>surface_m2</code> &mdash; 175,73</li>
+      <li><code>bathrooms</code> &mdash; 172,04</li>
+      <li><code>floor_built</code> &mdash; 133,63</li>
+      <li><code>bicimad_density_1km</code> &mdash; 96,09</li>
+    </ol>
+  </div>
+
+  <h2 id="modelo">4. Modelo · ensemble CatBoost top-5</h2>
+  <p>El predictor de producción es un <strong>ensemble de los 5 mejores modelos CatBoost</strong> resultantes de un estudio de Optuna con más de 2.000 trials. Los hiperparámetros del mejor modelo individual son:</p>
+  <table>
+    <thead><tr><th>Parámetro</th><th>Valor</th></tr></thead>
+    <tbody>
+      <tr><td>iterations</td><td>4.997</td></tr>
+      <tr><td>depth</td><td>8</td></tr>
+      <tr><td>learning_rate</td><td>0,299</td></tr>
+      <tr><td>l2_leaf_reg</td><td>0,015</td></tr>
+      <tr><td>random_strength</td><td>14,98</td></tr>
+      <tr><td>border_count</td><td>56</td></tr>
+      <tr><td>grow_policy</td><td>Depthwise</td></tr>
+      <tr><td>bootstrap_type</td><td>MVS · subsample 0,97</td></tr>
+    </tbody>
+  </table>
+  <p>El target principal es <code>price</code> (renta mensual €). En paralelo se entrena un modelo análogo para <code>price_m2</code> que se usa como validación cruzada de coherencia.</p>
+
+  <h2 id="validacion">5. Validación cruzada · cuatro esquemas</h2>
+  <p>Una de las decisiones más importantes del proyecto es <strong>no fiarse del MAE de K-Fold aleatorio</strong>. Cuando los datos tienen estructura geográfica y temporal, K-Fold infla las métricas porque el modelo ve barrios y fechas adyacentes en train. Reportamos los cuatro esquemas:</p>
+
+  <table>
+    <thead><tr><th>Esquema</th><th>MAE precio</th><th>MAE €/m²</th><th>Propósito</th></tr></thead>
+    <tbody>
+      <tr><td>CV aleatorio (KFold-5)</td><td>391,48 €</td><td>3,87</td><td>baseline optimista</td></tr>
+      <tr><td>GroupCV por <code>district</code></td><td>615,66 €</td><td>5,26</td><td>generalización entre distritos</td></tr>
+      <tr><td>CV espacial geohash-6</td><td><b>561,59 €</b></td><td>4,77</td><td>generalización a barrios nuevos</td></tr>
+      <tr><td>CV temporal (gap 208d)</td><td>493,26 €</td><td>4,43</td><td>generalización a fechas futuras</td></tr>
+      <tr><td>Holdout temporal final</td><td><b>301,31 €</b></td><td>3,17</td><td>cifra reportada en la web</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout">
+    <p>El holdout temporal tiene <strong>MAE 301 €</strong> porque mide la capacidad del modelo de predecir <em>la siguiente cohorte temporal</em>: 1.772 inmuebles publicados después del corte de entrenamiento, con un gap de 1 día para evitar leakage.</p>
+  </div>
+
+  <h2 id="intervalos">6. Intervalos · Conformal Quantile Regression</h2>
+  <p>Las predicciones puntuales no son suficientes: el usuario necesita saber el rango de incertidumbre. Para cada inmueble emitimos un intervalo P5–P95 calibrado mediante <strong>Conformal Quantile Regression</strong> (Romano et al., 2019).</p>
+  <h3>Pipeline CQR</h3>
+  <ol>
+    <li>Entrenamos dos modelos cuantílicos auxiliares (CatBoost con <code>Quantile:alpha=0.05</code> y <code>0.95</code>).</li>
+    <li>Sobre un conjunto de calibración independiente, calculamos los residuos <em>quantile-aware</em>.</li>
+    <li>Ajustamos el quantile <code>q̂</code> para alcanzar la cobertura nominal (90 %) sobre calibración.</li>
+    <li>Validamos sobre holdout: la cobertura empírica resulta <strong>86,96 %</strong> con ancho medio <strong>1.359 €</strong>.</li>
+  </ol>
+
+  <h2 id="oportunidades">7. Ranking de oportunidades · top-10 mensual</h2>
+  <p>Cada mes regeneramos el ranking de inmuebles más infravalorados según el modelo. El <em>opportunity score</em> es:</p>
+  <pre style="background:var(--surface-2);padding:1rem;border-radius:8px;font-family:var(--mono);font-size:.84rem;overflow-x:auto">opportunity_score = (predicted_price &minus; published_price) / σ_cluster</pre>
+  <p>Donde <code>σ_cluster</code> es la desviación estándar dentro del clúster KMeans al que pertenece el inmueble (4 clústeres principales por características constructivas). Esto evita que oportunidades en zonas de alta varianza dominen el ranking.</p>
+  <p>Publicamos tres rankings paralelos:</p>
+  <ul>
+    <li><strong>Score €</strong> &mdash; valor absoluto del descuento.</li>
+    <li><strong>Score €/m²</strong> &mdash; descuento relativo al tamaño del inmueble.</li>
+    <li><strong>Score mixto</strong> &mdash; combinación normalizada de ambos con peso adicional inverso a la incertidumbre del modelo.</li>
+  </ul>
+
+  <h2 id="limites">8. Limitaciones conocidas</h2>
+  <ul>
+    <li>El modelo está entrenado sobre el rango operativo del mercado madrileño: 12–990 m², 450–25.000 €. Fuera de ese rango, el intervalo de confianza se ensancha y se marca la valoración como de baja confianza.</li>
+    <li>Los distritos con menos densidad de datos (Vicálvaro, Villa de Vallecas, Barajas) tienen MAE mayor en términos relativos. Esto se refleja en el campo <em>"MAE en este distrito"</em> de cada predicción.</li>
+    <li>El modelo no captura factores no representados en las features: estado de conservación específico, mobiliario premium, vistas privilegiadas, copropietarios, restricciones legales, etc.</li>
+    <li>RentSamu no constituye <strong>tasación oficial homologada</strong> bajo la Orden ECO/805/2003. Para operaciones que requieran tasación, consulte a un tasador certificado.</li>
+  </ul>
+
+  <hr style="border:0;border-top:1px solid var(--line);margin-block:3rem">
+
+  <p style="font-family:var(--mono);font-size:.86rem;color:var(--ink-3);text-align:center">
+    Documento técnico v1.0 &middot; 2026 &middot; <a href="index.html" style="color:var(--accent)">Volver a la página principal</a>
+  </p>
+
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer__bottom" style="border-top:0;margin-top:0;padding-top:1rem">
+      <p class="footer__disclaimer">© 2026 RentSamu. Las predicciones son orientativas y no constituyen tasación oficial ni asesoramiento financiero.</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+// Theme toggle (shares localStorage key with main app)
+(function(){
+  const KEY = 'rentsamu.theme';
+  const btn = document.getElementById('themeToggle');
+  function apply(t){
+    if(t === 'dark') document.documentElement.setAttribute('data-theme','dark');
+    else document.documentElement.removeAttribute('data-theme');
+    if(btn) btn.setAttribute('aria-pressed', String(t === 'dark'));
+  }
+  let saved = null;
+  try{ saved = localStorage.getItem(KEY); }catch(e){}
+  if(!saved) saved = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  apply(saved);
+  if(btn) btn.addEventListener('click', ()=>{
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    const next = isDark ? 'light' : 'dark';
+    apply(next);
+    try{ localStorage.setItem(KEY, next); }catch(e){}
+  });
+})();
+
+// Mobile drawer
+(function(){
+  const drawer = document.getElementById('mobileDrawer');
+  const open = document.getElementById('navToggle');
+  const close = document.getElementById('navClose');
+  if(!drawer || !open) return;
+  function setOpen(state){
+    drawer.classList.toggle('is-open', state);
+    drawer.setAttribute('aria-hidden', String(!state));
+    open.setAttribute('aria-expanded', String(state));
+    document.body.style.overflow = state ? 'hidden' : '';
+  }
+  open.addEventListener('click', ()=>setOpen(true));
+  if(close) close.addEventListener('click', ()=>setOpen(false));
+  drawer.addEventListener('click', e=>{ if(e.target===drawer) setOpen(false); });
+  drawer.querySelectorAll('a').forEach(a=>a.addEventListener('click', ()=>setOpen(false)));
+  document.addEventListener('keydown', e=>{ if(e.key==='Escape' && drawer.classList.contains('is-open')) setOpen(false); });
+})();
+
+// Scroll header shadow
+(function(){
+  const h = document.getElementById('siteHeader');
+  if(!h) return;
+  window.addEventListener('scroll', ()=>{ h.classList.toggle('is-scrolled', window.scrollY > 12); }, {passive:true});
+})();
+</script>
+</body>
+</html>

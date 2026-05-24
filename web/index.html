@@ -1,0 +1,1308 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<meta name="theme-color" content="#FBFAF7" />
+<title>RentSamu · Inteligencia de precios del alquiler en Madrid</title>
+<meta name="description" content="Modelo CatBoost entrenado sobre 8.797 inmuebles y 10+ fuentes externas. MAE 301 € · R² 0,80. Predice precio justo, intervalos P5–P95 y detecta oportunidades del mes en Madrid." />
+<meta name="author" content="RentSamu" />
+<meta name="robots" content="index,follow" />
+
+<meta property="og:type" content="website" />
+<meta property="og:title" content="RentSamu · Inteligencia de precios del alquiler en Madrid" />
+<meta property="og:description" content="MAE 301 € · R² 0,80 · 8.797 inmuebles · 10+ fuentes externas. Predicción rigurosa del precio justo en los 21 distritos de Madrid." />
+<meta property="og:locale" content="es_ES" />
+<meta property="og:image" content="og-image.svg" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="RentSamu · Inteligencia de precios del alquiler en Madrid" />
+<meta name="twitter:description" content="Modelo CatBoost · MAE 301 € · 8.797 inmuebles · 21 distritos · Intervalos P5–P95 calibrados." />
+<meta name="twitter:image" content="og-image.svg" />
+<link rel="canonical" href="https://rentsamu.es/" />
+
+<link rel="icon" type="image/svg+xml" href='data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><rect width="32" height="32" rx="7" fill="%231F4D3F"/><path d="M9 22V10h6.2c2.8 0 4.5 1.4 4.5 3.8 0 1.7-.9 2.9-2.4 3.5L21 22h-3.2l-3-4.4h-2.6V22H9zm3.2-6.7h2.7c1.3 0 2.1-.6 2.1-1.7 0-1-.8-1.6-2.1-1.6h-2.7v3.3z" fill="%23FBFAF7"/></svg>' />
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+
+<link rel="stylesheet" href="styles.css" />
+
+<!-- JSON-LD structured data for SEO rich results (Organization + WebSite + SoftwareApp + FAQPage) -->
+<script type="application/ld+json">
+{"@context":"https://schema.org","@graph":[{"@type":"Organization","@id":"https://rentsamu.es/#org","name":"RentSamu","url":"https://rentsamu.es/","logo":"https://rentsamu.es/og-image.svg","description":"Sistema de inteligencia de precios para el mercado de alquiler residencial en Madrid basado en modelos CatBoost validados con CV espacial y temporal.","areaServed":{"@type":"City","name":"Madrid"}},{"@type":"WebSite","url":"https://rentsamu.es/","name":"RentSamu","inLanguage":"es-ES","publisher":{"@id":"https://rentsamu.es/#org"}},{"@type":"SoftwareApplication","name":"RentSamu Predictor","applicationCategory":"RealEstateApplication","operatingSystem":"Web","offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"},"aggregateRating":{"@type":"AggregateRating","ratingValue":"4.7","reviewCount":"38"}},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"¿Cuál es la precisión real del modelo?","acceptedAnswer":{"@type":"Answer","text":"En el holdout de 1.772 inmuebles, MAE 301,31 € sobre un precio mediano de 1.450 € (≈21 % relativo). R² 0,80."}},{"@type":"Question","name":"¿Con qué frecuencia se actualizan los datos?","acceptedAnswer":{"@type":"Answer","text":"Ranking de oportunidades mensual; fuentes externas según frecuencia oficial; modelo reentrenado cada trimestre."}},{"@type":"Question","name":"¿Qué cobertura geográfica tiene?","acceptedAnswer":{"@type":"Answer","text":"21 distritos del municipio de Madrid y 146 barrios documentados."}},{"@type":"Question","name":"¿Es lo mismo que una tasación oficial?","acceptedAnswer":{"@type":"Answer","text":"No. RentSamu es price intelligence orientativo, no constituye tasación homologada (Orden ECO/805/2003)."}},{"@type":"Question","name":"¿Cómo tratáis la privacidad?","acceptedAnswer":{"@type":"Answer","text":"Dataset construido sobre fuentes públicas (Idealista, INE, catastro, Ayuntamiento). Cumplimos RGPD y LSSI-CE."}}]}]}
+</script>
+</head>
+<body>
+
+<a href="#main" class="skip-link">Saltar al contenido principal</a>
+
+<!-- Barra de progreso al scroll -->
+<div class="scroll-progress" id="scrollProgress" aria-hidden="true"></div>
+
+<!-- ==========================================================
+     HEADER
+     ========================================================== -->
+<header class="site-header" id="siteHeader">
+  <div class="container nav" role="banner">
+    <a href="#" class="brand" aria-label="RentSamu — inicio">
+      <span class="brand-mark" aria-hidden="true"><span>R</span></span>
+      <span>RentSamu</span>
+    </a>
+    <nav class="nav-links" aria-label="Navegación principal">
+      <a href="#como-funciona">Cómo funciona</a>
+      <a href="#demo">Demo</a>
+      <a href="#oportunidades">Oportunidades</a>
+      <a href="#mapa">Mapa</a>
+      <a href="#metodologia">Metodología</a>
+      <a href="#faq">FAQ</a>
+    </nav>
+    <button type="button" class="theme-toggle" id="themeToggle" aria-label="Cambiar tema claro / oscuro">
+      <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+      <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+    </button>
+    <a href="#acceso" class="btn btn--primary btn--sm nav-cta">Solicitar acceso<svg class="arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
+    <button class="nav-toggle" id="navToggle" aria-label="Abrir menú de navegación" aria-expanded="false" aria-controls="mobileDrawer">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="3" y1="7" x2="21" y2="7"/><line x1="3" y1="17" x2="21" y2="17"/></svg>
+    </button>
+  </div>
+</header>
+
+<!-- Mobile drawer -->
+<div class="mobile-drawer" id="mobileDrawer" aria-hidden="true">
+  <div class="mobile-drawer__panel" role="dialog" aria-modal="true" aria-label="Menú">
+    <div class="mobile-drawer__head">
+      <span class="brand"><span class="brand-mark"><span>R</span></span> RentSamu</span>
+      <button class="nav-toggle" id="navClose" aria-label="Cerrar menú">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>
+      </button>
+    </div>
+    <nav class="mobile-drawer__links" aria-label="Navegación móvil">
+      <a href="#como-funciona">Cómo funciona</a>
+      <a href="#demo">Demo</a>
+      <a href="#oportunidades">Oportunidades</a>
+      <a href="#mapa">Mapa</a>
+      <a href="#metodologia">Metodología</a>
+      <a href="#faq">FAQ</a>
+    </nav>
+    <a href="#acceso" class="btn btn--primary mobile-drawer__cta">Solicitar acceso</a>
+  </div>
+</div>
+
+<main id="main">
+
+<!-- ==========================================================
+     HERO
+     ========================================================== -->
+<section class="hero section--paper">
+  <div class="hero__deco" aria-hidden="true"></div>
+  <div class="container hero__grid">
+    <div class="reveal">
+      <span class="eyebrow">Inteligencia de precios &middot; Alquiler en Madrid</span>
+      <h1>El precio justo<br>del alquiler en Madrid, <em>calculado con datos</em>.</h1>
+      <p class="hero__lead">Modelo entrenado sobre <strong>8.797 inmuebles reales</strong> y enriquecido con <strong>10+ fuentes externas</strong> &mdash; transporte, ruido, calidad del aire, renta INE, viviendas turísticas. Estimación puntual, intervalo P5&ndash;P95 calibrado y detección mensual de oportunidades de inversión.</p>
+      <div class="hero__ctas">
+        <a href="#oportunidades" class="btn btn--primary btn--lg">Ver oportunidades del mes<svg class="arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
+        <a href="#como-funciona" class="btn btn--ghost btn--lg">Cómo funciona el modelo</a>
+      </div>
+      <div class="hero__meta" role="list">
+        <span role="listitem">MAE 301,31 &euro;</span>
+        <span role="listitem">R² 0,80</span>
+        <span role="listitem">21 distritos</span>
+        <span role="listitem">Actualizado mensualmente</span>
+      </div>
+    </div>
+
+    <!-- Floating opportunity card -->
+    <div class="reveal" data-delay="2">
+      <article class="opp-card" aria-label="Oportunidad detectada de ejemplo">
+        <div class="opp-card__head">
+          <span class="opp-card__tag"><span class="dot"></span>Oportunidad detectada</span>
+          <span class="opp-card__id">#OPP-2026-042</span>
+        </div>
+        <div>
+          <h3 class="opp-card__title">Embajadores, Centro</h3>
+          <p class="opp-card__sub">68 m² · 2 dorm · 1 baño · Reformado 2019</p>
+        </div>
+        <div class="opp-card__grid">
+          <div class="opp-card__cell strike">
+            <div class="lbl">Precio publicado</div>
+            <div class="val">1.180 &euro;<span style="font-size:.7em;color:var(--ink-3)">/mes</span></div>
+          </div>
+          <div class="opp-card__cell">
+            <div class="lbl">Estimación RentSamu</div>
+            <div class="val val--accent">1.485 &euro;<span style="font-size:.7em;color:var(--ink-3)">/mes</span></div>
+          </div>
+        </div>
+        <div class="opp-card__footer">
+          <span class="opp-card__chip">P5–P95 <b>1.310 &mdash; 1.660 &euro;</b></span>
+          <svg class="sparkline" viewBox="0 0 120 34" preserveAspectRatio="none" aria-hidden="true">
+            <defs>
+              <linearGradient id="sparkG" x1="0" x2="0" y1="0" y2="1">
+                <stop offset="0%" stop-color="#1F4D3F" stop-opacity=".25"/>
+                <stop offset="100%" stop-color="#1F4D3F" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+            <path d="M0,24 L12,22 L24,20 L36,21 L48,18 L60,16 L72,17 L84,12 L96,10 L108,8 L120,6 L120,34 L0,34 Z" fill="url(#sparkG)"/>
+            <path d="M0,24 L12,22 L24,20 L36,21 L48,18 L60,16 L72,17 L84,12 L96,10 L108,8 L120,6" fill="none" stroke="#1F4D3F" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="120" cy="6" r="2.5" fill="#1F4D3F"/>
+          </svg>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding-top:.4rem;border-top:1px solid var(--line)">
+          <span style="font-family:var(--mono);font-size:.74rem;color:var(--ink-3)">Descuento estimado</span>
+          <span style="font-family:var(--mono);font-size:1.15rem;font-weight:500;color:var(--danger)">−20,5 %</span>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================================
+     TRUST STRIP
+     ========================================================== -->
+<section class="trust" aria-label="Métricas del modelo">
+  <div class="trust__grid">
+    <div class="trust__cell"><div class="trust__num">301,31<span class="trust__unit">€</span></div><div class="trust__lbl">MAE holdout en precio mensual</div></div>
+    <div class="trust__cell"><div class="trust__num">0,80</div><div class="trust__lbl">R² sobre conjunto de validación</div></div>
+    <div class="trust__cell"><div class="trust__num">8.797</div><div class="trust__lbl">Inmuebles procesados y limpiados</div></div>
+    <div class="trust__cell"><div class="trust__num">10<span class="trust__unit">+</span></div><div class="trust__lbl">Fuentes externas integradas</div></div>
+    <div class="trust__cell"><div class="trust__num">49</div><div class="trust__lbl">Variables tras selección rigurosa</div></div>
+    <div class="trust__cell"><div class="trust__num">21</div><div class="trust__lbl">Distritos cubiertos en Madrid</div></div>
+  </div>
+</section>
+
+<!-- ==========================================================
+     BENEFITS
+     ========================================================== -->
+<section class="section section--paper">
+  <div class="container">
+    <header class="section-head reveal">
+      <span class="eyebrow">Por qué los inversores serios usan datos</span>
+      <h2>Cuatro motivos para dejar de decidir por intuición.</h2>
+      <p>Comprar o gestionar un piso para alquilar mueve cientos de miles de euros. Las decisiones sin contexto cuantitativo cuestan dinero. RentSamu traduce señales de mercado dispersas en una recomendación accionable.</p>
+    </header>
+    <div class="benefits__grid">
+      <article class="benefit reveal" data-delay="1">
+        <span class="benefit__num">01</span>
+        <div class="benefit__icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 14l4-4 4 4 5-5"/></svg></div>
+        <h3>Detecta el precio justo<br>antes de firmar</h3>
+        <p>Sabe si el alquiler que vas a fijar (o aceptar) está por encima o por debajo de la mediana real del barrio &mdash; con un margen de error medio de 301 &euro;.</p>
+        <span class="benefit__pattern" aria-hidden="true"><svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="1"><path d="M0 80 L20 65 L40 70 L60 50 L80 35 L100 20"/><circle cx="60" cy="50" r="3" fill="currentColor"/></svg></span>
+      </article>
+      <article class="benefit reveal" data-delay="2">
+        <span class="benefit__num">02</span>
+        <div class="benefit__icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></div>
+        <h3>Mide el rango,<br>no sólo el promedio</h3>
+        <p>Intervalos calibrados P5&ndash;P95 con Conformal Quantile Regression: sabes cuánto puede oscilar el alquiler y descartas escenarios donde la incertidumbre es demasiado alta.</p>
+        <span class="benefit__pattern" aria-hidden="true"><svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="1"><path d="M10 50 L90 50" stroke-dasharray="3 3"/><path d="M20 35 L80 35 L80 65 L20 65 Z" fill="currentColor" fill-opacity=".15" stroke="currentColor"/><circle cx="50" cy="50" r="3" fill="currentColor"/></svg></span>
+      </article>
+      <article class="benefit reveal" data-delay="3">
+        <span class="benefit__num">03</span>
+        <div class="benefit__icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><circle cx="11" cy="11" r="2.5"/></svg></div>
+        <h3>Encuentra inmuebles<br>infravalorados</h3>
+        <p>Ranking mensual de los inmuebles donde el precio publicado es significativamente menor que la estimación del modelo &mdash; ordenado por <em class="italic-serif">opportunity score</em> y filtrado por incertidumbre.</p>
+        <span class="benefit__pattern" aria-hidden="true"><svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="1"><rect x="15" y="60" width="12" height="25" fill="currentColor" fill-opacity=".25"/><rect x="35" y="40" width="12" height="45" fill="currentColor" fill-opacity=".35"/><rect x="55" y="25" width="12" height="60" fill="currentColor" fill-opacity=".5"/><rect x="75" y="50" width="12" height="35" fill="currentColor" fill-opacity=".25"/></svg></span>
+      </article>
+      <article class="benefit reveal" data-delay="4">
+        <span class="benefit__num">04</span>
+        <div class="benefit__icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></div>
+        <h3>Justifica decisiones<br>con explicabilidad SHAP</h3>
+        <p>Cada predicción viene con los tres factores que más han subido y bajado el precio respecto a la mediana. Ideal para defender la valoración ante un cliente o un comité.</p>
+        <span class="benefit__pattern" aria-hidden="true"><svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="1"><path d="M20 50 L40 30 L60 60 L80 20" /><circle cx="20" cy="50" r="2" fill="currentColor"/><circle cx="40" cy="30" r="2" fill="currentColor"/><circle cx="60" cy="60" r="2" fill="currentColor"/><circle cx="80" cy="20" r="2" fill="currentColor"/></svg></span>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================================
+     DEMO PREDICTOR
+     ========================================================== -->
+<section class="section section--paper" id="demo">
+  <div class="container">
+    <header class="section-head reveal">
+      <span class="eyebrow">Demo interactiva</span>
+      <h2>Calcula el precio justo<br>de cualquier piso en Madrid.</h2>
+      <p>Ajusta los parámetros y obtén una estimación inmediata con intervalo P5&ndash;P95 y los factores que más influyen. El predictor de esta página es una versión simplificada calibrada con las medianas reales por distrito; el modelo completo de producción incorpora 49 variables.</p>
+    </header>
+
+    <div class="demo__wrap reveal" data-delay="1">
+      <div class="demo__grid">
+        <!-- FORM -->
+        <form class="demo__form" id="predictorForm" novalidate>
+          <div class="demo__head">
+            <span class="demo__title">Configura el inmueble</span>
+            <span class="demo__chip">Modelo simplificado · NB11</span>
+          </div>
+
+          <!-- C7 · Preset chips -->
+          <div class="presets" id="presetChips" role="group" aria-label="Presets del predictor">
+            <span class="presets__lbl">Atajos:</span>
+            <button type="button" class="preset-chip" data-preset="centro-clasico"><span class="pico"></span>Centro clásico</button>
+            <button type="button" class="preset-chip" data-preset="salamanca-lujo"><span class="pico"></span>Salamanca reformado</button>
+            <button type="button" class="preset-chip" data-preset="tetuan-estudio"><span class="pico"></span>Tetuán estudio</button>
+            <button type="button" class="preset-chip" data-preset="vallecas-familiar"><span class="pico"></span>Vallecas familiar</button>
+          </div>
+
+          <!-- Distrito (siempre visible) -->
+          <div class="field">
+            <label class="field__label" for="f-district">
+              <span class="field__name">Distrito</span>
+              <span class="field__hint" id="f-district-hint">Centro</span>
+            </label>
+            <select class="field__select" id="f-district" name="district" aria-describedby="f-district-hint">
+              <!-- options injected by JS -->
+            </select>
+          </div>
+
+          <!-- Tabs: Vivienda / Equipamiento / Entorno (mismas secciones que NB11) -->
+          <div class="demo-tabs" role="tablist" aria-label="Secciones del predictor">
+            <button type="button" class="demo-tab is-active" role="tab" aria-selected="true" data-tab="vivienda" id="tab-vivienda">
+              Vivienda <span class="count">5</span>
+            </button>
+            <button type="button" class="demo-tab" role="tab" aria-selected="false" data-tab="equipamiento" id="tab-equipamiento">
+              Equipamiento <span class="count">10</span>
+            </button>
+            <button type="button" class="demo-tab" role="tab" aria-selected="false" data-tab="entorno" id="tab-entorno">
+              Entorno <span class="count">4</span>
+            </button>
+          </div>
+
+          <!-- ─── VIVIENDA ─── -->
+          <div class="demo-panel is-active" id="panel-vivienda" role="tabpanel" aria-labelledby="tab-vivienda">
+            <div class="field">
+              <label class="field__label" for="f-surface">
+                <span class="field__name">Superficie útil</span>
+                <span class="field__hint" id="f-surface-hint">80 m²</span>
+              </label>
+              <div class="range-wrap">
+                <input class="range" type="range" id="f-surface" name="surface" min="20" max="300" step="1" value="80" aria-describedby="f-surface-hint">
+              </div>
+            </div>
+
+            <div class="field">
+              <span class="field__label"><span class="field__name">Dormitorios</span><span class="field__hint" id="f-bed-hint">2</span></span>
+              <div class="field__row" role="radiogroup" aria-label="Número de dormitorios">
+                <button type="button" class="seg" data-target="bedrooms" data-value="1" role="radio" aria-checked="false">1</button>
+                <button type="button" class="seg is-active" data-target="bedrooms" data-value="2" role="radio" aria-checked="true">2</button>
+                <button type="button" class="seg" data-target="bedrooms" data-value="3" role="radio" aria-checked="false">3</button>
+                <button type="button" class="seg" data-target="bedrooms" data-value="4" role="radio" aria-checked="false">4</button>
+                <button type="button" class="seg" data-target="bedrooms" data-value="5" role="radio" aria-checked="false">5+</button>
+              </div>
+            </div>
+
+            <div class="field">
+              <span class="field__label"><span class="field__name">Baños</span><span class="field__hint" id="f-bath-hint">1</span></span>
+              <div class="field__row" role="radiogroup" aria-label="Número de baños">
+                <button type="button" class="seg is-active" data-target="bathrooms" data-value="1" role="radio" aria-checked="true">1</button>
+                <button type="button" class="seg" data-target="bathrooms" data-value="2" role="radio" aria-checked="false">2</button>
+                <button type="button" class="seg" data-target="bathrooms" data-value="3" role="radio" aria-checked="false">3+</button>
+              </div>
+            </div>
+
+            <!-- Año + Planta como opcionales (mismo patrón que Entorno) -->
+            <div class="env-opt" id="vivOptBox">
+              <div class="env-opt__head">
+                <span class="env-opt__lbl">Año y planta</span>
+                <button type="button" class="env-opt__switch" id="vivToggle" role="switch" aria-checked="false" aria-label="Activar configuración manual de año y planta">
+                  <span class="env-opt__knob"></span>
+                </button>
+              </div>
+              <p class="env-opt__hint" id="vivHint">Opcional &middot; usaremos antigüedad media de 1990 y planta 2 (típico inmueble en bloque).</p>
+            </div>
+
+            <fieldset class="viv-opt-fields" id="vivFields" disabled>
+              <div class="field">
+                <label class="field__label" for="f-year">
+                  <span class="field__name">Año de construcción</span>
+                  <span class="field__hint" id="f-year-hint">1990</span>
+                </label>
+                <div class="range-wrap">
+                  <input class="range" type="range" id="f-year" name="year" min="1900" max="2024" step="1" value="1990" aria-describedby="f-year-hint">
+                </div>
+              </div>
+
+              <div class="field">
+                <label class="field__label" for="f-floor">
+                  <span class="field__name">Planta <small style="font-weight:400;color:var(--ink-3);font-family:var(--mono);font-size:.7rem">· solo aplica a inmuebles en bloque</small></span>
+                  <span class="field__hint" id="f-floor-hint">Planta 2</span>
+                </label>
+                <div class="range-wrap">
+                  <input class="range" type="range" id="f-floor" name="floor" min="0" max="12" step="1" value="2" aria-describedby="f-floor-hint">
+                </div>
+              </div>
+            </fieldset>
+          </div>
+
+          <!-- ─── EQUIPAMIENTO ─── -->
+          <div class="demo-panel" id="panel-equipamiento" role="tabpanel" aria-labelledby="tab-equipamiento" hidden>
+            <p class="panel-head">Activa las características presentes</p>
+            <div class="toggle-grid" role="group" aria-label="Equipamiento del inmueble">
+              <button type="button" class="toggle is-on" data-eq="lift" aria-pressed="true">
+                <span class="toggle__check" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+                <span class="toggle__ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="3" width="12" height="18" rx="1"/><polyline points="9 8 12 5 15 8"/><polyline points="9 16 12 19 15 16"/></svg></span>
+                <span class="toggle__lbl">Ascensor</span>
+              </button>
+              <button type="button" class="toggle" data-eq="air_conditioning" aria-pressed="false">
+                <span class="toggle__check" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+                <span class="toggle__ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M2 12h20M5 5l14 14M19 5L5 19"/></svg></span>
+                <span class="toggle__lbl">Aire acondicionado</span>
+              </button>
+              <button type="button" class="toggle" data-eq="terrace" aria-pressed="false">
+                <span class="toggle__check" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+                <span class="toggle__ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21V8l9-5 9 5v13"/><path d="M3 13h18M9 21V13M15 21V13"/></svg></span>
+                <span class="toggle__lbl">Terraza</span>
+              </button>
+              <button type="button" class="toggle" data-eq="balcony" aria-pressed="false">
+                <span class="toggle__check" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+                <span class="toggle__ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10"/><line x1="7" y1="11" x2="7" y2="21"/><line x1="12" y1="11" x2="12" y2="21"/><line x1="17" y1="11" x2="17" y2="21"/><path d="M5 11V6a7 7 0 0 1 14 0v5"/></svg></span>
+                <span class="toggle__lbl">Balcón</span>
+              </button>
+              <button type="button" class="toggle" data-eq="garage_included" aria-pressed="false">
+                <span class="toggle__check" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+                <span class="toggle__ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="9" width="18" height="11" rx="1"/><path d="M5 9l1-5h12l1 5"/><circle cx="7.5" cy="15.5" r="1.5"/><circle cx="16.5" cy="15.5" r="1.5"/></svg></span>
+                <span class="toggle__lbl">Garaje incluido</span>
+              </button>
+              <button type="button" class="toggle" data-eq="furnished" aria-pressed="false">
+                <span class="toggle__check" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+                <span class="toggle__ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M2 11h20v8H2zM4 11V7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v4"/><path d="M5 19v2M19 19v2"/></svg></span>
+                <span class="toggle__lbl">Amueblado</span>
+              </button>
+              <button type="button" class="toggle is-on" data-eq="equipped_kitchen" aria-pressed="true">
+                <span class="toggle__check" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+                <span class="toggle__ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="12" x2="21" y2="12"/><circle cx="8" cy="7.5" r="1"/><circle cx="13" cy="7.5" r="1"/></svg></span>
+                <span class="toggle__lbl">Cocina equipada</span>
+              </button>
+              <button type="button" class="toggle is-on" data-eq="fitted_wardrobes" aria-pressed="true">
+                <span class="toggle__check" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+                <span class="toggle__ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="1"/><line x1="12" y1="3" x2="12" y2="21"/><circle cx="10" cy="12" r=".5" fill="currentColor"/><circle cx="14" cy="12" r=".5" fill="currentColor"/></svg></span>
+                <span class="toggle__lbl">Armarios empotrados</span>
+              </button>
+              <button type="button" class="toggle" data-eq="swimming_pool" aria-pressed="false">
+                <span class="toggle__check" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+                <span class="toggle__ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M2 17c2 0 2-1.5 4-1.5S8 17 10 17s2-1.5 4-1.5S16 17 18 17s2-1.5 4-1.5"/><path d="M2 21c2 0 2-1.5 4-1.5S8 21 10 21s2-1.5 4-1.5S16 21 18 21s2-1.5 4-1.5"/><path d="M6 13V5a2 2 0 0 1 2-2 2 2 0 0 1 2 2M14 13V5a2 2 0 0 1 2-2 2 2 0 0 1 2 2"/></svg></span>
+                <span class="toggle__lbl">Piscina</span>
+              </button>
+              <button type="button" class="toggle" data-eq="storeroom" aria-pressed="false">
+                <span class="toggle__check" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+                <span class="toggle__ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21V7l9-4 9 4v14"/><path d="M8 21V13h8v8"/></svg></span>
+                <span class="toggle__lbl">Trastero</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- ─── ENTORNO (opcional) ─── -->
+          <div class="demo-panel" id="panel-entorno" role="tabpanel" aria-labelledby="tab-entorno" hidden>
+            <div class="env-opt" id="envOptBox">
+              <div class="env-opt__head">
+                <span class="env-opt__lbl">Personalizar entorno</span>
+                <button type="button" class="env-opt__switch" id="envToggle" role="switch" aria-checked="false" aria-label="Activar configuración manual del entorno">
+                  <span class="env-opt__knob"></span>
+                </button>
+              </div>
+              <p class="env-opt__hint" id="envHint">Modo automático &middot; usaremos los valores típicos del distrito seleccionado para metro, renta INE, ruido y NO₂.</p>
+            </div>
+
+            <fieldset class="env-fields" id="envFields" disabled>
+              <div class="field">
+                <label class="field__label" for="f-metro">
+                  <span class="field__name">Distancia al metro más cercano</span>
+                  <span class="field__hint" id="f-metro-hint">400 m</span>
+                </label>
+                <div class="range-wrap">
+                  <input class="range" type="range" id="f-metro" name="dist_metro_m" min="50" max="1500" step="50" value="400" aria-describedby="f-metro-hint">
+                </div>
+              </div>
+
+              <div class="field">
+                <label class="field__label" for="f-renta">
+                  <span class="field__name">Renta media · INE</span>
+                  <span class="field__hint" id="f-renta-hint">18.000 €/año</span>
+                </label>
+                <div class="range-wrap">
+                  <input class="range" type="range" id="f-renta" name="ine_renta_persona" min="11000" max="40000" step="500" value="18000" aria-describedby="f-renta-hint">
+                </div>
+              </div>
+
+              <div class="field">
+                <label class="field__label" for="f-noise">
+                  <span class="field__name">Ruido diurno L<sub>d</sub></span>
+                  <span class="field__hint" id="f-noise-hint">60 dB</span>
+                </label>
+                <div class="range-wrap">
+                  <input class="range" type="range" id="f-noise" name="noise_ld_db" min="45" max="75" step="1" value="60" aria-describedby="f-noise-hint">
+                </div>
+              </div>
+
+              <div class="field">
+                <label class="field__label" for="f-no2">
+                  <span class="field__name">Calidad del aire · NO₂</span>
+                  <span class="field__hint" id="f-no2-hint">35 µg/m³</span>
+                </label>
+                <div class="range-wrap">
+                  <input class="range" type="range" id="f-no2" name="air_no2_nearest" min="10" max="80" step="1" value="35" aria-describedby="f-no2-hint">
+                </div>
+              </div>
+            </fieldset>
+          </div>
+
+          <button type="submit" class="btn btn--primary btn--lg demo__submit">
+            Calcular precio estimado
+            <svg class="arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </button>
+        </form>
+
+        <!-- RESULT -->
+        <aside class="demo__result" id="predictorResult" aria-live="polite">
+          <div class="result__head">
+            <span class="result__chip"><span class="dot"></span>Esperando datos</span>
+            <span class="demo__chip" id="resultId">—</span>
+          </div>
+          <div class="result__empty" id="resultEmpty">
+            <div class="glyph" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M9 9h6v6H9z"/></svg></div>
+            <div>
+              <p class="result__title" style="color:var(--ink)">Ajusta los parámetros y pulsa <em class="italic-serif">Calcular</em>.</p>
+              <p style="font-size:.88rem;color:var(--ink-2);margin-top:.4rem;max-width:32ch">Verás la estimación puntual, el intervalo de confianza calibrado y los tres factores que más afectan al precio.</p>
+            </div>
+          </div>
+
+          <div id="resultContent" hidden>
+            <p class="result__title">Precio estimado mensual</p>
+            <div class="result__price"><span id="pricePoint">1.450</span><span class="cur">€</span><span class="per">/mes</span></div>
+
+            <div class="result__interval">
+              <div class="result__interval-head">
+                <span>Intervalo P5&ndash;P95</span>
+                <span id="intervalRange">— € · — €</span>
+              </div>
+              <div class="result__interval-bar" aria-hidden="true">
+                <div class="result__interval-fill" id="intervalFill"></div>
+                <div class="result__interval-mark" id="intervalMark"></div>
+              </div>
+              <div class="result__interval-vals">
+                <span id="intervalLow">P5</span>
+                <span id="intervalHigh">P95</span>
+              </div>
+            </div>
+
+            <p class="result__title" style="margin-top:.4rem">Factores que más influyen</p>
+            <div class="result__factors" id="resultFactors">
+              <!-- factors injected by JS -->
+            </div>
+
+            <!-- Mejora v2: tarjeta de confianza por distrito -->
+            <div class="confidence" id="confidenceCard" aria-live="polite">
+              <div class="confidence__head">
+                <span class="confidence__lbl">Confianza del modelo</span>
+                <span class="confidence__level" id="confLevel">Alta · 78 %</span>
+              </div>
+              <div class="confidence__bar" aria-hidden="true">
+                <div class="confidence__fill" id="confFill" style="width:78%"></div>
+              </div>
+              <dl class="confidence__grid">
+                <div><dt>MAE en este distrito</dt><dd class="is-accent" id="confDistrictMae">±0 €</dd></div>
+                <div><dt>MAE global del modelo</dt><dd>±301 €</dd></div>
+                <div><dt>Coef. de variación</dt><dd id="confCv">0,0 %</dd></div>
+              </dl>
+            </div>
+
+            <div class="result__foot">
+              <span id="footMethod">CatBoost simplificado</span>
+              <span id="footDistrict">Centro</span>
+              <span>MAE ±301 €</span>
+            </div>
+
+            <!-- Mejora v2: botón "Generar informe" en modo tasador -->
+            <div class="result__actions">
+              <button type="button" class="btn btn--ghost" id="printBtn" aria-label="Generar informe de valoración en PDF">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="15" x2="15" y2="15"/><line x1="9" y1="11" x2="15" y2="11"/></svg>
+                <span>Informe PDF</span>
+              </button>
+              <button type="button" class="btn btn--ink" id="copyBtn" aria-label="Copiar resumen al portapapeles">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+                <span id="copyLabel">Copiar resumen</span>
+              </button>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================================
+     HOW IT WORKS
+     ========================================================== -->
+<section class="section section--surface" id="como-funciona">
+  <div class="container">
+    <header class="section-head reveal">
+      <span class="eyebrow">Metodología</span>
+      <h2 id="metodologia">Cómo funciona, paso a paso.</h2>
+      <p>Tres etapas, cero magia. Cada decisión está documentada y reproducible en el repositorio del proyecto.</p>
+    </header>
+
+    <div class="process__grid">
+      <article class="step reveal" data-delay="1">
+        <span class="step__num">01 &middot; Datos</span>
+        <h3>Recogemos y enriquecemos los anuncios del mercado.</h3>
+        <p>Partimos del flujo público de Idealista y limpiamos outliers (precio, superficie, €/m²). A cada inmueble le añadimos el contexto urbano y socioeconómico de su entorno: 10 fuentes externas que aportan 16 variables.</p>
+        <ul>
+          <li>INE &mdash; renta, edad media, hogares unipersonales</li>
+          <li>GTFS &mdash; densidad Metro y EMT</li>
+          <li>BiciMAD &mdash; distancia y densidad de estaciones</li>
+          <li>Catastro &mdash; locales y terrazas a 1 km</li>
+          <li>Ayuntamiento &mdash; VUT, ruido L<sub>d</sub>, NO₂</li>
+        </ul>
+      </article>
+
+      <article class="step reveal" data-delay="2">
+        <span class="step__num">02 &middot; Modelo</span>
+        <h3>Entrenamos un ensemble validado contra leakage.</h3>
+        <p>Ensemble de CatBoost top-5, hiperparámetros optimizados con Optuna (más de 2.000 trials) y selección de variables por consenso entre SelectKBest, SHAP y *permutation noise probe*.</p>
+        <ul>
+          <li>Holdout temporal por <em class="italic-serif">staleness</em></li>
+          <li>CV espacial por geohash-6 (5 folds)</li>
+          <li>CV temporal con gap de 208 días</li>
+          <li>Calibración CQR para intervalos P5&ndash;P95</li>
+          <li>Cobertura empírica: 87 % en holdout</li>
+        </ul>
+      </article>
+
+      <article class="step reveal" data-delay="3">
+        <span class="step__num">03 &middot; Producto</span>
+        <h3>Te entregamos oportunidades priorizadas y explicadas.</h3>
+        <p>Cada mes detectamos los inmuebles donde el precio publicado se desvía significativamente a la baja respecto a la estimación. Cada oportunidad incluye explicabilidad SHAP y se ordena por un *score* compuesto que pondera incertidumbre y descuento.</p>
+        <ul>
+          <li>Top-10 mensual por descuento neto</li>
+          <li>Top-10 por descuento &euro;/m²</li>
+          <li>Ranking mixto ajustado por incertidumbre</li>
+          <li>Filtros por clúster y rango de precio</li>
+          <li>Mapa interactivo con capa de oportunidades</li>
+        </ul>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================================
+     OPPORTUNITIES TABLE
+     ========================================================== -->
+<section class="section section--paper" id="oportunidades">
+  <div class="container">
+    <div class="opps__head reveal">
+      <div>
+        <span class="eyebrow">Oportunidades del mes</span>
+        <h2>TOP-10 inmuebles infravalorados.</h2>
+        <p class="lead">Los 10 anuncios con mayor brecha entre el precio publicado y la estimación del modelo, ajustados por incertidumbre. Actualización mensual.</p>
+      </div>
+      <div class="opps__filter" role="tablist" aria-label="Ranking">
+        <button type="button" class="is-active" data-rank="mixed" role="tab" aria-selected="true">Mixto</button>
+        <button type="button" data-rank="score" role="tab" aria-selected="false">Descuento €</button>
+        <button type="button" data-rank="score_m2" role="tab" aria-selected="false">Descuento €/m²</button>
+      </div>
+    </div>
+
+    <!-- C4 · Filtros adicionales del TOP-10 -->
+    <div class="opps__filters-row reveal" data-delay="1" role="group" aria-label="Filtros del ranking">
+      <span class="opps__filters-lbl">Filtros</span>
+      <select id="oppsFilterDistrict" aria-label="Filtrar por distrito">
+        <option value="">Todos los distritos</option>
+      </select>
+      <select id="oppsFilterPrice" aria-label="Filtrar por precio publicado">
+        <option value="">Cualquier precio</option>
+        <option value="0-1000">Hasta 1.000 €</option>
+        <option value="1000-1500">1.000 – 1.500 €</option>
+        <option value="1500-2000">1.500 – 2.000 €</option>
+        <option value="2000-99999">Más de 2.000 €</option>
+      </select>
+      <select id="oppsFilterSurface" aria-label="Filtrar por superficie">
+        <option value="">Cualquier m²</option>
+        <option value="0-70">Hasta 70 m²</option>
+        <option value="70-90">70 – 90 m²</option>
+        <option value="90-9999">Más de 90 m²</option>
+      </select>
+      <button type="button" class="reset" id="oppsFiltersReset">Limpiar filtros</button>
+    </div>
+
+    <div class="opps__table-wrap reveal" data-delay="1">
+      <table class="opps__table" aria-label="Top 10 oportunidades">
+        <thead>
+          <tr>
+            <th class="col-rank">#</th>
+            <th class="col-barrio">Barrio</th>
+            <th class="col-hide-sm">Superficie</th>
+            <th>Publicado</th>
+            <th>Estimación</th>
+            <th>Descuento</th>
+            <th class="col-hide-sm">Score</th>
+            <th class="col-action" aria-label="Acción"></th>
+          </tr>
+        </thead>
+        <tbody id="oppsBody">
+          <!-- rows injected by JS -->
+        </tbody>
+      </table>
+    </div>
+    <div class="opps__legend">
+      <span><b>Score</b> = (estimación − publicado) / σ del modelo · más alto, más fiable</span>
+      <span><b>Fuente:</b> reports/opportunities_top10_*.csv</span>
+      <span><b>Actualizado:</b> mensualmente</span>
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================================
+     MAP
+     ========================================================== -->
+<section class="section map" id="mapa">
+  <div class="container">
+    <header class="section-head reveal">
+      <span class="eyebrow">Cobertura</span>
+      <h2>21 distritos. <em class="italic-serif">Una sola lente.</em></h2>
+      <p class="lead">Precio mediano €/m² por distrito calculado sobre el dataset enriquecido de 146 barrios. Pasa el ratón sobre cualquier hexágono o sobre la lista para ver el detalle.</p>
+    </header>
+
+    <div class="map__layout">
+      <div class="map__svg-wrap reveal" data-delay="1">
+        <span class="map__title">Cartograma · Madrid<b>Mediana €/m² alquiler</b></span>
+        <span class="map__compass" aria-hidden="true">N ↑</span>
+        <svg class="map__svg" viewBox="0 0 720 600" role="img" aria-label="Cartograma estilizado de los 21 distritos de Madrid coloreado por precio mediano de alquiler en euros por metro cuadrado" preserveAspectRatio="xMidYMid meet">
+          <defs>
+            <filter id="hexGlow" x="-20%" y="-20%" width="140%" height="140%">
+              <feGaussianBlur stdDeviation="4" result="blur"/>
+              <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+            </filter>
+          </defs>
+          <g id="mapDistricts"></g>
+        </svg>
+      </div>
+
+      <div class="map__panel">
+        <div class="map__legend reveal" data-delay="2">
+          <h3>Escala precio €/m²</h3>
+          <div class="legend-scale" aria-hidden="true">
+            <span class="swatch" style="background:#1F2E29"></span>
+            <span class="swatch" style="background:#234740"></span>
+            <span class="swatch" style="background:#2A5C50"></span>
+            <span class="swatch" style="background:#32735F"></span>
+            <span class="swatch" style="background:#3E907A"></span>
+            <span class="swatch" style="background:#52B59C"></span>
+          </div>
+          <div class="legend-scale-labels">
+            <span>13,9 €</span>
+            <span>17,5 €</span>
+            <span>21,0 €</span>
+            <span>23,7 €</span>
+          </div>
+        </div>
+
+        <div class="dist-list reveal" data-delay="2" aria-label="Ranking de distritos por precio">
+          <div class="dist-list__head">
+            <h3>Ranking por €/m²</h3>
+            <span class="dist-list__count">21 distritos</span>
+          </div>
+          <div class="dist-list__body" id="distList" role="list">
+            <!-- rows injected by JS -->
+          </div>
+        </div>
+
+        <div class="map__detail reveal" data-delay="3" id="mapDetail">
+          <span class="map__detail-tag">Pasa el ratón sobre un distrito</span>
+          <p class="map__detail-empty">Selecciona uno de los 21 distritos para ver el precio mediano, el €/m², el número de barrios cubiertos y la posición en el ranking.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- C2 · Comparador de distritos (always dark — vive en la sección oscura del mapa) -->
+    <div class="compdist__wrap reveal" data-delay="3" id="compDist">
+      <header style="margin-bottom:1rem">
+        <span class="eyebrow" style="color:#A39E8E">Comparar distritos</span>
+        <h3 style="font-family:var(--serif);font-weight:400;font-size:1.4rem;line-height:1.15;margin-top:.4rem">Selecciona hasta 3 distritos para ver sus métricas lado a lado.</h3>
+      </header>
+      <div class="compdist__select" id="compDistChips" role="group" aria-label="Distritos a comparar"></div>
+      <div class="compdist__table-wrap">
+        <table class="compdist__table" id="compDistTable" hidden>
+          <thead><tr id="compDistHead"></tr></thead>
+          <tbody id="compDistBody"></tbody>
+        </table>
+      </div>
+      <p class="compdist__empty" id="compDistEmpty">Elige al menos 2 distritos arriba para ver la comparativa.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================================
+     COMPARISON
+     ========================================================== -->
+<section class="section section--paper">
+  <div class="container">
+    <header class="section-head reveal">
+      <span class="eyebrow">RentSamu vs. alternativas</span>
+      <h2>Por qué no basta con un portal o una tasadora.</h2>
+      <p>Cada herramienta del mercado tiene un propósito distinto. Esto es lo que aporta RentSamu frente a lo que ya estabas usando.</p>
+    </header>
+
+    <div class="compare reveal" data-delay="1">
+      <table class="compare__table">
+        <thead>
+          <tr>
+            <th></th>
+            <th class="is-us">RentSamu</th>
+            <th>Portales clásicos</th>
+            <th>Tasador tradicional</th>
+            <th>Intuición</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Precio justo por inmueble individual</td>
+            <td class="is-us"><span class="check">✓ Predicción puntual</span></td>
+            <td><span class="partial">~ Promedio del barrio</span></td>
+            <td><span class="check">✓ Manual</span></td>
+            <td><span class="cross">✗</span></td>
+          </tr>
+          <tr>
+            <td>Intervalo de confianza calibrado</td>
+            <td class="is-us"><span class="check">✓ P5–P95 al 87 %</span></td>
+            <td><span class="cross">✗</span></td>
+            <td><span class="partial">~ Rango sin calibrar</span></td>
+            <td><span class="cross">✗</span></td>
+          </tr>
+          <tr>
+            <td>Detección automática de oportunidades</td>
+            <td class="is-us"><span class="check">✓ TOP-10 mensual</span></td>
+            <td><span class="cross">✗</span></td>
+            <td><span class="cross">✗</span></td>
+            <td><span class="cross">✗</span></td>
+          </tr>
+          <tr>
+            <td>Explicabilidad de la valoración</td>
+            <td class="is-us"><span class="check">✓ Factores SHAP</span></td>
+            <td><span class="cross">✗</span></td>
+            <td><span class="check">✓ Informe escrito</span></td>
+            <td><span class="cross">✗</span></td>
+          </tr>
+          <tr>
+            <td>Enriquecimiento socioeconómico y urbano</td>
+            <td class="is-us"><span class="check">✓ 10+ fuentes</span></td>
+            <td><span class="cross">✗</span></td>
+            <td><span class="partial">~ Limitado</span></td>
+            <td><span class="cross">✗</span></td>
+          </tr>
+          <tr>
+            <td>Velocidad y coste por consulta</td>
+            <td class="is-us"><span class="check">✓ Instantáneo</span></td>
+            <td><span class="check">✓ Instantáneo</span></td>
+            <td><span class="cross">✗ 200–500 €</span></td>
+            <td><span class="check">✓ Gratis</span></td>
+          </tr>
+          <tr>
+            <td>Validación metodológica reproducible</td>
+            <td class="is-us"><span class="check">✓ Repositorio público</span></td>
+            <td><span class="partial">~ Cerrado</span></td>
+            <td><span class="partial">~ Caso a caso</span></td>
+            <td><span class="cross">✗</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================================
+     SOCIAL PROOF
+     ========================================================== -->
+<section class="section section--surface">
+  <div class="container">
+    <header class="section-head reveal">
+      <span class="eyebrow">Validación práctica y metodológica</span>
+      <h2>Sobrios. Cuantitativos. Honestos.</h2>
+    </header>
+
+    <div class="testi__grid">
+      <figure class="testi reveal" data-delay="1">
+        <blockquote class="testi__quote">Antes negociaba la renta a ojo. Ahora llego con un rango defendible delante del propietario y otro frente al inquilino. En tres meses ha pagado todo el coste anual.</blockquote>
+        <figcaption class="testi__author">
+          <span class="testi__avatar" aria-hidden="true">JR</span>
+          <span class="testi__who">
+            <span class="testi__name">Jorge R.</span>
+            <span class="testi__role">Inversor particular &middot; 6 pisos en Madrid</span>
+          </span>
+        </figcaption>
+      </figure>
+
+      <figure class="testi reveal" data-delay="2">
+        <blockquote class="testi__quote">El intervalo P5–P95 es lo que me convenció. Que un modelo te diga «1.450 €, pero entre 1.310 y 1.660 con un 87 % de confianza» es exactamente lo que necesito para hablar con clientes.</blockquote>
+        <figcaption class="testi__author">
+          <span class="testi__avatar" aria-hidden="true">LM</span>
+          <span class="testi__who">
+            <span class="testi__name">Laura M.</span>
+            <span class="testi__role">Asesora patrimonial &middot; Madrid centro</span>
+          </span>
+        </figcaption>
+      </figure>
+
+      <figure class="testi reveal" data-delay="3">
+        <blockquote class="testi__quote">Gestionamos 80 inmuebles. La diferencia entre alquilarlos al precio justo y al «precio del portal» es de cinco cifras al año. Ahora cada renovación pasa por RentSamu antes de salir.</blockquote>
+        <figcaption class="testi__author">
+          <span class="testi__avatar" aria-hidden="true">AT</span>
+          <span class="testi__who">
+            <span class="testi__name">Álex T.</span>
+            <span class="testi__role">Property manager &middot; 80 inmuebles</span>
+          </span>
+        </figcaption>
+      </figure>
+    </div>
+
+    <div class="method-card reveal" data-delay="2">
+      <div class="method-card__head">
+        <span class="eyebrow">Validado con rigor metodológico</span>
+        <h3>No medimos sólo el promedio, medimos el límite.</h3>
+        <p style="font-size:.92rem;color:var(--ink-2);line-height:1.55">Un modelo bueno en K-Fold aleatorio puede ser malo en geografía nueva. Por eso reportamos el MAE en cuatro esquemas distintos &mdash; incluido el más exigente.</p>
+      </div>
+      <dl class="method-card__list">
+        <div><dt>CV aleatorio (K-Fold)</dt><dd><span class="num">391,48 €</span> &mdash; baseline</dd></div>
+        <div><dt>CV espacial (geohash-6)</dt><dd><span class="num">561,59 €</span> &mdash; barrios nuevos</dd></div>
+        <div><dt>CV temporal (gap 208 días)</dt><dd><span class="num">493,26 €</span> &mdash; fechas futuras</dd></div>
+        <div><dt>Holdout final</dt><dd><span class="num">301,31 €</span> &mdash; cifra reportada</dd></div>
+      </dl>
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================================
+     FAQ
+     ========================================================== -->
+<section class="section section--paper" id="faq">
+  <div class="container">
+    <header class="section-head reveal">
+      <span class="eyebrow">Preguntas frecuentes</span>
+      <h2>Las dudas habituales antes de pedir acceso.</h2>
+    </header>
+    <div class="faq__list">
+      <details class="faq__item reveal" data-delay="1">
+        <summary class="faq__q">¿Cuál es la precisión real del modelo?<span class="plus" aria-hidden="true"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor"><line x1="6" y1="2" x2="6" y2="10"/><line x1="2" y1="6" x2="10" y2="6"/></svg></span></summary>
+        <div class="faq__a">
+          <p>En el conjunto de holdout (1.772 inmuebles que el modelo nunca ha visto en entrenamiento), el error absoluto medio es de <strong>301,31 €</strong> sobre un precio mediano de 1.450 € &mdash; es decir, alrededor del 21 % en términos relativos. El R² es 0,80.</p>
+          <p>Para inmuebles atípicos (precios &gt; 2.430 € o &lt; 1.080 €), el error sube. Por eso entregamos siempre un intervalo P5&ndash;P95: si el rango es muy ancho, el modelo te avisa de que ese inmueble es difícil de predecir.</p>
+        </div>
+      </details>
+
+      <details class="faq__item reveal" data-delay="1">
+        <summary class="faq__q">¿Con qué frecuencia se actualizan los datos?<span class="plus" aria-hidden="true"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor"><line x1="6" y1="2" x2="6" y2="10"/><line x1="2" y1="6" x2="10" y2="6"/></svg></span></summary>
+        <div class="faq__a">
+          <p>El ranking de oportunidades se regenera mensualmente con el nuevo lote de anuncios. Las fuentes externas estáticas (INE, catastro, GTFS) se actualizan en cuanto la fuente publica una nueva versión (típicamente cada 6&ndash;12 meses para INE, anual para catastro).</p>
+          <p>El modelo se reentrena cada trimestre con los datos acumulados, manteniendo la cadena de validación temporal intacta.</p>
+        </div>
+      </details>
+
+      <details class="faq__item reveal" data-delay="1">
+        <summary class="faq__q">¿Qué cobertura geográfica tiene?<span class="plus" aria-hidden="true"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor"><line x1="6" y1="2" x2="6" y2="10"/><line x1="2" y1="6" x2="10" y2="6"/></svg></span></summary>
+        <div class="faq__a">
+          <p>21 distritos del municipio de Madrid y 146 barrios documentados. El dataset tiene mayor densidad en Centro, Salamanca, Chamberí y Tetuán; menor en Vicálvaro, Villaverde y Barajas. La calidad de la predicción es proporcional a la densidad &mdash; algo que el intervalo de confianza refleja automáticamente.</p>
+          <p>Próximamente: Alcorcón, Móstoles, Getafe y Leganés.</p>
+        </div>
+      </details>
+
+      <details class="faq__item reveal" data-delay="1">
+        <summary class="faq__q">¿Qué pasa con pisos atípicos (lofts, áticos extremos, palacetes)?<span class="plus" aria-hidden="true"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor"><line x1="6" y1="2" x2="6" y2="10"/><line x1="2" y1="6" x2="10" y2="6"/></svg></span></summary>
+        <div class="faq__a">
+          <p>El modelo está entrenado sobre el rango operativo del mercado: 12&ndash;990 m², 450&ndash;25.000 € mensuales. Para inmuebles fuera de ese rango, la incertidumbre se dispara y el intervalo P5&ndash;P95 se ensancha. Lo verás visualmente en la demo.</p>
+          <p>En esos casos, RentSamu marca la valoración como <em class="italic-serif">de baja confianza</em> y recomienda una tasación humana.</p>
+        </div>
+      </details>
+
+      <details class="faq__item reveal" data-delay="1">
+        <summary class="faq__q">¿Es lo mismo que una tasación oficial?<span class="plus" aria-hidden="true"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor"><line x1="6" y1="2" x2="6" y2="10"/><line x1="2" y1="6" x2="10" y2="6"/></svg></span></summary>
+        <div class="faq__a">
+          <p>No, y nunca pretendemos serlo. Una tasación oficial homologada (ECO 805/2003) es un documento jurídico realizado por un tasador certificado que incluye visita física, certificado urbanístico y responsabilidad legal. RentSamu es <strong>price intelligence</strong>: te da una referencia cuantitativa para negociar, fijar renta o evaluar oportunidades.</p>
+          <p>En la práctica son complementarios: usa RentSamu para filtrar, usa una tasación oficial para cerrar una operación que lo requiera.</p>
+        </div>
+      </details>
+
+      <details class="faq__item reveal" data-delay="1">
+        <summary class="faq__q">¿Cómo tratáis la privacidad de los datos?<span class="plus" aria-hidden="true"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor"><line x1="6" y1="2" x2="6" y2="10"/><line x1="2" y1="6" x2="10" y2="6"/></svg></span></summary>
+        <div class="faq__a">
+          <p>Nuestro dataset se construye a partir de información pública anunciada en portales inmobiliarios, agregados oficiales (INE, catastro, Ayuntamiento) y datasets abiertos. No procesamos información de inquilinos, propietarios físicos identificables ni contratos privados.</p>
+          <p>Cuando solicitas acceso anticipado, sólo guardamos tu email y tu perfil profesional para enviarte la invitación. No compartimos datos con terceros. Cumplimos RGPD y LSSI-CE.</p>
+        </div>
+      </details>
+
+      <details class="faq__item reveal" data-delay="1">
+        <summary class="faq__q">¿Qué uso típico le dan los usuarios actuales?<span class="plus" aria-hidden="true"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor"><line x1="6" y1="2" x2="6" y2="10"/><line x1="2" y1="6" x2="10" y2="6"/></svg></span></summary>
+        <div class="faq__a">
+          <p>Tres patrones se repiten: (1) <strong>validar una renta</strong> antes de firmar un contrato o renovación, (2) <strong>filtrar oportunidades</strong> de compra para alquiler usando el TOP-10 mensual, y (3) <strong>justificar valoraciones</strong> ante clientes finales con la explicabilidad SHAP.</p>
+        </div>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================================
+     FINAL CTA
+     ========================================================== -->
+<section class="section cta-final" id="acceso">
+  <div class="container cta-final__inner">
+    <div class="reveal">
+      <span class="eyebrow">Acceso anticipado &middot; Mayo 2026</span>
+      <h2>Decide con la misma <em class="italic-serif">información</em> que usa el otro lado de la mesa.</h2>
+      <p>Estamos abriendo el producto a un grupo reducido de inversores particulares, asesores patrimoniales y property managers. Plazas limitadas.</p>
+      <ul>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> Acceso al ranking mensual de oportunidades</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> Predictor completo con 49 variables (no la versión demo)</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> Explicabilidad SHAP por inmueble</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> Acceso a las próximas versiones (Barcelona Q3 2026)</li>
+      </ul>
+    </div>
+
+    <form class="cta-final__form reveal" data-delay="1" id="accessForm" novalidate>
+      <div class="form-fields">
+        <h3>Solicita acceso anticipado</h3>
+        <p class="sub">Te escribimos en menos de 48 horas con la invitación y los pasos siguientes.</p>
+
+        <label for="cf-email" class="field__name" style="margin-bottom:.35rem;display:block">Email profesional</label>
+        <input id="cf-email" name="email" type="email" required autocomplete="email" placeholder="tu.correo@empresa.com" aria-describedby="cf-email-err">
+
+        <div style="margin-top:.7rem">
+          <span class="field__name" style="display:block;margin-bottom:.5rem">¿Cuál es tu perfil?</span>
+          <div class="role-grid" role="radiogroup" aria-label="Tipo de perfil">
+            <label><input type="radio" name="role" value="inversor" required>Inversor particular</label>
+            <label><input type="radio" name="role" value="asesor">Asesor patrimonial</label>
+            <label><input type="radio" name="role" value="property">Property manager</label>
+            <label><input type="radio" name="role" value="otro">Otro</label>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn--primary btn--lg cta-final__submit">
+          Solicitar acceso anticipado
+          <svg class="arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </button>
+        <p class="cta-final__legal">Sin spam. Sin compartir tus datos. Puedes darte de baja en cualquier momento. Al enviar aceptas la política de privacidad de RentSamu.</p>
+      </div>
+
+      <div class="cta-final__success" id="formSuccess" aria-live="polite">
+        <div class="icon" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <h4>Solicitud recibida.</h4>
+        <p>Te escribiremos a tu correo en las próximas 48 horas con la invitación de acceso anticipado. Gracias por confiar en RentSamu.</p>
+      </div>
+    </form>
+  </div>
+</section>
+
+</main>
+
+<!-- ==========================================================
+     PRINT-ONLY REPORT (modo tasador) — rediseñado v2
+     Solo visible al imprimir o exportar como PDF.
+     ========================================================== -->
+<section class="print-report" id="printReport" aria-hidden="true">
+
+  <!-- Cabecera -->
+  <header class="pr-header">
+    <div class="pr-header__brand">
+      <span class="pr-logo">R</span>
+      <div>
+        <div class="pr-name">RentSamu</div>
+        <div class="pr-tagline">Inteligencia de precios · Alquiler Madrid</div>
+      </div>
+    </div>
+    <div class="pr-header__meta">
+      <div class="pr-meta-line"><span>Documento</span><b>Informe de valoración orientativa</b></div>
+      <div class="pr-meta-line"><span>Referencia</span><b id="prId">—</b></div>
+      <div class="pr-meta-line"><span>Fecha emisión</span><b id="prDate">—</b></div>
+      <div class="pr-meta-line"><span>Modelo</span><b>CatBoost ensemble · v2026.05</b></div>
+    </div>
+  </header>
+
+  <!-- Inmueble -->
+  <section class="pr-block">
+    <div class="pr-sectitle">
+      <span class="pr-secnum">01</span>
+      <h2>Inmueble objeto del informe</h2>
+    </div>
+    <table class="pr-proptable">
+      <tbody>
+        <tr>
+          <th>Distrito</th><td id="prDistrict">—</td>
+          <th>Tipología</th><td>Vivienda residencial</td>
+        </tr>
+        <tr>
+          <th>Superficie útil</th><td id="prSurface">—</td>
+          <th>Año construcción</th><td id="prYear">—</td>
+        </tr>
+        <tr>
+          <th>Dormitorios</th><td id="prBeds">—</td>
+          <th>Planta</th><td id="prFloor">—</td>
+        </tr>
+        <tr>
+          <th>Baños</th><td id="prBaths">—</td>
+          <th>Equipamiento activo</th><td id="prEquip">—</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- Valoración -->
+  <section class="pr-block">
+    <div class="pr-sectitle">
+      <span class="pr-secnum">02</span>
+      <h2>Valoración del modelo</h2>
+    </div>
+
+    <div class="pr-hero">
+      <div class="pr-hero__lbl">Renta mensual estimada</div>
+      <div class="pr-hero__price"><span id="prPrice">—</span><span class="pr-cur">€</span><span class="pr-per">/ mes</span></div>
+      <div class="pr-hero__perm2"><span id="prPriceM2">—</span> €/m² · base mediana del distrito <span id="prDistMed">—</span> €/m²</div>
+    </div>
+
+    <div class="pr-interval">
+      <div class="pr-interval__head">
+        <div class="pr-interval__title">Intervalo de confianza P5–P95</div>
+        <div class="pr-interval__cov">Cobertura empírica · <b>86,96 %</b></div>
+      </div>
+      <div class="pr-interval__bar">
+        <div class="pr-interval__fill" id="prIntervalFill"></div>
+        <div class="pr-interval__mark" id="prIntervalMark"></div>
+      </div>
+      <div class="pr-interval__vals">
+        <div><span>P5</span><b id="prLow">—</b> €</div>
+        <div><span>Estimación</span><b id="prCenter">—</b> €</div>
+        <div><span>P95</span><b id="prHigh">—</b> €</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Factores -->
+  <section class="pr-block pr-block--avoid">
+    <div class="pr-sectitle">
+      <span class="pr-secnum">03</span>
+      <h2>Factores determinantes &middot; <em>explicabilidad SHAP</em></h2>
+    </div>
+    <table class="pr-factable" id="prFactorsTable">
+      <thead>
+        <tr><th>Factor</th><th>Descripción</th><th class="num">Impacto</th></tr>
+      </thead>
+      <tbody id="prFactorsBody"></tbody>
+    </table>
+  </section>
+
+  <!-- Confianza -->
+  <section class="pr-block pr-block--avoid">
+    <div class="pr-sectitle">
+      <span class="pr-secnum">04</span>
+      <h2>Confianza del modelo</h2>
+    </div>
+
+    <div class="pr-conf">
+      <div class="pr-conf__main">
+        <div class="pr-conf__level">
+          <span class="pr-conf__lvllbl">Nivel global</span>
+          <span class="pr-conf__lvlval" id="prConfLevel">—</span>
+        </div>
+        <div class="pr-conf__score">
+          <span class="pr-conf__scorenum" id="prConfPct">—</span>
+          <span class="pr-conf__scoremax">/100</span>
+        </div>
+      </div>
+      <div class="pr-conf__bar">
+        <div class="pr-conf__fill" id="prConfFill"></div>
+      </div>
+      <div class="pr-conf__grid">
+        <div><span>MAE en este distrito</span><b id="prConfMae">—</b></div>
+        <div><span>MAE global · holdout</span><b>±301,31 €</b></div>
+        <div><span>Coef. variación</span><b id="prConfCv">—</b></div>
+        <div><span>R² holdout</span><b>0,80</b></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Metodología -->
+  <section class="pr-block">
+    <div class="pr-sectitle">
+      <span class="pr-secnum">05</span>
+      <h2>Metodología</h2>
+    </div>
+    <div class="pr-meth">
+      <div class="pr-meth__pill">8.797 inmuebles</div>
+      <div class="pr-meth__pill">49 variables</div>
+      <div class="pr-meth__pill">10+ fuentes externas</div>
+      <div class="pr-meth__pill">21 distritos</div>
+      <div class="pr-meth__pill">Holdout temporal</div>
+      <div class="pr-meth__pill">CV espacial geohash-6</div>
+      <div class="pr-meth__pill">CQR calibrado</div>
+    </div>
+    <p class="pr-meth__text">Predicción generada por un ensemble CatBoost top-5, hipertuneado con Optuna sobre 8.797 inmuebles madrileños enriquecidos con 16 variables externas — INE (renta, edad media, hogares), GTFS (densidad Metro y EMT), BiciMAD, catastro (locales, terrazas), Ayuntamiento (VUT, ruido L<sub>d</sub>, NO₂), parques y asociaciones. Validación cruzada combinada: holdout temporal por <em>staleness</em> (test 0,2; gap 1 día), CV espacial por geohash-6 (5 folds) y CV temporal (gap 208 días). El intervalo P5–P95 se calibra mediante Conformal Quantile Regression con cobertura empírica del 86,96 % sobre holdout. Selección final de 49 variables por consenso entre SelectKBest, SHAP TreeExplainer y permutation noise probe.</p>
+  </section>
+
+  <!-- Footer / Aviso -->
+  <footer class="pr-foot">
+    <div class="pr-foot__rule"></div>
+    <p><b>Aviso legal.</b> Las predicciones de este informe son <em>orientativas</em>, se basan en modelos estadísticos sobre datos públicos y <b>no constituyen tasación oficial homologada</b> (Orden ECO/805/2003), asesoramiento financiero, jurídico ni recomendación de inversión. RentSamu no se responsabiliza de decisiones tomadas exclusivamente sobre la base de estas estimaciones. Para operaciones que requieran tasación oficial, consulte a un tasador certificado.</p>
+    <div class="pr-foot__bottom">
+      <span>© 2026 RentSamu · rentsamu.es</span>
+      <span>Documento generado automáticamente · Versión simplificada del modelo de producción</span>
+    </div>
+  </footer>
+</section>
+
+<!-- ==========================================================
+     FOOTER
+     ========================================================== -->
+<footer class="site-footer">
+  <div class="container">
+    <!-- E5 · Newsletter -->
+    <div class="newsletter" id="newsletterBox">
+      <div>
+        <h4>Boletín mensual de oportunidades</h4>
+        <p>Recibe cada mes las 10 mejores oportunidades de Madrid analizadas por RentSamu. Sin spam, baja en un clic.</p>
+      </div>
+      <form class="newsletter__form" id="newsletterForm" novalidate>
+        <input type="email" name="email" id="newsletterEmail" placeholder="tu@email.com" autocomplete="email" required aria-label="Tu email" />
+        <button type="submit">Suscribirme</button>
+      </form>
+      <p class="newsletter__success" id="newsletterSuccess">✓ Te apuntamos. Recibirás el primer boletín en cuanto lo publiquemos.</p>
+    </div>
+
+    <div class="footer__grid">
+      <div class="footer__brand">
+        <a href="#" class="brand">
+          <span class="brand-mark" aria-hidden="true"><span>R</span></span>
+          <span>RentSamu</span>
+        </a>
+        <p>Inteligencia de precios del alquiler residencial en Madrid. Modelos validados, datos públicos enriquecidos, decisiones defendibles.</p>
+      </div>
+
+      <div class="footer__col">
+        <h4>Producto</h4>
+        <ul>
+          <li><a href="#demo">Predictor</a></li>
+          <li><a href="#oportunidades">Top-10 oportunidades</a></li>
+          <li><a href="#mapa">Mapa por distrito</a></li>
+          <li><a href="#acceso">Acceso anticipado</a></li>
+        </ul>
+      </div>
+
+      <div class="footer__col">
+        <h4>Metodología</h4>
+        <ul>
+          <li><a href="metodologia.html">Documento técnico</a></li>
+          <li><a href="#como-funciona">Cómo entrenamos</a></li>
+          <li><a href="metodologia.html#validacion">Validación cruzada</a></li>
+          <li><a href="#faq">FAQ técnico</a></li>
+        </ul>
+      </div>
+
+      <div class="footer__col">
+        <h4>Empresa</h4>
+        <ul>
+          <li><a href="sobre.html">Sobre RentSamu</a></li>
+          <li><a href="metodologia.html">Metodología</a></li>
+          <li><a href="contacto.html#prensa">Prensa</a></li>
+          <li><a href="contacto.html">Contacto</a></li>
+        </ul>
+      </div>
+
+      <div class="footer__col">
+        <h4>Legal</h4>
+        <ul>
+          <li><a href="privacidad.html">Política de privacidad</a></li>
+          <li><a href="terminos.html">Términos de servicio</a></li>
+          <li><a href="aviso-legal.html">Aviso legal</a></li>
+          <li><a href="cookies.html">Cookies</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer__bottom">
+      <p class="footer__disclaimer">© 2026 RentSamu. Las predicciones que ofrece esta plataforma son orientativas, se basan en modelos estadísticos y no constituyen asesoramiento financiero, jurídico ni tasación oficial homologada. RentSamu no se responsabiliza de las decisiones tomadas exclusivamente sobre la base de sus estimaciones.</p>
+      <div class="footer__social">
+        <a href="#" aria-label="LinkedIn"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.5 2h-17A1.5 1.5 0 002 3.5v17A1.5 1.5 0 003.5 22h17a1.5 1.5 0 001.5-1.5v-17A1.5 1.5 0 0020.5 2zM8 19H5v-9h3zM6.5 8.25A1.75 1.75 0 118.3 6.5 1.78 1.78 0 016.5 8.25zM19 19h-3v-4.74c0-1.42-.6-1.93-1.38-1.93A1.74 1.74 0 0013 14.19a.66.66 0 000 .14V19h-3v-9h2.9v1.3a3.11 3.11 0 012.7-1.4c1.55 0 3.36.86 3.36 3.66z"/></svg></a>
+        <a href="#" aria-label="GitHub"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 00-3.16 19.49c.5.1.68-.22.68-.48v-1.7c-2.78.6-3.37-1.34-3.37-1.34-.46-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.89 1.53 2.34 1.09 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.94 0-1.09.39-1.98 1.03-2.68-.1-.25-.45-1.27.1-2.64 0 0 .84-.27 2.75 1.02a9.58 9.58 0 015 0c1.91-1.29 2.75-1.02 2.75-1.02.55 1.37.2 2.39.1 2.64.64.7 1.03 1.59 1.03 2.68 0 3.84-2.34 4.68-4.57 4.93.36.31.68.92.68 1.85V21c0 .27.18.58.69.48A10 10 0 0012 2z"/></svg></a>
+        <a href="#" aria-label="X (Twitter)"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- ==========================================================
+     V3 ENHANCEMENTS · widgets inyectados al final del body
+     ========================================================== -->
+
+<!-- Back-to-top flotante -->
+<button type="button" class="back-top" id="backTop" aria-label="Volver arriba" hidden>
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <line x1="12" y1="19" x2="12" y2="5"/>
+    <polyline points="5 12 12 5 19 12"/>
+  </svg>
+</button>
+
+<!-- Compare bar (predicciones guardadas) -->
+<div class="compare-bar" id="compareBar" hidden aria-label="Predicciones guardadas para comparar">
+  <div class="compare-bar__inner">
+    <div class="compare-bar__head">
+      <div>
+        <strong>Comparador</strong>
+        <span class="compare-bar__count" id="compareCount">0</span>
+        <span class="compare-bar__hint">de 3</span>
+      </div>
+      <div class="compare-bar__actions">
+        <button type="button" class="btn btn--ghost btn--sm" id="compareOpen">Abrir vista completa</button>
+        <button type="button" class="compare-bar__close" id="compareClear" aria-label="Vaciar comparador">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="compare-bar__slots" id="compareSlots"></div>
+  </div>
+</div>
+
+<!-- Compare modal (vista lateral lateral con tarjetas detalladas) -->
+<div class="modal" id="compareModal" hidden role="dialog" aria-modal="true" aria-labelledby="compareModalTitle">
+  <div class="modal__backdrop" data-close></div>
+  <div class="modal__panel modal__panel--wide" role="document">
+    <header class="modal__head">
+      <h3 id="compareModalTitle">Comparador de predicciones</h3>
+      <button type="button" class="modal__close" data-close aria-label="Cerrar comparador">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>
+      </button>
+    </header>
+    <div class="modal__body" id="compareModalBody"></div>
+  </div>
+</div>
+
+<!-- Opportunity detail modal -->
+<div class="modal" id="oppModal" hidden role="dialog" aria-modal="true" aria-labelledby="oppModalTitle">
+  <div class="modal__backdrop" data-close></div>
+  <div class="modal__panel" role="document">
+    <header class="modal__head">
+      <h3 id="oppModalTitle">Oportunidad</h3>
+      <button type="button" class="modal__close" data-close aria-label="Cerrar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>
+      </button>
+    </header>
+    <div class="modal__body" id="oppModalBody"></div>
+  </div>
+</div>
+
+<!-- Live valuation toasts -->
+<div class="live-toasts" id="liveToasts" aria-live="polite" aria-atomic="false"></div>
+
+<!-- Onboarding tour -->
+<div class="tour" id="tour" hidden role="dialog" aria-modal="true" aria-labelledby="tourTitle">
+  <div class="tour__backdrop"></div>
+  <div class="tour__panel">
+    <div class="tour__progress" id="tourProgress"></div>
+    <span class="tour__step" id="tourStepLabel">Paso 1 de 4</span>
+    <h3 id="tourTitle" class="tour__title">Bienvenido a RentSamu</h3>
+    <p class="tour__text" id="tourText">Te enseñamos en 30 segundos cómo aprovechar el predictor y el ranking de oportunidades.</p>
+    <div class="tour__actions">
+      <button type="button" class="btn btn--ghost btn--sm" id="tourSkip">Saltar</button>
+      <button type="button" class="btn btn--primary btn--sm" id="tourNext">Empezar →</button>
+    </div>
+  </div>
+</div>
+
+<script src="app.js" defer></script>
+</body>
+</html>
