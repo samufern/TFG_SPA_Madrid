@@ -72,45 +72,47 @@ const DISTRICTS_22 = [
 ];
 
 // ============================================================
-//  OPPORTUNITIES — built from reports/opportunities_top10_mixed.csv (URLs)
-//  + price reconstruction consistent with district medians (P10/P50/P90 = 850/1450/3550)
+//  OPPORTUNITIES — derived from reports/opportunities_top10_*.csv
+//  Fórmula: score = (estimated − published) / ancho intervalo CQR
+//  Filtro: solo entradas con publicado < P5 calibrado (≈ 5,7 % del train)
+//  El campo `score` es la z-score heteroscedástica real (no un placeholder)
 // ============================================================
 const OPPORTUNITIES = {
   mixed: [
-    {rank:1,  barrio:"Embajadores",       district:"Centro",          m2: 68, published:1180, estimated:1485, url:"98829876"},
-    {rank:2,  barrio:"Bellas Vistas",     district:"Tetuán",          m2: 82, published:1240, estimated:1620, url:"95953330"},
-    {rank:3,  barrio:"Acacias",           district:"Arganzuela",      m2: 95, published:1560, estimated:1985, url:"99346252"},
-    {rank:4,  barrio:"Quintana",          district:"Ciudad Lineal",   m2: 78, published:1080, estimated:1395, url:"99341841"},
-    {rank:5,  barrio:"Cuatro Caminos",    district:"Tetuán",          m2: 71, published:1190, estimated:1545, url:"99361320"},
-    {rank:6,  barrio:"Pacífico",          district:"Retiro",          m2: 88, published:1620, estimated:2060, url:"99014659"},
-    {rank:7,  barrio:"Aluche",            district:"Latina",          m2: 75, published: 980, estimated:1280, url:"99398480"},
-    {rank:8,  barrio:"Almagro",           district:"Chamberí",        m2:102, published:2180, estimated:2780, url:"97824571"},
-    {rank:9,  barrio:"Universidad",       district:"Centro",          m2: 64, published:1340, estimated:1690, url:"99194469"},
-    {rank:10, barrio:"Pueblo Nuevo",      district:"Ciudad Lineal",   m2: 86, published:1220, estimated:1535, url:"1355304"}
+    {rank:1,  barrio:"Centro",                          district:"Meco",                m2:230, published:1200, estimated:6053, score:1.16, url:"99170119"},
+    {rank:2,  barrio:"Chueca-Justicia",                 district:"Centro",              m2: 88, published:1200, estimated:3066, score:1.11, url:"98971974"},
+    {rank:3,  barrio:"Trafalgar",                       district:"Chamberí",            m2: 55, published: 900, estimated:2087, score:1.00, url:"36951938"},
+    {rank:4,  barrio:"Goya",                            district:"Salamanca",           m2: 90, published:1400, estimated:3362, score:1.00, url:"99410525"},
+    {rank:5,  barrio:"Centro",                          district:"Moralzarzal",         m2: 80, published: 825, estimated:2495, score:1.08, url:"99381086"},
+    {rank:6,  barrio:"Trafalgar",                       district:"Chamberí",            m2: 45, published: 800, estimated:1899, score:0.87, url:"98829876"},
+    {rank:7,  barrio:"Nuevos Ministerios-Ríos Rosas",   district:"Chamberí",            m2: 37, published: 850, estimated:1683, score:0.89, url:"99427117"},
+    {rank:8,  barrio:"Pacífico",                        district:"Retiro",              m2: 96, published:1100, estimated:2587, score:1.25, url:"99402050"},
+    {rank:9,  barrio:"Malasaña-Universidad",            district:"Centro",              m2:115, published:1500, estimated:3778, score:0.96, url:"96823743"},
+    {rank:10, barrio:"Lista",                           district:"Salamanca",           m2: 30, published: 800, estimated:2029, score:0.79, url:"40216813"}
   ],
   score: [
-    {rank:1,  barrio:"Justicia",          district:"Centro",          m2: 72, published:1450, estimated:2050, url:"98763129"},
-    {rank:2,  barrio:"Pacífico",          district:"Retiro",          m2: 88, published:1480, estimated:2010, url:"99249635"},
-    {rank:3,  barrio:"Cortes",            district:"Centro",          m2: 65, published:1320, estimated:1755, url:"99162225"},
-    {rank:4,  barrio:"Almagro",           district:"Chamberí",        m2: 90, published:1850, estimated:2380, url:"99217150"},
-    {rank:5,  barrio:"Lista",             district:"Salamanca",       m2: 84, published:1980, estimated:2470, url:"91635655"},
-    {rank:6,  barrio:"Quintana",          district:"Ciudad Lineal",   m2: 80, published:1080, estimated:1430, url:"99423253"},
-    {rank:7,  barrio:"Universidad",       district:"Centro",          m2: 58, published:1080, estimated:1480, url:"99194469"},
-    {rank:8,  barrio:"Pueblo Nuevo",      district:"Ciudad Lineal",   m2: 95, published:1240, estimated:1610, url:"86008181"},
-    {rank:9,  barrio:"Aluche",            district:"Latina",          m2: 70, published: 920, estimated:1240, url:"96221775"},
-    {rank:10, barrio:"Hispanoamérica",    district:"Chamartín",       m2: 92, published:1740, estimated:2150, url:"98013230"}
+    {rank:1,  barrio:"Ventilla-Almenara",               district:"Tetuán",              m2:132, published:1500, estimated:2816, score:1.76, url:"93465238"},
+    {rank:2,  barrio:"Las Tablas",                      district:"Fuencarral",          m2:150, published:1350, estimated:2420, score:1.47, url:"98590106"},
+    {rank:3,  barrio:"Sector B",                        district:"Boadilla del Monte",  m2: 86, published:1200, estimated:2031, score:1.29, url:"99351788"},
+    {rank:4,  barrio:"Vista Alegre",                    district:"Carabanchel",         m2: 85, published: 750, estimated:1057, score:1.28, url:"99166138"},
+    {rank:5,  barrio:"Pacífico",                        district:"Retiro",              m2: 96, published:1100, estimated:2587, score:1.25, url:"99402050"},
+    {rank:6,  barrio:"Virgen del Cortijo - Manoteras",  district:"Hortaleza",           m2: 65, published: 900, estimated:1584, score:1.20, url:"31818434"},
+    {rank:7,  barrio:"Centro",                          district:"Meco",                m2:230, published:1200, estimated:6053, score:1.16, url:"99170119"},
+    {rank:8,  barrio:"Chueca-Justicia",                 district:"Centro",              m2: 88, published:1200, estimated:3066, score:1.11, url:"98971974"},
+    {rank:9,  barrio:"Centro",                          district:"Moralzarzal",         m2: 80, published: 825, estimated:2495, score:1.08, url:"99381086"},
+    {rank:10, barrio:"Guindalera",                      district:"Salamanca",           m2:190, published:2100, estimated:3449, score:1.04, url:"99389955"}
   ],
   score_m2: [
-    {rank:1,  barrio:"Acacias",           district:"Arganzuela",      m2: 65, published: 980, estimated:1430, url:"99379227"},
-    {rank:2,  barrio:"Bellas Vistas",     district:"Tetuán",          m2: 82, published:1240, estimated:1620, url:"95953330"},
-    {rank:3,  barrio:"Cuatro Caminos",    district:"Tetuán",          m2: 75, published:1150, estimated:1540, url:"99360208"},
-    {rank:4,  barrio:"Aluche",            district:"Latina",          m2: 68, published: 850, estimated:1175, url:"98579247"},
-    {rank:5,  barrio:"Embajadores",       district:"Centro",          m2: 68, published:1180, estimated:1485, url:"98829876"},
-    {rank:6,  barrio:"Comillas",          district:"Carabanchel",     m2: 70, published: 820, estimated:1095, url:"97094337"},
-    {rank:7,  barrio:"Almenara",          district:"Tetuán",          m2: 78, published:1120, estimated:1455, url:"95460357"},
-    {rank:8,  barrio:"Numancia",          district:"Puente Vallecas", m2: 72, published: 920, estimated:1210, url:"95534590"},
-    {rank:9,  barrio:"Aluche",            district:"Latina",          m2: 75, published: 980, estimated:1280, url:"99398480"},
-    {rank:10, barrio:"Cuatro Caminos",    district:"Tetuán",          m2: 71, published:1190, estimated:1545, url:"99361320"}
+    {rank:1,  barrio:"Sol",                             district:"Centro",              m2: 33, published:1290, estimated:5126, score:0.55, url:"99264012"},
+    {rank:2,  barrio:"Lista",                           district:"Salamanca",           m2: 30, published: 800, estimated:2029, score:0.79, url:"40216813"},
+    {rank:3,  barrio:"El Viso",                         district:"Chamartín",           m2: 30, published: 700, estimated:1609, score:0.58, url:"99408105"},
+    {rank:4,  barrio:"Sol",                             district:"Centro",              m2: 25, published: 600, estimated:1290, score:0.44, url:"666696"},
+    {rank:5,  barrio:"Chueca-Justicia",                 district:"Centro",              m2: 30, published: 750, estimated:1577, score:0.66, url:"99360208"},
+    {rank:6,  barrio:"Trafalgar",                       district:"Chamberí",            m2: 45, published: 800, estimated:1899, score:0.87, url:"98829876"},
+    {rank:7,  barrio:"Berruguete",                      district:"Tetuán",              m2: 33, published: 600, estimated:1361, score:0.68, url:"27377142"},
+    {rank:8,  barrio:"Ibiza",                           district:"Retiro",              m2: 40, published: 750, estimated:1664, score:0.73, url:"37685759"},
+    {rank:9,  barrio:"Nuevos Ministerios-Ríos Rosas",   district:"Chamberí",            m2: 37, published: 850, estimated:1683, score:0.89, url:"99427117"},
+    {rank:10, barrio:"Goya",                            district:"Salamanca",           m2: 90, published:1400, estimated:3362, score:1.00, url:"99410525"}
   ]
 };
 
@@ -779,7 +781,7 @@ document.getElementById('copyBtn').addEventListener('click', async ()=>{
   const r = lastPrediction;
   const fmt = n => n.toLocaleString('es-ES');
   const summary =
-    `RentSamu · Estimación de alquiler\n` +
+    `RentIA · Estimación de alquiler\n` +
     `Ref. ${lastPredictionId} · ${new Date().toLocaleDateString('es-ES')}\n` +
     `\n` +
     `Inmueble: ${r.inputs.surface} m² · ${r.inputs.bedrooms} dorm · ${r.inputs.bathrooms} baños · ${r.inputs.year}\n` +
@@ -793,7 +795,7 @@ document.getElementById('copyBtn').addEventListener('click', async ()=>{
     `\n` +
     `Factores principales:\n` +
     r.factors.map(f=>`  ${f.delta>=0?'+':'−'} ${f.label} (${f.detail})  ${f.delta>=0?'+':'−'}${Math.abs(Math.round(f.delta))} €`).join('\n') +
-    `\n\n— Orientativo. No constituye tasación oficial. rentsamu.es`;
+    `\n\n— Orientativo. No constituye tasación oficial. rentia.es`;
 
   const label = document.getElementById('copyLabel');
   const original = label.textContent;
@@ -844,7 +846,8 @@ function renderOpps(key){
   body.innerHTML = '';
   data.forEach(o=>{
     const pct = ((o.estimated - o.published) / o.estimated * 100);
-    const score = (o.estimated - o.published) / 100;
+    // Score real desde el CSV: z-score CQR heteroscedástica.
+    const scoreStr = (typeof o.score === 'number') ? o.score.toFixed(2).replace('.', ',') : '—';
     const tr = document.createElement('tr');
     tr.innerHTML = `
       <td class="col-rank ${o.rank<=3?'is-top':''}"><span>${o.rank}</span></td>
@@ -852,8 +855,8 @@ function renderOpps(key){
       <td class="col-hide-sm num">${o.m2} m²</td>
       <td class="num num--muted">${o.published.toLocaleString('es-ES')} €</td>
       <td class="num">${o.estimated.toLocaleString('es-ES')} €</td>
-      <td><span class="badge-pct">−${pct.toFixed(1)} %</span></td>
-      <td class="col-hide-sm num">${score.toFixed(2)}</td>
+      <td><span class="badge-pct">−${pct.toFixed(1).replace('.', ',')} %</span></td>
+      <td class="col-hide-sm num" title="z-score CQR · (estimación − publicado) / ancho intervalo">${scoreStr}</td>
       <td class="col-action"><a href="#" aria-label="Ver detalle de la oportunidad ${o.rank}">Ver detalle →</a></td>
     `;
     body.appendChild(tr);
@@ -870,7 +873,12 @@ document.querySelectorAll('.opps__filter button').forEach(btn=>{
     });
     btn.classList.add('is-active');
     btn.setAttribute('aria-selected','true');
-    renderOpps(btn.dataset.rank);
+    // Mostrar/ocultar panel de personalización
+    const panel = document.getElementById('oppsCustomPanel');
+    if(panel) panel.hidden = (btn.dataset.rank !== 'custom');
+    // El render real lo gestiona el IIFE C4 — aquí solo renderOpps para los 3 rankings estáticos.
+    // (Para 'custom', el IIFE C4 ya invoca apply() que lee customPool.)
+    if(btn.dataset.rank !== 'custom') renderOpps(btn.dataset.rank);
   });
 });
 
@@ -1112,7 +1120,7 @@ document.querySelectorAll('a[href^="#"]').forEach(a=>{
 // ============================================================
 //  A2/A3 · STATE PERSISTENCE (localStorage) + PERMALINK (URL)
 // ============================================================
-const STATE_KEY = 'rentsamu.state.v1';
+const STATE_KEY = 'rentia.state.v1';
 const STATE_KEYS = [
   'district','surface','bedrooms','bathrooms','viv_manual','year','floor',
   'lift','air_conditioning','terrace','balcony','garage_included',
@@ -1871,7 +1879,7 @@ function buildMapDetailExtras(d){
 })();
 
 // ============================================================
-//  C4 · TOP-10 EXTRA FILTERS
+//  C4 · TOP-10 EXTRA FILTERS + ranking personalizado "A medida"
 // ============================================================
 (function(){
   const districtSel = document.getElementById('oppsFilterDistrict');
@@ -1879,7 +1887,98 @@ function buildMapDetailExtras(d){
   const surfaceSel  = document.getElementById('oppsFilterSurface');
   const resetBtn    = document.getElementById('oppsFiltersReset');
   const body        = document.getElementById('oppsBody');
+  const customPanel = document.getElementById('oppsCustomPanel');
   if(!districtSel || !body) return;
+
+  // ──────────────────────────────────────────────────────────
+  // Estado del ranking personalizado
+  // ──────────────────────────────────────────────────────────
+  const FACTORS = [
+    { field:'distance_center_km', direction:'less' },
+    { field:'dist_metro_m',       direction:'less' },
+    { field:'m2',                 direction:'more' },
+    { field:'air_no2_nearest',    direction:'less' },
+    { field:'noise_ld_db',        direction:'less' },
+    { field:'equipment_count',    direction:'more' }
+  ];
+  const WEIGHTS_KEY = 'rentia.personalize.v1';
+  let customPool = [];               // 100 candidatos fetched
+  let customWeights = loadWeights(); // {factor: 0..4}
+
+  function loadWeights(){
+    try{ return JSON.parse(localStorage.getItem(WEIGHTS_KEY)) || {}; }
+    catch(e){ return {}; }
+  }
+  function saveWeights(){
+    try{ localStorage.setItem(WEIGHTS_KEY, JSON.stringify(customWeights)); }
+    catch(e){}
+  }
+
+  // Rank percentile robusta: 0..1, neutral (.5) cuando falta el valor
+  function rankPct(value, allValues){
+    if(value == null || !isFinite(value)) return 0.5;
+    const clean = allValues.filter(v => v != null && isFinite(v));
+    if(clean.length <= 1) return 0.5;
+    const below = clean.filter(v => v < value).length;
+    return below / (clean.length - 1);
+  }
+
+  // Pre-computar arrays de valores por factor para acelerar rankPct
+  let factorValues = {};
+  let baseScoreValues = [];
+  function recomputeFactorCaches(){
+    factorValues = {};
+    FACTORS.forEach(({field}) => {
+      factorValues[field] = customPool.map(p => p[field]);
+    });
+    baseScoreValues = customPool.map(p => p.score);
+  }
+
+  function personalScore(item){
+    let s = rankPct(item.score, baseScoreValues);  // base infraprecio (peso fijo 1)
+    FACTORS.forEach(({field, direction}) => {
+      const w = customWeights[field] || 0;
+      if(w === 0) return;
+      let norm = rankPct(item[field], factorValues[field]);
+      if(direction === 'less') norm = 1 - norm;
+      s += w * norm;
+    });
+    return s;
+  }
+
+  // Top 10 personalizado: clona el pool, asigna personal_score, ordena, slice(10)
+  function computeCustomTop10(){
+    if(!customPool.length) return [];
+    const scored = customPool.map(p => ({...p, _ps: personalScore(p)}));
+    scored.sort((a,b) => b._ps - a._ps);
+    // Anota rank dinámico tras orden
+    return scored.slice(0, 30).map((p, i) => ({...p, rank: i+1, url: p.url_id}));
+  }
+
+  // ──────────────────────────────────────────────────────────
+  // Fetch del pool al cargar (no bloquea el resto de la web)
+  // ──────────────────────────────────────────────────────────
+  fetch('data/opportunities_pool.json')
+    .then(r => r.ok ? r.json() : Promise.reject(r.status))
+    .then(data => {
+      customPool = (data.items || []).map(it => ({
+        ...it,
+        // Aliases para que `passes()` y la tabla puedan reutilizarse sin cambios
+        url: it.url_id,
+        barrio: it.barrio,
+        district: it.district
+      }));
+      recomputeFactorCaches();
+      applyChipsFromState();
+      // Si el usuario ya estaba en la pestaña custom (vuelta a la web), re-render
+      if(currentRank === 'custom') apply();
+    })
+    .catch(err => {
+      // Sin pool, ocultar la pestaña 'A medida' (degradación elegante)
+      const customBtn = document.querySelector('.opps__filter button[data-rank="custom"]');
+      if(customBtn) customBtn.style.display = 'none';
+      console.warn('opportunities_pool.json no disponible:', err);
+    });
 
   // Populate district options from the opportunities pool
   const allDists = new Set();
@@ -1893,7 +1992,11 @@ function buildMapDetailExtras(d){
   let currentRank = 'mixed';
   const origFilter = document.querySelectorAll('.opps__filter button');
   origFilter.forEach(b=>{
-    b.addEventListener('click', ()=>{ currentRank = b.dataset.rank; apply(); });
+    b.addEventListener('click', ()=>{
+      currentRank = b.dataset.rank;
+      if(customPanel) customPanel.hidden = (currentRank !== 'custom');
+      apply();
+    });
   });
 
   function passes(o){
@@ -1909,12 +2012,20 @@ function buildMapDetailExtras(d){
     return true;
   }
   function apply(){
-    const all = OPPORTUNITIES[currentRank] || OPPORTUNITIES.mixed;
-    const filtered = all.filter(passes);
+    let source;
+    if(currentRank === 'custom'){
+      source = computeCustomTop10();
+    } else {
+      source = OPPORTUNITIES[currentRank] || OPPORTUNITIES.mixed;
+    }
+    const filtered = source.filter(passes).slice(0, 10);
     body.innerHTML = '';
     if(!filtered.length){
       const tr = document.createElement('tr');
-      tr.innerHTML = '<td colspan="8" class="opps__no-results">Sin resultados con esos filtros. <button type="button" class="reset" id="oppsClearInline" style="margin-left:.5rem;background:transparent;color:var(--accent);text-decoration:underline">Limpiar</button></td>';
+      const msg = currentRank === 'custom' && !customPool.length
+        ? 'Cargando pool de oportunidades...'
+        : 'Sin resultados con esos filtros.';
+      tr.innerHTML = `<td colspan="8" class="opps__no-results">${msg} <button type="button" class="reset" id="oppsClearInline" style="margin-left:.5rem;background:transparent;color:var(--accent);text-decoration:underline">Limpiar</button></td>`;
       body.appendChild(tr);
       const inl = document.getElementById('oppsClearInline');
       if(inl) inl.addEventListener('click', clearFilters);
@@ -1922,7 +2033,8 @@ function buildMapDetailExtras(d){
     }
     filtered.forEach((o, i)=>{
       const pct = ((o.estimated - o.published) / o.estimated * 100);
-      const score = (o.estimated - o.published) / 100;
+      // Score real desde el CSV: z-score CQR heteroscedástica.
+      const scoreStr = (typeof o.score === 'number') ? o.score.toFixed(2).replace('.', ',') : '—';
       const rank = o.rank;
       const tr = document.createElement('tr');
       tr.innerHTML = `
@@ -1932,7 +2044,7 @@ function buildMapDetailExtras(d){
         <td class="num num--muted">${o.published.toLocaleString('es-ES')} €</td>
         <td class="num">${o.estimated.toLocaleString('es-ES')} €</td>
         <td><span class="badge-pct">−${pct.toFixed(1).replace('.', ',')} %</span></td>
-        <td class="col-hide-sm num">${score.toFixed(2).replace('.', ',')}</td>
+        <td class="col-hide-sm num" title="z-score CQR · (estimación − publicado) / ancho intervalo">${scoreStr}</td>
         <td class="col-action"><a href="#" data-opp-i="${i}" aria-label="Ver detalle">Ver detalle →</a></td>
       `;
       body.appendChild(tr);
@@ -1952,6 +2064,51 @@ function buildMapDetailExtras(d){
   }
   [districtSel, priceSel, surfaceSel].forEach(s=> s.addEventListener('change', apply));
   resetBtn.addEventListener('click', clearFilters);
+
+  // ──────────────────────────────────────────────────────────
+  // Chips de personalización
+  // ──────────────────────────────────────────────────────────
+  function applyChipsFromState(){
+    // Sincroniza los chips visuales con customWeights
+    document.querySelectorAll('.opps__custom-row').forEach(row=>{
+      const factor = row.dataset.factor;
+      const w = customWeights[factor] || 0;
+      row.querySelectorAll('.opps__custom-chips button').forEach(btn=>{
+        const isOn = Number(btn.dataset.w) === w;
+        btn.classList.toggle('is-active', isOn);
+        btn.setAttribute('aria-checked', String(isOn));
+      });
+    });
+  }
+  applyChipsFromState();
+
+  document.querySelectorAll('.opps__custom-row').forEach(row=>{
+    const factor = row.dataset.factor;
+    row.querySelectorAll('.opps__custom-chips button').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const w = Number(btn.dataset.w);
+        customWeights[factor] = w;
+        // Actualiza UI de chips de esta fila
+        row.querySelectorAll('.opps__custom-chips button').forEach(b=>{
+          const on = b === btn;
+          b.classList.toggle('is-active', on);
+          b.setAttribute('aria-checked', String(on));
+        });
+        saveWeights();
+        if(currentRank === 'custom') apply();
+      });
+    });
+  });
+
+  const customResetBtn = document.getElementById('oppsCustomReset');
+  if(customResetBtn){
+    customResetBtn.addEventListener('click', ()=>{
+      customWeights = {};
+      try{ localStorage.removeItem(WEIGHTS_KEY); }catch(e){}
+      applyChipsFromState();
+      if(currentRank === 'custom') apply();
+    });
+  }
 
   // Initial render (override the original renderOpps once on load)
   apply();
@@ -1995,14 +2152,14 @@ function openOpportunityModal(o){
           <div style="font-weight:500;color:var(--ink-2);margin-top:.15rem;text-decoration:line-through;font-family:var(--mono)">${o.published.toLocaleString('es-ES')} €/mes</div>
         </div>
         <div>
-          <div style="font-family:var(--mono);font-size:.66rem;color:var(--ink-3);text-transform:uppercase;letter-spacing:.08em">Estimación RentSamu</div>
+          <div style="font-family:var(--mono);font-size:.66rem;color:var(--ink-3);text-transform:uppercase;letter-spacing:.08em">Estimación RentIA</div>
           <div style="font-weight:500;color:var(--accent);margin-top:.15rem;font-family:var(--mono)">${o.estimated.toLocaleString('es-ES')} €/mes</div>
         </div>
       </div>
 
       <div style="padding:1rem 1.2rem;border:1px solid var(--line);border-radius:10px;background:var(--surface)">
         <div style="font-family:var(--mono);font-size:.7rem;color:var(--ink-3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.5rem">Por qué es una oportunidad</div>
-        <p style="font-size:.92rem;color:var(--ink-2);line-height:1.55">El modelo estima un precio justo de <b style="color:var(--ink)">${o.estimated.toLocaleString('es-ES')} €</b> basándose en el €/m² mediano del distrito (${(o.estimated / o.m2).toFixed(1).replace('.', ',')} €/m²), las características típicas de los inmuebles enriquecidas con 16 fuentes externas, y un score de descuento ${(savings/100).toFixed(2).replace('.', ',')} sobre la desviación estándar de la zona.</p>
+        <p style="font-size:.92rem;color:var(--ink-2);line-height:1.55">El modelo estima un precio justo de <b style="color:var(--ink)">${o.estimated.toLocaleString('es-ES')} €</b> (${(o.estimated / o.m2).toFixed(1).replace('.', ',')} €/m²) basándose en las características del inmueble enriquecidas con 16 fuentes externas. El precio publicado cae por debajo del límite inferior P5 del intervalo CQR calibrado — equivalente a una <b>z-score de ${(typeof o.score==='number' ? o.score.toFixed(2).replace('.', ',') : '—')}</b> bajo el modelo, una anomalía estadísticamente significativa (test conformal al 95 %).</p>
       </div>
 
       <div style="display:flex;gap:.5rem;flex-wrap:wrap">
@@ -2030,7 +2187,7 @@ function openOpportunityModal(o){
 (function(){
   const btn = document.getElementById('themeToggle');
   if(!btn) return;
-  const KEY = 'rentsamu.theme';
+  const KEY = 'rentia.theme';
   function apply(theme){
     if(theme === 'dark') document.documentElement.setAttribute('data-theme','dark');
     else document.documentElement.removeAttribute('data-theme');
@@ -2057,7 +2214,7 @@ function openOpportunityModal(o){
   if(matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   const container = document.getElementById('liveToasts');
   if(!container) return;
-  const KEY = 'rentsamu.toasts.shown';
+  const KEY = 'rentia.toasts.shown';
   try{ if(sessionStorage.getItem(KEY) === '1') return; }catch(e){}
 
   const fakeEvents = [
@@ -2118,13 +2275,13 @@ function openOpportunityModal(o){
 (function(){
   const tour = document.getElementById('tour');
   if(!tour) return;
-  const KEY = 'rentsamu.tour.completed';
+  const KEY = 'rentia.tour.completed';
   try{ if(localStorage.getItem(KEY) === '1') return; }catch(e){}
   // Don't show tour if user landed with a permalink (they already know what they want)
   if(window.location.search.length > 1) return;
 
   const steps = [
-    {title:'Bienvenido a RentSamu', text:'Te enseñamos en 30 segundos cómo aprovechar el predictor y el ranking de oportunidades. Pulsa Empezar.', cta:'Empezar →'},
+    {title:'Bienvenido a RentIA', text:'Te enseñamos en 30 segundos cómo aprovechar el predictor y el ranking de oportunidades. Pulsa Empezar.', cta:'Empezar →'},
     {title:'1. Configura el inmueble', text:'En la sección Demo, ajusta distrito, superficie, dormitorios y equipamiento. Hay presets rápidos arriba del formulario.', cta:'Siguiente →'},
     {title:'2. Lee la estimación con confianza', text:'Verás el precio puntual, el intervalo P5–P95 y un score de confianza específico de ese distrito. Puedes guardar varias predicciones para comparar.', cta:'Siguiente →'},
     {title:'3. Explora el TOP-10 y el mapa', text:'En Oportunidades filtra por distrito y precio. En el mapa pasa el ratón sobre cualquier hexágono para ver detalle y tendencia 24M. ¡Listo!', cta:'Entendido'}

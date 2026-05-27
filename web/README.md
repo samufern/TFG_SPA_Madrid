@@ -1,4 +1,4 @@
-# RentSamu · Guía de ejecución
+# RentIA · Guía de ejecución
 
 Web pública del Trabajo Fin de Grado **Sistema de Predicción y Análisis del alquiler en Madrid**, desarrollada por Samuel Fernández Fernández.
 

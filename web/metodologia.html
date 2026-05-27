@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Metodología · RentSamu</title>
-<meta name="description" content="Pipeline técnico completo de RentSamu: enriquecimiento de 16 fuentes externas, ensemble CatBoost top-5, validación cruzada espacial y temporal, conformal quantile regression." />
+<title>Metodología · RentIA</title>
+<meta name="description" content="Pipeline técnico completo de RentIA: enriquecimiento de 16 fuentes externas, ensemble CatBoost top-5, validación cruzada espacial y temporal, conformal quantile regression." />
 <meta name="theme-color" content="#FBFAF7" />
 
 <link rel="icon" type="image/svg+xml" href='data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><rect width="32" height="32" rx="7" fill="%231F4D3F"/><path d="M9 22V10h6.2c2.8 0 4.5 1.4 4.5 3.8 0 1.7-.9 2.9-2.4 3.5L21 22h-3.2l-3-4.4h-2.6V22H9z" fill="%23FBFAF7"/></svg>' />
@@ -42,9 +42,9 @@
 
 <header class="site-header" id="siteHeader">
   <div class="container nav">
-    <a href="index.html" class="brand" aria-label="RentSamu — inicio">
+    <a href="index.html" class="brand" aria-label="RentIA — inicio">
       <span class="brand-mark"><span>R</span></span>
-      <span>RentSamu</span>
+      <span>RentIA</span>
     </a>
     <nav class="nav-links" aria-label="Navegación principal">
       <a href="index.html#como-funciona">Cómo funciona</a>
@@ -67,7 +67,7 @@
 <div class="mobile-drawer" id="mobileDrawer" aria-hidden="true">
   <div class="mobile-drawer__panel" role="dialog" aria-modal="true" aria-label="Menú">
     <div class="mobile-drawer__head">
-      <span class="brand"><span class="brand-mark"><span>R</span></span> RentSamu</span>
+      <span class="brand"><span class="brand-mark"><span>R</span></span> RentIA</span>
       <button class="nav-toggle" id="navClose" aria-label="Cerrar menú">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>
       </button>
@@ -209,14 +209,31 @@
   </ol>
 
   <h2 id="oportunidades">7. Ranking de oportunidades · top-10 mensual</h2>
-  <p>Cada mes regeneramos el ranking de inmuebles más infravalorados según el modelo. El <em>opportunity score</em> es:</p>
-  <pre style="background:var(--surface-2);padding:1rem;border-radius:8px;font-family:var(--mono);font-size:.84rem;overflow-x:auto">opportunity_score = (predicted_price &minus; published_price) / σ_cluster</pre>
-  <p>Donde <code>σ_cluster</code> es la desviación estándar dentro del clúster KMeans al que pertenece el inmueble (4 clústeres principales por características constructivas). Esto evita que oportunidades en zonas de alta varianza dominen el ranking.</p>
-  <p>Publicamos tres rankings paralelos:</p>
+  <p>Para cada inmueble calculamos una <em>z-score heteroscedástica</em> basada en el intervalo CQR calibrado por inmueble:</p>
+  <pre style="background:var(--surface-2);padding:1rem;border-radius:8px;font-family:var(--mono);font-size:.84rem;overflow-x:auto">opportunity_score = (predicted_price &minus; published_price) / (P95 &minus; P5)</pre>
+  <p>Donde <code>P95 &minus; P5</code> es el ancho del intervalo CQR <strong>específico de esa predicción</strong> (no una varianza global ni cluster-wise). El score mide <strong>cuántos anchos del intervalo</strong> está el precio publicado por debajo de la predicción central. Esto premia descuentos cuando el modelo está seguro de la valoración (intervalo estrecho) y los penaliza cuando el modelo es incierto (intervalo amplio).</p>
+  <p><strong>Filtro de significancia estadística</strong>: solo entran en el ranking los inmuebles donde el publicado cae <strong>por debajo del límite inferior del intervalo CQR</strong> (P5 calibrado). Esto equivale a un test unilateral de anomalía conformal al 95 %. En el dataset actual, <strong>~5,7 % de los inmuebles</strong> superan este filtro.</p>
+  <p>Publicamos tres rankings paralelos sobre las filas que pasan el filtro:</p>
   <ul>
-    <li><strong>Score €</strong> &mdash; valor absoluto del descuento.</li>
-    <li><strong>Score €/m²</strong> &mdash; descuento relativo al tamaño del inmueble.</li>
-    <li><strong>Score mixto</strong> &mdash; combinación normalizada de ambos con peso adicional inverso a la incertidumbre del modelo.</li>
+    <li><strong>Score €</strong> &mdash; z-score sobre residual absoluto.</li>
+    <li><strong>Score €/m²</strong> &mdash; residual €/m² normalizado por el MAD del train (escala robusta).</li>
+    <li><strong>Score mixto</strong> &mdash; media de los percentiles de ambos rankings (Borda count). Exige posición alta en los dos criterios.</li>
+  </ul>
+  <div class="callout">
+    <p><strong>Lo que no entra en la fórmula</strong>: variables de ubicación (proximidad al metro, densidad urbana, etc.) ya están <em>dentro</em> del modelo como features que influyen en <code>predicted_price</code>. Sumarlas otra vez al final como bonus sería doble conteo y sesgaría el ranking hacia preferencias subjetivas de ubicación céntrica, ocultando oportunidades reales en la periferia.</p>
+  </div>
+
+  <h3>Capa de personalización por usuario (pestaña "A medida")</h3>
+  <p>El score CQR es <strong>objetivo</strong> — mide infravaloración estadística sin imponer una preferencia de vida. Pero cada usuario tiene prioridades distintas (una familia quiere superficie, alguien sensible al asma busca calidad del aire, etc.).</p>
+  <p>Para respetar ambos objetivos, la pestaña <em>A medida</em> aplica una <strong>capa post-modelo</strong>: parte del pool de los 100 inmuebles que pasan el filtro CQR al 95 % y los reordena según pesos que el propio usuario asigna a 6 criterios (cercanía al centro, cercanía al metro, superficie, calidad del aire, tranquilidad, equipamiento).</p>
+  <pre style="background:var(--surface-2);padding:1rem;border-radius:8px;font-family:var(--mono);font-size:.84rem;overflow-x:auto">personal_score_i = rank_pct(opportunity_score_i) + Σⱼ wⱼ · rank_pct(factorⱼ_i)
+  con wⱼ ∈ {0, 1, 2, 4} (Nada · Poco · Bastante · Mucho)</pre>
+  <p>Notas clave:</p>
+  <ul>
+    <li>La normalización por <em>rank percentile</em> es invariante a escala y robusta a outliers.</li>
+    <li>El filtro CQR <strong>nunca se relaja</strong>: la personalización solo reordena entre oportunidades estadísticamente significativas. Un usuario no puede pedir "más inmuebles" forzando el algoritmo a mostrar casos no infravalorados.</li>
+    <li>Si todos los pesos están a "Nada", el orden coincide con el ranking absoluto del modelo (peso fijo 1 sobre el opportunity_score).</li>
+    <li>Las preferencias se guardan en <code>localStorage</code> para que persistan entre visitas.</li>
   </ul>
 
   <h2 id="limites">8. Limitaciones conocidas</h2>
@@ -224,7 +241,7 @@
     <li>El modelo está entrenado sobre el rango operativo del mercado madrileño: 12–990 m², 450–25.000 €. Fuera de ese rango, el intervalo de confianza se ensancha y se marca la valoración como de baja confianza.</li>
     <li>Los distritos con menos densidad de datos (Vicálvaro, Villa de Vallecas, Barajas) tienen MAE mayor en términos relativos. Esto se refleja en el campo <em>"MAE en este distrito"</em> de cada predicción.</li>
     <li>El modelo no captura factores no representados en las features: estado de conservación específico, mobiliario premium, vistas privilegiadas, copropietarios, restricciones legales, etc.</li>
-    <li>RentSamu no constituye <strong>tasación oficial homologada</strong> bajo la Orden ECO/805/2003. Para operaciones que requieran tasación, consulte a un tasador certificado.</li>
+    <li>RentIA no constituye <strong>tasación oficial homologada</strong> bajo la Orden ECO/805/2003. Para operaciones que requieran tasación, consulte a un tasador certificado.</li>
   </ul>
 
   <hr style="border:0;border-top:1px solid var(--line);margin-block:3rem">
@@ -238,7 +255,7 @@
 <footer class="site-footer">
   <div class="container">
     <div class="footer__bottom" style="border-top:0;margin-top:0;padding-top:1rem">
-      <p class="footer__disclaimer">© 2026 RentSamu. Las predicciones son orientativas y no constituyen tasación oficial ni asesoramiento financiero.</p>
+      <p class="footer__disclaimer">© 2026 RentIA. Las predicciones son orientativas y no constituyen tasación oficial ni asesoramiento financiero.</p>
     </div>
   </div>
 </footer>
@@ -246,7 +263,7 @@
 <script>
 // Theme toggle (shares localStorage key with main app)
 (function(){
-  const KEY = 'rentsamu.theme';
+  const KEY = 'rentia.theme';
   const btn = document.getElementById('themeToggle');
   function apply(t){
     if(t === 'dark') document.documentElement.setAttribute('data-theme','dark');

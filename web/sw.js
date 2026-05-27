@@ -1,10 +1,10 @@
 /**
- * RentSamu service worker — v2
+ * RentIA service worker — v2
  * - Cache-first para assets, network-first para navegaciones.
  * - Auto-update: cuando hay un nuevo SW listo, el client recibe un postMessage
  *   y muestra un banner que permite recargar para activar la nueva versión.
  */
-const CACHE = 'rentsamu-v2';
+const CACHE = 'rentia-v4';
 const SHELL = [
   './',
   './index.html',
@@ -17,7 +17,8 @@ const SHELL = [
   './aviso-legal.html',
   './privacidad.html',
   './terminos.html',
-  './cookies.html'
+  './cookies.html',
+  './data/opportunities_pool.json'
 ];
 
 self.addEventListener('install', e => {

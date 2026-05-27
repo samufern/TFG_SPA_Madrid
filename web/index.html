@@ -4,23 +4,23 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
 <meta name="theme-color" content="#FBFAF7" />
-<title>RentSamu · Inteligencia de precios del alquiler en Madrid</title>
+<title>RentIA · Inteligencia de precios del alquiler en Madrid</title>
 <meta name="description" content="Modelo CatBoost entrenado sobre 8.797 inmuebles y 10+ fuentes externas. MAE 301 € · R² 0,80. Predice precio justo, intervalos P5–P95 y detecta oportunidades del mes en Madrid." />
-<meta name="author" content="RentSamu" />
+<meta name="author" content="RentIA" />
 <meta name="robots" content="index,follow" />
 
 <meta property="og:type" content="website" />
-<meta property="og:title" content="RentSamu · Inteligencia de precios del alquiler en Madrid" />
+<meta property="og:title" content="RentIA · Inteligencia de precios del alquiler en Madrid" />
 <meta property="og:description" content="MAE 301 € · R² 0,80 · 8.797 inmuebles · 10+ fuentes externas. Predicción rigurosa del precio justo en los 21 distritos de Madrid." />
 <meta property="og:locale" content="es_ES" />
 <meta property="og:image" content="og-image.svg" />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="630" />
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:title" content="RentSamu · Inteligencia de precios del alquiler en Madrid" />
+<meta name="twitter:title" content="RentIA · Inteligencia de precios del alquiler en Madrid" />
 <meta name="twitter:description" content="Modelo CatBoost · MAE 301 € · 8.797 inmuebles · 21 distritos · Intervalos P5–P95 calibrados." />
 <meta name="twitter:image" content="og-image.svg" />
-<link rel="canonical" href="https://rentsamu.es/" />
+<link rel="canonical" href="https://rentia.es/" />
 
 <link rel="icon" type="image/svg+xml" href='data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><rect width="32" height="32" rx="7" fill="%231F4D3F"/><path d="M9 22V10h6.2c2.8 0 4.5 1.4 4.5 3.8 0 1.7-.9 2.9-2.4 3.5L21 22h-3.2l-3-4.4h-2.6V22H9zm3.2-6.7h2.7c1.3 0 2.1-.6 2.1-1.7 0-1-.8-1.6-2.1-1.6h-2.7v3.3z" fill="%23FBFAF7"/></svg>' />
 
@@ -32,7 +32,7 @@
 
 <!-- JSON-LD structured data for SEO rich results (Organization + WebSite + SoftwareApp + FAQPage) -->
 <script type="application/ld+json">
-{"@context":"https://schema.org","@graph":[{"@type":"Organization","@id":"https://rentsamu.es/#org","name":"RentSamu","url":"https://rentsamu.es/","logo":"https://rentsamu.es/og-image.svg","description":"Sistema de inteligencia de precios para el mercado de alquiler residencial en Madrid basado en modelos CatBoost validados con CV espacial y temporal.","areaServed":{"@type":"City","name":"Madrid"}},{"@type":"WebSite","url":"https://rentsamu.es/","name":"RentSamu","inLanguage":"es-ES","publisher":{"@id":"https://rentsamu.es/#org"}},{"@type":"SoftwareApplication","name":"RentSamu Predictor","applicationCategory":"RealEstateApplication","operatingSystem":"Web","offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"},"aggregateRating":{"@type":"AggregateRating","ratingValue":"4.7","reviewCount":"38"}},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"¿Cuál es la precisión real del modelo?","acceptedAnswer":{"@type":"Answer","text":"En el holdout de 1.772 inmuebles, MAE 301,31 € sobre un precio mediano de 1.450 € (≈21 % relativo). R² 0,80."}},{"@type":"Question","name":"¿Con qué frecuencia se actualizan los datos?","acceptedAnswer":{"@type":"Answer","text":"Ranking de oportunidades mensual; fuentes externas según frecuencia oficial; modelo reentrenado cada trimestre."}},{"@type":"Question","name":"¿Qué cobertura geográfica tiene?","acceptedAnswer":{"@type":"Answer","text":"21 distritos del municipio de Madrid y 146 barrios documentados."}},{"@type":"Question","name":"¿Es lo mismo que una tasación oficial?","acceptedAnswer":{"@type":"Answer","text":"No. RentSamu es price intelligence orientativo, no constituye tasación homologada (Orden ECO/805/2003)."}},{"@type":"Question","name":"¿Cómo tratáis la privacidad?","acceptedAnswer":{"@type":"Answer","text":"Dataset construido sobre fuentes públicas (Idealista, INE, catastro, Ayuntamiento). Cumplimos RGPD y LSSI-CE."}}]}]}
+{"@context":"https://schema.org","@graph":[{"@type":"Organization","@id":"https://rentia.es/#org","name":"RentIA","url":"https://rentia.es/","logo":"https://rentia.es/og-image.svg","description":"Sistema de inteligencia de precios para el mercado de alquiler residencial en Madrid basado en modelos CatBoost validados con CV espacial y temporal.","areaServed":{"@type":"City","name":"Madrid"}},{"@type":"WebSite","url":"https://rentia.es/","name":"RentIA","inLanguage":"es-ES","publisher":{"@id":"https://rentia.es/#org"}},{"@type":"SoftwareApplication","name":"RentIA Predictor","applicationCategory":"RealEstateApplication","operatingSystem":"Web","offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"},"aggregateRating":{"@type":"AggregateRating","ratingValue":"4.7","reviewCount":"38"}},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"¿Cuál es la precisión real del modelo?","acceptedAnswer":{"@type":"Answer","text":"En el holdout de 1.772 inmuebles, MAE 301,31 € sobre un precio mediano de 1.450 € (≈21 % relativo). R² 0,80."}},{"@type":"Question","name":"¿Con qué frecuencia se actualizan los datos?","acceptedAnswer":{"@type":"Answer","text":"Ranking de oportunidades mensual; fuentes externas según frecuencia oficial; modelo reentrenado cada trimestre."}},{"@type":"Question","name":"¿Qué cobertura geográfica tiene?","acceptedAnswer":{"@type":"Answer","text":"21 distritos del municipio de Madrid y 146 barrios documentados."}},{"@type":"Question","name":"¿Es lo mismo que una tasación oficial?","acceptedAnswer":{"@type":"Answer","text":"No. RentIA es price intelligence orientativo, no constituye tasación homologada (Orden ECO/805/2003)."}},{"@type":"Question","name":"¿Cómo tratáis la privacidad?","acceptedAnswer":{"@type":"Answer","text":"Dataset construido sobre fuentes públicas (Idealista, INE, catastro, Ayuntamiento). Cumplimos RGPD y LSSI-CE."}}]}]}
 </script>
 </head>
 <body>
@@ -47,9 +47,9 @@
      ========================================================== -->
 <header class="site-header" id="siteHeader">
   <div class="container nav" role="banner">
-    <a href="#" class="brand" aria-label="RentSamu — inicio">
+    <a href="#" class="brand" aria-label="RentIA — inicio">
       <span class="brand-mark" aria-hidden="true"><span>R</span></span>
-      <span>RentSamu</span>
+      <span>RentIA</span>
     </a>
     <nav class="nav-links" aria-label="Navegación principal">
       <a href="#como-funciona">Cómo funciona</a>
@@ -74,7 +74,7 @@
 <div class="mobile-drawer" id="mobileDrawer" aria-hidden="true">
   <div class="mobile-drawer__panel" role="dialog" aria-modal="true" aria-label="Menú">
     <div class="mobile-drawer__head">
-      <span class="brand"><span class="brand-mark"><span>R</span></span> RentSamu</span>
+      <span class="brand"><span class="brand-mark"><span>R</span></span> RentIA</span>
       <button class="nav-toggle" id="navClose" aria-label="Cerrar menú">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>
       </button>
@@ -132,7 +132,7 @@
             <div class="val">1.180 &euro;<span style="font-size:.7em;color:var(--ink-3)">/mes</span></div>
           </div>
           <div class="opp-card__cell">
-            <div class="lbl">Estimación RentSamu</div>
+            <div class="lbl">Estimación RentIA</div>
             <div class="val val--accent">1.485 &euro;<span style="font-size:.7em;color:var(--ink-3)">/mes</span></div>
           </div>
         </div>
@@ -181,7 +181,7 @@
     <header class="section-head reveal">
       <span class="eyebrow">Por qué los inversores serios usan datos</span>
       <h2>Cuatro motivos para dejar de decidir por intuición.</h2>
-      <p>Comprar o gestionar un piso para alquilar mueve cientos de miles de euros. Las decisiones sin contexto cuantitativo cuestan dinero. RentSamu traduce señales de mercado dispersas en una recomendación accionable.</p>
+      <p>Comprar o gestionar un piso para alquilar mueve cientos de miles de euros. Las decisiones sin contexto cuantitativo cuestan dinero. RentIA traduce señales de mercado dispersas en una recomendación accionable.</p>
     </header>
     <div class="benefits__grid">
       <article class="benefit reveal" data-delay="1">
@@ -600,6 +600,74 @@
         <button type="button" class="is-active" data-rank="mixed" role="tab" aria-selected="true">Mixto</button>
         <button type="button" data-rank="score" role="tab" aria-selected="false">Descuento €</button>
         <button type="button" data-rank="score_m2" role="tab" aria-selected="false">Descuento €/m²</button>
+        <button type="button" data-rank="custom" role="tab" aria-selected="false">A medida</button>
+      </div>
+    </div>
+
+    <!-- Panel de personalización (sólo visible con data-rank="custom") -->
+    <div class="opps__custom" id="oppsCustomPanel" hidden>
+      <div class="opps__custom-head">
+        <div>
+          <span class="opps__custom-title">Tu TOP-10 a medida</span>
+          <span class="opps__custom-hint">Ajusta la importancia de cada criterio · sigue restringido a los inmuebles que pasan el filtro CQR al 95 %</span>
+        </div>
+        <button type="button" class="opps__custom-reset" id="oppsCustomReset" aria-label="Resetear todas las preferencias">Resetear</button>
+      </div>
+      <div class="opps__custom-grid">
+        <div class="opps__custom-row" data-factor="distance_center_km" data-direction="less">
+          <span class="opps__custom-lbl">Cercanía al centro <small>menos km mejor</small></span>
+          <div class="opps__custom-chips" role="radiogroup" aria-label="Importancia: cercanía al centro">
+            <button type="button" data-w="0" class="is-active" role="radio" aria-checked="true">Nada</button>
+            <button type="button" data-w="1" role="radio" aria-checked="false">Poco</button>
+            <button type="button" data-w="2" role="radio" aria-checked="false">Bastante</button>
+            <button type="button" data-w="4" role="radio" aria-checked="false">Mucho</button>
+          </div>
+        </div>
+        <div class="opps__custom-row" data-factor="dist_metro_m" data-direction="less">
+          <span class="opps__custom-lbl">Cercanía al metro <small>menos metros mejor</small></span>
+          <div class="opps__custom-chips" role="radiogroup" aria-label="Importancia: cercanía al metro">
+            <button type="button" data-w="0" class="is-active" role="radio" aria-checked="true">Nada</button>
+            <button type="button" data-w="1" role="radio" aria-checked="false">Poco</button>
+            <button type="button" data-w="2" role="radio" aria-checked="false">Bastante</button>
+            <button type="button" data-w="4" role="radio" aria-checked="false">Mucho</button>
+          </div>
+        </div>
+        <div class="opps__custom-row" data-factor="m2" data-direction="more">
+          <span class="opps__custom-lbl">Superficie amplia <small>más m² mejor</small></span>
+          <div class="opps__custom-chips" role="radiogroup" aria-label="Importancia: superficie amplia">
+            <button type="button" data-w="0" class="is-active" role="radio" aria-checked="true">Nada</button>
+            <button type="button" data-w="1" role="radio" aria-checked="false">Poco</button>
+            <button type="button" data-w="2" role="radio" aria-checked="false">Bastante</button>
+            <button type="button" data-w="4" role="radio" aria-checked="false">Mucho</button>
+          </div>
+        </div>
+        <div class="opps__custom-row" data-factor="air_no2_nearest" data-direction="less">
+          <span class="opps__custom-lbl">Calidad del aire <small>menos NO₂ mejor</small></span>
+          <div class="opps__custom-chips" role="radiogroup" aria-label="Importancia: calidad del aire">
+            <button type="button" data-w="0" class="is-active" role="radio" aria-checked="true">Nada</button>
+            <button type="button" data-w="1" role="radio" aria-checked="false">Poco</button>
+            <button type="button" data-w="2" role="radio" aria-checked="false">Bastante</button>
+            <button type="button" data-w="4" role="radio" aria-checked="false">Mucho</button>
+          </div>
+        </div>
+        <div class="opps__custom-row" data-factor="noise_ld_db" data-direction="less">
+          <span class="opps__custom-lbl">Tranquilidad <small>menos ruido diurno mejor</small></span>
+          <div class="opps__custom-chips" role="radiogroup" aria-label="Importancia: tranquilidad">
+            <button type="button" data-w="0" class="is-active" role="radio" aria-checked="true">Nada</button>
+            <button type="button" data-w="1" role="radio" aria-checked="false">Poco</button>
+            <button type="button" data-w="2" role="radio" aria-checked="false">Bastante</button>
+            <button type="button" data-w="4" role="radio" aria-checked="false">Mucho</button>
+          </div>
+        </div>
+        <div class="opps__custom-row" data-factor="equipment_count" data-direction="more">
+          <span class="opps__custom-lbl">Equipamiento completo <small>ascensor · A/C · amueblado · garaje · trastero · piscina · etc.</small></span>
+          <div class="opps__custom-chips" role="radiogroup" aria-label="Importancia: equipamiento">
+            <button type="button" data-w="0" class="is-active" role="radio" aria-checked="true">Nada</button>
+            <button type="button" data-w="1" role="radio" aria-checked="false">Poco</button>
+            <button type="button" data-w="2" role="radio" aria-checked="false">Bastante</button>
+            <button type="button" data-w="4" role="radio" aria-checked="false">Mucho</button>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -645,9 +713,9 @@
       </table>
     </div>
     <div class="opps__legend">
-      <span><b>Score</b> = (estimación − publicado) / σ del modelo · más alto, más fiable</span>
-      <span><b>Fuente:</b> reports/opportunities_top10_*.csv</span>
-      <span><b>Actualizado:</b> mensualmente</span>
+      <span><b>Score</b> = (estimación − publicado) / ancho intervalo CQR · z-score heteroscedástica</span>
+      <span><b>Filtro:</b> sólo inmuebles con publicado &lt; P5 calibrado (anomalía conformal al 95 %)</span>
+      <span><b>Fuente:</b> reports/opportunities_top10_*.csv · actualización mensual</span>
     </div>
   </div>
 </section>
@@ -738,9 +806,9 @@
 <section class="section section--paper">
   <div class="container">
     <header class="section-head reveal">
-      <span class="eyebrow">RentSamu vs. alternativas</span>
+      <span class="eyebrow">RentIA vs. alternativas</span>
       <h2>Por qué no basta con un portal o una tasadora.</h2>
-      <p>Cada herramienta del mercado tiene un propósito distinto. Esto es lo que aporta RentSamu frente a lo que ya estabas usando.</p>
+      <p>Cada herramienta del mercado tiene un propósito distinto. Esto es lo que aporta RentIA frente a lo que ya estabas usando.</p>
     </header>
 
     <div class="compare reveal" data-delay="1">
@@ -748,7 +816,7 @@
         <thead>
           <tr>
             <th></th>
-            <th class="is-us">RentSamu</th>
+            <th class="is-us">RentIA</th>
             <th>Portales clásicos</th>
             <th>Tasador tradicional</th>
             <th>Intuición</th>
@@ -844,7 +912,7 @@
       </figure>
 
       <figure class="testi reveal" data-delay="3">
-        <blockquote class="testi__quote">Gestionamos 80 inmuebles. La diferencia entre alquilarlos al precio justo y al «precio del portal» es de cinco cifras al año. Ahora cada renovación pasa por RentSamu antes de salir.</blockquote>
+        <blockquote class="testi__quote">Gestionamos 80 inmuebles. La diferencia entre alquilarlos al precio justo y al «precio del portal» es de cinco cifras al año. Ahora cada renovación pasa por RentIA antes de salir.</blockquote>
         <figcaption class="testi__author">
           <span class="testi__avatar" aria-hidden="true">AT</span>
           <span class="testi__who">
@@ -909,15 +977,15 @@
         <summary class="faq__q">¿Qué pasa con pisos atípicos (lofts, áticos extremos, palacetes)?<span class="plus" aria-hidden="true"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor"><line x1="6" y1="2" x2="6" y2="10"/><line x1="2" y1="6" x2="10" y2="6"/></svg></span></summary>
         <div class="faq__a">
           <p>El modelo está entrenado sobre el rango operativo del mercado: 12&ndash;990 m², 450&ndash;25.000 € mensuales. Para inmuebles fuera de ese rango, la incertidumbre se dispara y el intervalo P5&ndash;P95 se ensancha. Lo verás visualmente en la demo.</p>
-          <p>En esos casos, RentSamu marca la valoración como <em class="italic-serif">de baja confianza</em> y recomienda una tasación humana.</p>
+          <p>En esos casos, RentIA marca la valoración como <em class="italic-serif">de baja confianza</em> y recomienda una tasación humana.</p>
         </div>
       </details>
 
       <details class="faq__item reveal" data-delay="1">
         <summary class="faq__q">¿Es lo mismo que una tasación oficial?<span class="plus" aria-hidden="true"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor"><line x1="6" y1="2" x2="6" y2="10"/><line x1="2" y1="6" x2="10" y2="6"/></svg></span></summary>
         <div class="faq__a">
-          <p>No, y nunca pretendemos serlo. Una tasación oficial homologada (ECO 805/2003) es un documento jurídico realizado por un tasador certificado que incluye visita física, certificado urbanístico y responsabilidad legal. RentSamu es <strong>price intelligence</strong>: te da una referencia cuantitativa para negociar, fijar renta o evaluar oportunidades.</p>
-          <p>En la práctica son complementarios: usa RentSamu para filtrar, usa una tasación oficial para cerrar una operación que lo requiera.</p>
+          <p>No, y nunca pretendemos serlo. Una tasación oficial homologada (ECO 805/2003) es un documento jurídico realizado por un tasador certificado que incluye visita física, certificado urbanístico y responsabilidad legal. RentIA es <strong>price intelligence</strong>: te da una referencia cuantitativa para negociar, fijar renta o evaluar oportunidades.</p>
+          <p>En la práctica son complementarios: usa RentIA para filtrar, usa una tasación oficial para cerrar una operación que lo requiera.</p>
         </div>
       </details>
 
@@ -978,13 +1046,13 @@
           Solicitar acceso anticipado
           <svg class="arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
         </button>
-        <p class="cta-final__legal">Sin spam. Sin compartir tus datos. Puedes darte de baja en cualquier momento. Al enviar aceptas la política de privacidad de RentSamu.</p>
+        <p class="cta-final__legal">Sin spam. Sin compartir tus datos. Puedes darte de baja en cualquier momento. Al enviar aceptas la política de privacidad de RentIA.</p>
       </div>
 
       <div class="cta-final__success" id="formSuccess" aria-live="polite">
         <div class="icon" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
         <h4>Solicitud recibida.</h4>
-        <p>Te escribiremos a tu correo en las próximas 48 horas con la invitación de acceso anticipado. Gracias por confiar en RentSamu.</p>
+        <p>Te escribiremos a tu correo en las próximas 48 horas con la invitación de acceso anticipado. Gracias por confiar en RentIA.</p>
       </div>
     </form>
   </div>
@@ -1003,7 +1071,7 @@
     <div class="pr-header__brand">
       <span class="pr-logo">R</span>
       <div>
-        <div class="pr-name">RentSamu</div>
+        <div class="pr-name">RentIA</div>
         <div class="pr-tagline">Inteligencia de precios · Alquiler Madrid</div>
       </div>
     </div>
@@ -1138,9 +1206,9 @@
   <!-- Footer / Aviso -->
   <footer class="pr-foot">
     <div class="pr-foot__rule"></div>
-    <p><b>Aviso legal.</b> Las predicciones de este informe son <em>orientativas</em>, se basan en modelos estadísticos sobre datos públicos y <b>no constituyen tasación oficial homologada</b> (Orden ECO/805/2003), asesoramiento financiero, jurídico ni recomendación de inversión. RentSamu no se responsabiliza de decisiones tomadas exclusivamente sobre la base de estas estimaciones. Para operaciones que requieran tasación oficial, consulte a un tasador certificado.</p>
+    <p><b>Aviso legal.</b> Las predicciones de este informe son <em>orientativas</em>, se basan en modelos estadísticos sobre datos públicos y <b>no constituyen tasación oficial homologada</b> (Orden ECO/805/2003), asesoramiento financiero, jurídico ni recomendación de inversión. RentIA no se responsabiliza de decisiones tomadas exclusivamente sobre la base de estas estimaciones. Para operaciones que requieran tasación oficial, consulte a un tasador certificado.</p>
     <div class="pr-foot__bottom">
-      <span>© 2026 RentSamu · rentsamu.es</span>
+      <span>© 2026 RentIA · rentia.es</span>
       <span>Documento generado automáticamente · Versión simplificada del modelo de producción</span>
     </div>
   </footer>
@@ -1155,7 +1223,7 @@
     <div class="newsletter" id="newsletterBox">
       <div>
         <h4>Boletín mensual de oportunidades</h4>
-        <p>Recibe cada mes las 10 mejores oportunidades de Madrid analizadas por RentSamu. Sin spam, baja en un clic.</p>
+        <p>Recibe cada mes las 10 mejores oportunidades de Madrid analizadas por RentIA. Sin spam, baja en un clic.</p>
       </div>
       <form class="newsletter__form" id="newsletterForm" novalidate>
         <input type="email" name="email" id="newsletterEmail" placeholder="tu@email.com" autocomplete="email" required aria-label="Tu email" />
@@ -1168,7 +1236,7 @@
       <div class="footer__brand">
         <a href="#" class="brand">
           <span class="brand-mark" aria-hidden="true"><span>R</span></span>
-          <span>RentSamu</span>
+          <span>RentIA</span>
         </a>
         <p>Inteligencia de precios del alquiler residencial en Madrid. Modelos validados, datos públicos enriquecidos, decisiones defendibles.</p>
       </div>
@@ -1196,7 +1264,7 @@
       <div class="footer__col">
         <h4>Empresa</h4>
         <ul>
-          <li><a href="sobre.html">Sobre RentSamu</a></li>
+          <li><a href="sobre.html">Sobre RentIA</a></li>
           <li><a href="metodologia.html">Metodología</a></li>
           <li><a href="contacto.html#prensa">Prensa</a></li>
           <li><a href="contacto.html">Contacto</a></li>
@@ -1215,7 +1283,7 @@
     </div>
 
     <div class="footer__bottom">
-      <p class="footer__disclaimer">© 2026 RentSamu. Las predicciones que ofrece esta plataforma son orientativas, se basan en modelos estadísticos y no constituyen asesoramiento financiero, jurídico ni tasación oficial homologada. RentSamu no se responsabiliza de las decisiones tomadas exclusivamente sobre la base de sus estimaciones.</p>
+      <p class="footer__disclaimer">© 2026 RentIA. Las predicciones que ofrece esta plataforma son orientativas, se basan en modelos estadísticos y no constituyen asesoramiento financiero, jurídico ni tasación oficial homologada. RentIA no se responsabiliza de las decisiones tomadas exclusivamente sobre la base de sus estimaciones.</p>
       <div class="footer__social">
         <a href="#" aria-label="LinkedIn"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.5 2h-17A1.5 1.5 0 002 3.5v17A1.5 1.5 0 003.5 22h17a1.5 1.5 0 001.5-1.5v-17A1.5 1.5 0 0020.5 2zM8 19H5v-9h3zM6.5 8.25A1.75 1.75 0 118.3 6.5 1.78 1.78 0 016.5 8.25zM19 19h-3v-4.74c0-1.42-.6-1.93-1.38-1.93A1.74 1.74 0 0013 14.19a.66.66 0 000 .14V19h-3v-9h2.9v1.3a3.11 3.11 0 012.7-1.4c1.55 0 3.36.86 3.36 3.66z"/></svg></a>
         <a href="#" aria-label="GitHub"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 00-3.16 19.49c.5.1.68-.22.68-.48v-1.7c-2.78.6-3.37-1.34-3.37-1.34-.46-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.89 1.53 2.34 1.09 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.94 0-1.09.39-1.98 1.03-2.68-.1-.25-.45-1.27.1-2.64 0 0 .84-.27 2.75 1.02a9.58 9.58 0 015 0c1.91-1.29 2.75-1.02 2.75-1.02.55 1.37.2 2.39.1 2.64.64.7 1.03 1.59 1.03 2.68 0 3.84-2.34 4.68-4.57 4.93.36.31.68.92.68 1.85V21c0 .27.18.58.69.48A10 10 0 0012 2z"/></svg></a>
@@ -1294,7 +1362,7 @@
   <div class="tour__panel">
     <div class="tour__progress" id="tourProgress"></div>
     <span class="tour__step" id="tourStepLabel">Paso 1 de 4</span>
-    <h3 id="tourTitle" class="tour__title">Bienvenido a RentSamu</h3>
+    <h3 id="tourTitle" class="tour__title">Bienvenido a RentIA</h3>
     <p class="tour__text" id="tourText">Te enseñamos en 30 segundos cómo aprovechar el predictor y el ranking de oportunidades.</p>
     <div class="tour__actions">
       <button type="button" class="btn btn--ghost btn--sm" id="tourSkip">Saltar</button>
