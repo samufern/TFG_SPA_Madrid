@@ -60,7 +60,7 @@
 
 ## Contexto y objetivos
 
-En este Trabajo de Fin de Grado he querido hacer la intersección entre la ciencia de datos aplicada, la economía urbana y la ingeniería de software, persiguiendo objetivos valiosos como:
+Este proyecto constituye el **Trabajo Fin de Grado** desarrollado en la **Universidad Carlos III de Madrid** durante el curso **2025–2026**, bajo la dirección de **Miguel Ángel Patricio** y **Antonio Berlanga**. Se sitúa en la intersección entre la ciencia de datos aplicada, la economía urbana y la ingeniería de software, persiguiendo tres objetivos concretos:
 
 1. **Estimación dual-target.** Predecir tanto el alquiler mensual (`price`, €/mes) como el precio normalizado por superficie (`price_m2`, €/m²) para permitir comparaciones justas entre viviendas de distinto tamaño.
 2. **Cuantificación de la incertidumbre.** Acompañar cada predicción puntual de un intervalo `[P5, P95]` con garantía estadística de cobertura mediante CQR, no de bandas heurísticas.
@@ -96,7 +96,7 @@ En este Trabajo de Fin de Grado he querido hacer la intersección entre la cienc
 | **I/O** | `requests` 2.32.5 · `openpyxl` 3.1.5 · `xlsxwriter` 3.2.9 · `joblib` 1.5.3 · `tqdm` 4.67.1 |
 | **Web** | HTML5 · CSS3 (dark mode, responsive) · JavaScript vanilla · Service Worker · SVG inline |
 
-> Listado completo (155 dependencias) disponible en [`reports/environment.txt`](reports/environment.txt).
+> Listado completo disponible en [`reports/environment.txt`](reports/environment.txt).
 
 ---
 
@@ -105,69 +105,71 @@ En este Trabajo de Fin de Grado he querido hacer la intersección entre la cienc
 ```text
 TFG_SPA_Madrid/
 ├── data/
-│   ├── raw/                          # Dataset Idealista + metadatos de generación
-│   │   ├── madrid_rent_with_geolocation.csv
-│   │   ├── alquiler_barrios_madrid_oct2025.js
-│   │   └── Como_se_ha_generado_el_dataset_*.txt
-│   └── external/                     # Datos abiertos para enriquecimiento
-│       ├── admin/                    # Shapefiles distritos, barrios, secciones censales
-│       ├── env/                      # Ruido (GeoTIFF), calidad del aire, parques
-│       ├── mobility/                 # Metro, BiciMAD, GTFS de EMT
-│       ├── socioeco/                 # INE, IRPF, SERPAVI
-│       ├── timeseries/               # IPC, IPVA, IRAV
-│       └── urban/                    # VUT, terrazas, licencias, tráfico
+│   ├── raw/                                       # Dataset Idealista + metadatos de generación
+│   │   ├── madrid_rent_with_geolocation.csv       # Microdato base de Idealista (9.229 anuncios, 34 columnas)
+│   │   ├── alquiler_barrios_madrid_oct2025.js     # Array JS con precios agregados por barrio (Oct 2025)
+│   │   └── Como_se_ha_generado_el_dataset_*.txt   # Documentación del proceso de obtención y limpieza
+│   └── external/                                  # Datos abiertos para enriquecimiento
+│       ├── admin/                                 # Shapefiles distritos, barrios, secciones censales
+│       ├── env/                                   # Ruido (GeoTIFF), calidad del aire, parques
+│       ├── mobility/                              # Metro, BiciMAD, GTFS de EMT
+│       ├── socioeco/                              # INE, IRPF, SERPAVI
+│       ├── timeseries/                            # IPC, IPVA, IRAV
+│       └── urban/                                 # VUT, terrazas, licencias, tráfico
 │
-├── notebooks/                        # 11 notebooks numerados
-│   ├── 01_data_quality.ipynb
-│   ├── 02_eda.ipynb
-│   ├── 03_features_core.ipynb
-│   ├── 04_baselines.ipynb
-│   ├── 05_boosting.ipynb
-│   ├── 06_explainability.ipynb
-│   ├── 07_uncertainty.ipynb
-│   ├── 08_clustering_opportunities.ipynb
-│   ├── 09_open_data_enrichment.ipynb
-│   ├── 10_temporal_trends.ipynb
-│   └── 11_dashboard_mvp.ipynb
+├── notebooks/                                     # 11 notebooks numerados (ejecutar en orden)
+│   ├── 01_data_quality.ipynb                      # Ingesta, deduplicación, validación y split hold-out temporal
+│   ├── 02_eda.ipynb                               # Análisis exploratorio: distribuciones, correlaciones, geohash
+│   ├── 03_features_core.ipynb                     # Ingeniería de features core + enrichment + VUT espacial
+│   ├── 04_baselines.ipynb                         # Modelos baseline (media, OLS, ElasticNet, Random Forest)
+│   ├── 05_boosting.ipynb                          # CatBoost dual-target con CV temporal/espacial y Optuna
+│   ├── 06_explainability.ipynb                    # SHAP global/local + Permutation Importance + PDP/ICE
+│   ├── 07_uncertainty.ipynb                       # Conformal Quantile Regression e intervalos calibrados
+│   ├── 08_clustering_opportunities.ipynb          # K-Means + scoring heteroscedástico + filtro conformal
+│   ├── 09_open_data_enrichment.ipynb              # Auditoría A/B del impacto del enriquecimiento (+5,2 % MAE)
+│   ├── 10_temporal_trends.ipynb                   # Integración de series INE (IPC, IPVA, IRAV) y CV temporal
+│   └── 11_dashboard_mvp.ipynb                     # Dashboard interactivo con ipywidgets y mapas multicapa
 │
 ├── src/
-│   └── utils.py                      # 47 funciones compartidas (download, geo, CV, eval...)
+│   └── utils.py                                   # 47 funciones compartidas (download, geo, CV, eval...)
 │
-├── artifacts/                        # Outputs reutilizables (gestionados con Git LFS)
-│   ├── processed_rent.parquet        # Dataset limpio (8.797 filas)
-│   ├── features_master.parquet       # 70 columnas (core + enrichment)
-│   ├── features_core.parquet
-│   ├── features_enriched.csv.gz
-│   ├── features_temporal.csv.gz
-│   ├── clusters.csv
-│   ├── selected_features.json
-│   ├── barriosMadrid.json
-│   └── splits/                       # Índices del hold-out
+├── artifacts/                                     # Outputs reutilizables (gestionados con Git LFS)
+│   ├── processed_rent.parquet                     # Dataset limpio (8.797 filas, 38 columnas)
+│   ├── features_master.parquet                    # Dataset maestro: 70 columnas (core + enrichment)
+│   ├── features_core.parquet                      # Subconjunto sin enrichment (fallback)
+│   ├── features_enriched.csv.gz                   # Dataset con enrichment en CSV comprimido (49 features)
+│   ├── features_temporal.csv.gz                   # Features temporales empalmadas con series INE
+│   ├── clusters.csv                               # Asignación de cluster (K=5) por anuncio
+│   ├── selected_features.json                     # Features finales por consenso SelectKBest + SHAP + Permutation
+│   ├── barriosMadrid.json                         # 146 barrios con coordenadas, medianas y metadatos
+│   └── splits/                                    # Índices inmutables del hold-out (npz + csv + config)
 │
-├── models/                           # Modelos serializados (~252 MB con LFS)
-│   ├── best_model.joblib             # CatBoost single-target (legacy, 11,7 MB)
-│   ├── best_models.joblib            # Dual-target {price, price_m2} (230,8 MB)
-│   ├── quantile_models.joblib        # Modelos cuantílicos CQR (2,3 MB)
-│   └── optuna_studies.db             # Histórico de búsqueda de hiperparámetros
+├── models/                                        # Modelos serializados (~252 MB con LFS)
+│   ├── best_model.joblib                          # CatBoost single-target (legacy, 11,7 MB)
+│   ├── best_models.joblib                         # Dual-target {price, price_m2} (230,8 MB)
+│   ├── quantile_models.joblib                     # Modelos cuantílicos CQR (2,3 MB)
+│   └── optuna_studies.db                          # Histórico de búsqueda de hiperparámetros (SQLite)
 │
-├── reports/                          # Métricas, figuras y documentación técnica
-│   ├── figures/                      # 30 PNG: EDA, SHAP, mapas, incertidumbre
-│   ├── slides/                       # Material de presentación
-│   ├── *.csv / *.json / *.md         # Métricas estructuradas y reportes
-│   └── environment.txt               # Listado exacto de dependencias
+├── reports/                                       # Métricas, figuras y documentación técnica
+│   ├── figures/                                   # 30 PNG: EDA, SHAP, mapas, incertidumbre
+│   ├── slides/                                    # Material de presentación (trabajo futuro)
+│   ├── *.csv / *.json / *.md                      # Métricas estructuradas y reportes técnicos
+│   └── environment.txt                            # Listado exacto de dependencias (155 paquetes)
 │
-├── web/                              # SPA estática
-│   ├── index.html                    # Landing + predictor + mapa + oportunidades
-│   ├── app.js                        # Lógica de predicción y UI
-│   ├── styles.css                    # Diseño responsive + dark mode
-│   ├── sw.js                         # Service Worker offline
-│   ├── metodologia.html              # Documentación técnica para usuario final
-│   ├── sobre.html / contacto.html / privacidad.html / cookies.html / ...
-│   └── data/opportunities_pool.json  # Top-100 oportunidades servidas a la web
+├── web/                                           # SPA estática (sin backend, sin build step)
+│   ├── index.html                                 # Landing + predictor + mapa + oportunidades
+│   ├── app.js                                     # Lógica de predicción y UI
+│   ├── styles.css                                 # Diseño responsive + dark mode
+│   ├── sw.js                                      # Service Worker offline
+│   ├── og-image.svg                               # Imagen social (1200×630) para enlaces compartidos
+│   ├── metodologia.html                           # Documentación técnica para usuario final
+│   ├── sobre.html / contacto.html / ...           # Páginas legales e institucionales (RGPD, LSSI)
+│   ├── data/opportunities_pool.json               # Top-100 oportunidades servidas a la web
+│   └── README.md                                  # Guía para lanzar el servidor local
 │
-├── .gitattributes                    # Configuración Git LFS (csv, parquet, zip, tif)
-├── .gitignore
-└── README.md
+├── .gitattributes                                 # Configuración Git LFS (csv, parquet, zip, tif)
+├── .gitignore                                     # Excluye artifacts/** (gestionados por LFS)
+└── README.md                                      # Archivo explicativo del proyecto
 ```
 
 ---
@@ -429,6 +431,10 @@ Líneas recogidas en la presentación [`reports/slides/trabajo_futuro_spatio_tem
 
 **Samuel Fernández Fernández**
 [![Gmail](https://img.shields.io/badge/-samufernandezf@gmail.com-D14836?style=flat-square&logo=gmail&logoColor=white)](mailto:samufernandezf@gmail.com)
+
+Trabajo Fin de Grado — **Universidad Carlos III de Madrid** · Curso **2025–2026**
+
+**Tutores:** Miguel Ángel Patricio · Antonio Berlanga
 
 ---
 
