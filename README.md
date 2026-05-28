@@ -21,7 +21,7 @@
 
 | MAE (€/mes) | R² | Cobertura CQR | Mejora vs RF | Anuncios |
 | :---: | :---: | :---: | :---: | :---: |
-| **301,31 €** | **0,831** | **87,0 %** | **−9,4 %** | **8.797** |
+| **301,31 €** | **0,804** | **87,0 %** | **−9,4 %** | **8.797** |
 
 *Métricas finales sobre holdout temporal (target `price`)*
 
@@ -54,7 +54,7 @@
 
 ## Resumen ejecutivo
 
-**RentIA Madrid** es un Trabajo Fin de Grado que aborda el problema de la estimación de precios de alquiler en la ciudad de Madrid combinando microdatos de portales inmobiliarios con datos abiertos del Ayuntamiento, INE y OpenStreetMap. El sistema entrena modelos de **gradient boosting (CatBoost)** sobre **8.797 anuncios** enriquecidos con **19 variables externas** (transporte, ruido, calidad del aire, renta, viviendas turísticas...), aprende de manera simultánea dos targets — precio absoluto (€/mes) y precio por superficie (€/m²) — y produce **intervalos de predicción calibrados** mediante *Conformal Quantile Regression* con cobertura empírica del 87 %. Finalmente, un sistema de *scoring* heteroscedástico filtrado por anomalía conformal detecta el **5,7 %** de anuncios estadísticamente infravalorados y los expone en una **web interactiva** que incluye predictor, cartograma SVG de los 21 distritos y top-10 de oportunidades.
+**RentIA Madrid** es un Trabajo Fin de Grado que aborda el problema de la estimación de precios de alquiler en la ciudad de Madrid combinando microdatos de portales inmobiliarios con datos abiertos del Ayuntamiento, INE y OpenStreetMap. El sistema entrena modelos de **gradient boosting (CatBoost)** sobre **8.797 anuncios** enriquecidos con **16 variables externas (12 fuentes)** (transporte, ruido, calidad del aire, renta, viviendas turísticas...), aprende de manera simultánea dos targets — precio absoluto (€/mes) y precio por superficie (€/m²) — y produce **intervalos de predicción calibrados** mediante *Conformal Quantile Regression* con cobertura empírica del 87 %. Finalmente, un sistema de *scoring* heteroscedástico filtrado por anomalía conformal detecta el **5,7 %** de anuncios estadísticamente infravalorados y los expone en una **web interactiva** que incluye predictor, cartograma SVG de los 21 distritos y top-10 de oportunidades.
 
 ---
 
@@ -71,7 +71,7 @@ Este proyecto constituye el **Trabajo Fin de Grado** desarrollado en la **Univer
 ## Características principales
 
 - **Modelado dual-target** con CatBoost optimizado por Optuna (4.997 trials, profundidad 8, lr 0.299).
-- **Enriquecimiento masivo** con 19 features externas: distancias y densidades a Metro, BiciMAD y EMT; renta INE, edad media y tamaño del hogar; ruido (dB) y NO₂; viviendas turísticas (VUT); zonas verdes, terrazas y licencias comerciales.
+- **Enriquecimiento masivo** con 16 features externas procedentes de 12 fuentes abiertas: distancias y densidades a Metro, BiciMAD y EMT; renta INE, edad media y tamaño del hogar; ruido (dB) y NO₂; viviendas turísticas (VUT); zonas verdes, terrazas y licencias comerciales.
 - **5 esquemas de validación cruzada**: hold-out temporal con purga de 1 día, K-Fold estratificado, Time-blocked CV, Spatial CV por geohash-6 y Grouped CV por distrito.
 - **Intervalos calibrados** mediante *Conformal Quantile Regression* con corrección de *quantile crossing* y dos modos (raw y log).
 - **Explicabilidad** con SHAP `TreeExplainer` global y local, con fallback a *permutation importance*.
@@ -252,14 +252,14 @@ Todas las descargas quedan registradas en [`reports/download_log.jsonl`](reports
 | Regresión Lineal (OLS) | Baseline lineal | 509,82 € | 0,679 | — |
 | ElasticNet | L1 + L2 | 456,28 € | 0,694 | −10,5 % |
 | Random Forest | 200 árboles | 332,18 € | 0,811 | −34,8 % |
-| **CatBoost (final)** | **Boosting + Optuna** | **301,31 €** | **0,831** | **−40,9 %** |
+| **CatBoost (final)** | **Boosting + Optuna** | **301,31 €** | **0,804** | **−40,9 %** |
 
 ### Métricas finales en hold-out
 
 | Target | MAE CV | MAE hold-out | R² hold-out | Cobertura CQR | Anchura media P5–P95 |
 | :--- | :---: | :---: | :---: | :---: | :---: |
-| `price` (€/mes) | 391,48 € | **301,31 €** | **0,831** | **87,0 %** | 1.359,75 € |
-| `price_m2` (€/m²) | 3,87 €/m² | **3,17 €/m²** | **0,521** | **87,1 %** | 14,71 €/m² |
+| `price` (€/mes) | 391,48 € | **301,31 €** | **0,804** | **87,0 %** | 1.359,75 € |
+| `price_m2` (€/m²) | 3,87 €/m² | **3,17 €/m²** | **0,589** | **87,1 %** | 14,71 €/m² |
 
 > Cobertura nominal objetivo: 85 %. Ambos targets la superan ligeramente, evidenciando que CQR está bien calibrado.
 
@@ -411,7 +411,7 @@ La carpeta [`reports/`](reports/) contiene la documentación técnica estructura
 
 - **Snapshot temporal acotado.** El dataset cubre un período corto (principalmente finales de 2025) y el microdato crudo solo contiene día/mes, no año, por lo que las features temporales (NB10) están **reservadas para un futuro análisis y no se incorporan al modelo principal**.
 - **Cobertura parcial en algunas fuentes**: INE censal (68,5 %), ruido (65 %), VUT espacial (67,5 %) requieren imputación o se restringen a subconjuntos.
-- **`price_m2` más difícil de predecir** (R² = 0,521) debido a factores cualitativos no observados (estado real del inmueble, vistas, orientación, marketing del anuncio...).
+- **`price_m2` más difícil de predecir** (R² = 0,589) debido a factores cualitativos no observados (estado real del inmueble, vistas, orientación, marketing del anuncio...).
 - **CQR en `price`**: cobertura 87,0 % frente a un objetivo de 85 %.
 
 ---
