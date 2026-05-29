@@ -1,6 +1,6 @@
 {
   "generated_at": "2026-05-25T07:01:57.515451+00:00",
-  "n": 100,
+  "n": 79,
   "items": [
     {
       "url_id": "93465238",
@@ -35,23 +35,6 @@
       "equipment_count": 8,
       "year_built": 1975,
       "year_imputed": true
-    },
-    {
-      "url_id": "99351788",
-      "barrio": "Sector B",
-      "district": "Boadilla del Monte",
-      "m2": 86,
-      "published": 1200,
-      "estimated": 2031,
-      "score": 1.293,
-      "distance_center_km": 16.02,
-      "dist_metro_m": 7937,
-      "noise_ld_db": 61.7,
-      "noise_imputed": true,
-      "air_no2_nearest": 33.6,
-      "equipment_count": 6,
-      "year_built": 2008,
-      "year_imputed": false
     },
     {
       "url_id": "99166138",
@@ -105,23 +88,6 @@
       "year_imputed": true
     },
     {
-      "url_id": "99170119",
-      "barrio": "Centro",
-      "district": "Meco",
-      "m2": 230,
-      "published": 1200,
-      "estimated": 6053,
-      "score": 1.164,
-      "distance_center_km": 0.32,
-      "dist_metro_m": 274,
-      "noise_ld_db": 61.7,
-      "noise_imputed": true,
-      "air_no2_nearest": 31.8,
-      "equipment_count": 7,
-      "year_built": 1975,
-      "year_imputed": true
-    },
-    {
       "url_id": "98971974",
       "barrio": "Chueca-Justicia",
       "district": "Centro",
@@ -135,23 +101,6 @@
       "noise_imputed": true,
       "air_no2_nearest": 30.4,
       "equipment_count": 5,
-      "year_built": 1975,
-      "year_imputed": true
-    },
-    {
-      "url_id": "99381086",
-      "barrio": "Centro",
-      "district": "Moralzarzal",
-      "m2": 80,
-      "published": 825,
-      "estimated": 2495,
-      "score": 1.075,
-      "distance_center_km": 0.61,
-      "dist_metro_m": 47,
-      "noise_ld_db": 61.7,
-      "noise_imputed": true,
-      "air_no2_nearest": 30.4,
-      "equipment_count": 3,
       "year_built": 1975,
       "year_imputed": true
     },
@@ -207,40 +156,6 @@
       "year_imputed": true
     },
     {
-      "url_id": "99424034",
-      "barrio": "Fuencarral-El Pardo",
-      "district": "Collado Mediano",
-      "m2": 124,
-      "published": 850,
-      "estimated": 1613,
-      "score": 0.972,
-      "distance_center_km": 8.15,
-      "dist_metro_m": 323,
-      "noise_ld_db": 55.5,
-      "noise_imputed": false,
-      "air_no2_nearest": 46.4,
-      "equipment_count": 5,
-      "year_built": 1970,
-      "year_imputed": false
-    },
-    {
-      "url_id": "96651776",
-      "barrio": "Noroeste",
-      "district": "Torrejón de Ardoz",
-      "m2": 77,
-      "published": 905,
-      "estimated": 1267,
-      "score": 0.962,
-      "distance_center_km": 19.41,
-      "dist_metro_m": 5748,
-      "noise_ld_db": 61.7,
-      "noise_imputed": true,
-      "air_no2_nearest": 24.4,
-      "equipment_count": 5,
-      "year_built": 1975,
-      "year_imputed": true
-    },
-    {
       "url_id": "96823743",
       "barrio": "Malasaña-Universidad",
       "district": "Centro",
@@ -256,23 +171,6 @@
       "equipment_count": 6,
       "year_built": 2012,
       "year_imputed": false
-    },
-    {
-      "url_id": "91635655",
-      "barrio": "Centro",
-      "district": "El Escorial",
-      "m2": 90,
-      "published": 850,
-      "estimated": 2183,
-      "score": 0.95,
-      "distance_center_km": 2.01,
-      "dist_metro_m": 278,
-      "noise_ld_db": 50.0,
-      "noise_imputed": false,
-      "air_no2_nearest": 44.0,
-      "equipment_count": 7,
-      "year_built": 1975,
-      "year_imputed": true
     },
     {
       "url_id": "26403626",
@@ -377,23 +275,6 @@
       "year_imputed": false
     },
     {
-      "url_id": "99255874",
-      "barrio": "Valdemorillo pueblo",
-      "district": "Valdemorillo",
-      "m2": 350,
-      "published": 2000,
-      "estimated": 3498,
-      "score": 0.841,
-      "distance_center_km": 11.25,
-      "dist_metro_m": 1739,
-      "noise_ld_db": 57.2,
-      "noise_imputed": false,
-      "air_no2_nearest": 24.4,
-      "equipment_count": 7,
-      "year_built": 1975,
-      "year_imputed": true
-    },
-    {
       "url_id": "98278928",
       "barrio": "Castellana",
       "district": "Salamanca",
@@ -408,23 +289,6 @@
       "air_no2_nearest": 41.2,
       "equipment_count": 5,
       "year_built": 1940,
-      "year_imputed": false
-    },
-    {
-      "url_id": "98603166",
-      "barrio": "Casco Antiguo",
-      "district": "Boadilla del Monte",
-      "m2": 140,
-      "published": 1500,
-      "estimated": 2479,
-      "score": 0.814,
-      "distance_center_km": 15.24,
-      "dist_metro_m": 6970,
-      "noise_ld_db": 61.7,
-      "noise_imputed": true,
-      "air_no2_nearest": 33.6,
-      "equipment_count": 8,
-      "year_built": 1989,
       "year_imputed": false
     },
     {
@@ -479,23 +343,6 @@
       "year_imputed": true
     },
     {
-      "url_id": "94727068",
-      "barrio": "Centro",
-      "district": "El Escorial",
-      "m2": 150,
-      "published": 1100,
-      "estimated": 2756,
-      "score": 0.799,
-      "distance_center_km": 0.39,
-      "dist_metro_m": 224,
-      "noise_ld_db": 61.7,
-      "noise_imputed": true,
-      "air_no2_nearest": 31.8,
-      "equipment_count": 5,
-      "year_built": 1975,
-      "year_imputed": true
-    },
-    {
       "url_id": "99065207",
       "barrio": "Media Legua",
       "district": "Moratalaz",
@@ -509,23 +356,6 @@
       "noise_imputed": false,
       "air_no2_nearest": 44.0,
       "equipment_count": 1,
-      "year_built": 1975,
-      "year_imputed": true
-    },
-    {
-      "url_id": "40216813",
-      "barrio": "Lista",
-      "district": "Salamanca",
-      "m2": 30,
-      "published": 800,
-      "estimated": 2029,
-      "score": 0.788,
-      "distance_center_km": 3.03,
-      "dist_metro_m": 14,
-      "noise_ld_db": 61.7,
-      "noise_imputed": true,
-      "air_no2_nearest": 41.2,
-      "equipment_count": 6,
       "year_built": 1975,
       "year_imputed": true
     },
@@ -598,23 +428,6 @@
       "year_imputed": true
     },
     {
-      "url_id": "99243373",
-      "barrio": "Las Matas- Peñascales",
-      "district": "Las Rozas de Madrid",
-      "m2": 120,
-      "published": 1250,
-      "estimated": 1885,
-      "score": 0.73,
-      "distance_center_km": 21.41,
-      "dist_metro_m": 14485,
-      "noise_ld_db": 61.7,
-      "noise_imputed": true,
-      "air_no2_nearest": 37.6,
-      "equipment_count": 8,
-      "year_built": 2012,
-      "year_imputed": false
-    },
-    {
       "url_id": "99361191",
       "barrio": "Huertas-Cortes",
       "district": "Centro",
@@ -664,23 +477,6 @@
       "equipment_count": 3,
       "year_built": 1975,
       "year_imputed": true
-    },
-    {
-      "url_id": "98254642",
-      "barrio": "Casco Antiguo",
-      "district": "Galapagar",
-      "m2": 70,
-      "published": 700,
-      "estimated": 1583,
-      "score": 0.724,
-      "distance_center_km": 0.04,
-      "dist_metro_m": 10,
-      "noise_ld_db": 47.7,
-      "noise_imputed": false,
-      "air_no2_nearest": 31.8,
-      "equipment_count": 7,
-      "year_built": 1996,
-      "year_imputed": false
     },
     {
       "url_id": "99281819",
@@ -783,40 +579,6 @@
       "equipment_count": 4,
       "year_built": 1975,
       "year_imputed": true
-    },
-    {
-      "url_id": "98999417",
-      "barrio": "Centro",
-      "district": "Villaviciosa de Odón",
-      "m2": 120,
-      "published": 1000,
-      "estimated": 2918,
-      "score": 0.699,
-      "distance_center_km": 0.04,
-      "dist_metro_m": 14,
-      "noise_ld_db": 47.7,
-      "noise_imputed": false,
-      "air_no2_nearest": 31.8,
-      "equipment_count": 8,
-      "year_built": 1975,
-      "year_imputed": true
-    },
-    {
-      "url_id": "99370696",
-      "barrio": "Tetuán",
-      "district": "Cercedilla",
-      "m2": 210,
-      "published": 1450,
-      "estimated": 2959,
-      "score": 0.695,
-      "distance_center_km": 4.37,
-      "dist_metro_m": 443,
-      "noise_ld_db": 61.7,
-      "noise_imputed": true,
-      "air_no2_nearest": 38.2,
-      "equipment_count": 5,
-      "year_built": 2006,
-      "year_imputed": false
     },
     {
       "url_id": "99393457",
@@ -936,40 +698,6 @@
       "equipment_count": 3,
       "year_built": 1975,
       "year_imputed": true
-    },
-    {
-      "url_id": "25203754",
-      "barrio": "Centro",
-      "district": "Meco",
-      "m2": 270,
-      "published": 1500,
-      "estimated": 4366,
-      "score": 0.664,
-      "distance_center_km": 0.38,
-      "dist_metro_m": 377,
-      "noise_ld_db": 61.7,
-      "noise_imputed": true,
-      "air_no2_nearest": 31.8,
-      "equipment_count": 7,
-      "year_built": 1975,
-      "year_imputed": true
-    },
-    {
-      "url_id": "98313463",
-      "barrio": "Zona Carretera del Plantío",
-      "district": "Majadahonda",
-      "m2": 147,
-      "published": 1400,
-      "estimated": 1755,
-      "score": 0.66,
-      "distance_center_km": 14.02,
-      "dist_metro_m": 10709,
-      "noise_ld_db": 61.7,
-      "noise_imputed": true,
-      "air_no2_nearest": 37.6,
-      "equipment_count": 6,
-      "year_built": 1977,
-      "year_imputed": false
     },
     {
       "url_id": "91600299",
@@ -1363,23 +1091,6 @@
       "year_imputed": false
     },
     {
-      "url_id": "97628340",
-      "barrio": "Parque Empresarial",
-      "district": "Las Rozas de Madrid",
-      "m2": 161,
-      "published": 1250,
-      "estimated": 1825,
-      "score": 0.57,
-      "distance_center_km": 19.81,
-      "dist_metro_m": 14457,
-      "noise_ld_db": 61.7,
-      "noise_imputed": true,
-      "air_no2_nearest": 37.6,
-      "equipment_count": 4,
-      "year_built": 1975,
-      "year_imputed": true
-    },
-    {
       "url_id": "26806997",
       "barrio": "Lavapiés-Embajadores",
       "district": "Centro",
@@ -1431,23 +1142,6 @@
       "year_imputed": true
     },
     {
-      "url_id": "93902530",
-      "barrio": "Viñas Viejas",
-      "district": "Boadilla del Monte",
-      "m2": 254,
-      "published": 1700,
-      "estimated": 2671,
-      "score": 0.557,
-      "distance_center_km": 16.43,
-      "dist_metro_m": 9587,
-      "noise_ld_db": 61.7,
-      "noise_imputed": true,
-      "air_no2_nearest": 33.6,
-      "equipment_count": 8,
-      "year_built": 2003,
-      "year_imputed": false
-    },
-    {
       "url_id": "88142087",
       "barrio": "El Viso",
       "district": "Chamartín",
@@ -1482,23 +1176,6 @@
       "year_imputed": true
     },
     {
-      "url_id": "90935087",
-      "barrio": "El Burgo",
-      "district": "Las Rozas de Madrid",
-      "m2": 240,
-      "published": 2000,
-      "estimated": 3018,
-      "score": 0.551,
-      "distance_center_km": 17.58,
-      "dist_metro_m": 13854,
-      "noise_ld_db": 61.7,
-      "noise_imputed": true,
-      "air_no2_nearest": 37.6,
-      "equipment_count": 8,
-      "year_built": 1975,
-      "year_imputed": true
-    },
-    {
       "url_id": "95526932",
       "barrio": "Palos de Moguer",
       "district": "Arganzuela",
@@ -1511,23 +1188,6 @@
       "noise_ld_db": 72.5,
       "noise_imputed": false,
       "air_no2_nearest": 22.1,
-      "equipment_count": 4,
-      "year_built": 1975,
-      "year_imputed": true
-    },
-    {
-      "url_id": "99264012",
-      "barrio": "Sol",
-      "district": "Centro",
-      "m2": 33,
-      "published": 1290,
-      "estimated": 5126,
-      "score": 0.548,
-      "distance_center_km": 0.03,
-      "dist_metro_m": 78,
-      "noise_ld_db": 49.0,
-      "noise_imputed": false,
-      "air_no2_nearest": 31.8,
       "equipment_count": 4,
       "year_built": 1975,
       "year_imputed": true
@@ -1565,23 +1225,6 @@
       "equipment_count": 4,
       "year_built": 1975,
       "year_imputed": true
-    },
-    {
-      "url_id": "98790920",
-      "barrio": "Zona Estación",
-      "district": "Pozuelo de Alarcón",
-      "m2": 221,
-      "published": 2000,
-      "estimated": 2663,
-      "score": 0.531,
-      "distance_center_km": 9.4,
-      "dist_metro_m": 6242,
-      "noise_ld_db": 61.7,
-      "noise_imputed": true,
-      "air_no2_nearest": 37.6,
-      "equipment_count": 7,
-      "year_built": 1992,
-      "year_imputed": false
     },
     {
       "url_id": "99266915",
@@ -1702,5 +1345,8 @@
       "year_built": 1975,
       "year_imputed": true
     }
-  ]
+  ],
+  "scope": "municipio_madrid_21_distritos",
+  "restricted_at": "2026-05-29T07:37:51.147635+00:00",
+  "max_est_eur_m2": 53.7
 }

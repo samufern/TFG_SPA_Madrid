@@ -1,0 +1,278 @@
+{
+  "mixed": [
+    {
+      "url_id": "99170119",
+      "barrio": "Centro",
+      "district": "Meco",
+      "m2": 230,
+      "published": 1200,
+      "estimated": 6053,
+      "score": 1.16
+    },
+    {
+      "url_id": "98971974",
+      "barrio": "Chueca-Justicia",
+      "district": "Centro",
+      "m2": 88,
+      "published": 1200,
+      "estimated": 3066,
+      "score": 1.11
+    },
+    {
+      "url_id": "36951938",
+      "barrio": "Trafalgar",
+      "district": "Chamberí",
+      "m2": 55,
+      "published": 900,
+      "estimated": 2087,
+      "score": 1.0
+    },
+    {
+      "url_id": "99410525",
+      "barrio": "Goya",
+      "district": "Salamanca",
+      "m2": 90,
+      "published": 1400,
+      "estimated": 3362,
+      "score": 1.0
+    },
+    {
+      "url_id": "99381086",
+      "barrio": "Centro",
+      "district": "Moralzarzal",
+      "m2": 80,
+      "published": 825,
+      "estimated": 2495,
+      "score": 1.08
+    },
+    {
+      "url_id": "98829876",
+      "barrio": "Trafalgar",
+      "district": "Chamberí",
+      "m2": 45,
+      "published": 800,
+      "estimated": 1899,
+      "score": 0.87
+    },
+    {
+      "url_id": "99427117",
+      "barrio": "Nuevos Ministerios-Ríos Rosas",
+      "district": "Chamberí",
+      "m2": 37,
+      "published": 850,
+      "estimated": 1683,
+      "score": 0.89
+    },
+    {
+      "url_id": "99402050",
+      "barrio": "Pacífico",
+      "district": "Retiro",
+      "m2": 96,
+      "published": 1100,
+      "estimated": 2587,
+      "score": 1.25
+    },
+    {
+      "url_id": "96823743",
+      "barrio": "Malasaña-Universidad",
+      "district": "Centro",
+      "m2": 115,
+      "published": 1500,
+      "estimated": 3778,
+      "score": 0.96
+    },
+    {
+      "url_id": "40216813",
+      "barrio": "Lista",
+      "district": "Salamanca",
+      "m2": 30,
+      "published": 800,
+      "estimated": 2029,
+      "score": 0.79
+    }
+  ],
+  "score": [
+    {
+      "url_id": "93465238",
+      "barrio": "Ventilla-Almenara",
+      "district": "Tetuán",
+      "m2": 132,
+      "published": 1500,
+      "estimated": 2816,
+      "score": 1.76
+    },
+    {
+      "url_id": "98590106",
+      "barrio": "Las Tablas",
+      "district": "Fuencarral",
+      "m2": 150,
+      "published": 1350,
+      "estimated": 2420,
+      "score": 1.47
+    },
+    {
+      "url_id": "99351788",
+      "barrio": "Sector B",
+      "district": "Boadilla del Monte",
+      "m2": 86,
+      "published": 1200,
+      "estimated": 2031,
+      "score": 1.29
+    },
+    {
+      "url_id": "99166138",
+      "barrio": "Vista Alegre",
+      "district": "Carabanchel",
+      "m2": 85,
+      "published": 750,
+      "estimated": 1057,
+      "score": 1.28
+    },
+    {
+      "url_id": "99402050",
+      "barrio": "Pacífico",
+      "district": "Retiro",
+      "m2": 96,
+      "published": 1100,
+      "estimated": 2587,
+      "score": 1.25
+    },
+    {
+      "url_id": "31818434",
+      "barrio": "Virgen del Cortijo - Manoteras",
+      "district": "Hortaleza",
+      "m2": 65,
+      "published": 900,
+      "estimated": 1584,
+      "score": 1.2
+    },
+    {
+      "url_id": "99170119",
+      "barrio": "Centro",
+      "district": "Meco",
+      "m2": 230,
+      "published": 1200,
+      "estimated": 6053,
+      "score": 1.16
+    },
+    {
+      "url_id": "98971974",
+      "barrio": "Chueca-Justicia",
+      "district": "Centro",
+      "m2": 88,
+      "published": 1200,
+      "estimated": 3066,
+      "score": 1.11
+    },
+    {
+      "url_id": "99381086",
+      "barrio": "Centro",
+      "district": "Moralzarzal",
+      "m2": 80,
+      "published": 825,
+      "estimated": 2495,
+      "score": 1.08
+    },
+    {
+      "url_id": "99389955",
+      "barrio": "Guindalera",
+      "district": "Salamanca",
+      "m2": 190,
+      "published": 2100,
+      "estimated": 3449,
+      "score": 1.04
+    }
+  ],
+  "score_m2": [
+    {
+      "url_id": "99264012",
+      "barrio": "Sol",
+      "district": "Centro",
+      "m2": 33,
+      "published": 1290,
+      "estimated": 5126,
+      "score": 0.55
+    },
+    {
+      "url_id": "40216813",
+      "barrio": "Lista",
+      "district": "Salamanca",
+      "m2": 30,
+      "published": 800,
+      "estimated": 2029,
+      "score": 0.79
+    },
+    {
+      "url_id": "99408105",
+      "barrio": "El Viso",
+      "district": "Chamartín",
+      "m2": 30,
+      "published": 700,
+      "estimated": 1609,
+      "score": 0.58
+    },
+    {
+      "url_id": "666696",
+      "barrio": "Sol",
+      "district": "Centro",
+      "m2": 25,
+      "published": 600,
+      "estimated": 1290,
+      "score": 0.44
+    },
+    {
+      "url_id": "99360208",
+      "barrio": "Chueca-Justicia",
+      "district": "Centro",
+      "m2": 30,
+      "published": 750,
+      "estimated": 1577,
+      "score": 0.66
+    },
+    {
+      "url_id": "98829876",
+      "barrio": "Trafalgar",
+      "district": "Chamberí",
+      "m2": 45,
+      "published": 800,
+      "estimated": 1899,
+      "score": 0.87
+    },
+    {
+      "url_id": "27377142",
+      "barrio": "Berruguete",
+      "district": "Tetuán",
+      "m2": 33,
+      "published": 600,
+      "estimated": 1361,
+      "score": 0.68
+    },
+    {
+      "url_id": "37685759",
+      "barrio": "Ibiza",
+      "district": "Retiro",
+      "m2": 40,
+      "published": 750,
+      "estimated": 1664,
+      "score": 0.73
+    },
+    {
+      "url_id": "99427117",
+      "barrio": "Nuevos Ministerios-Ríos Rosas",
+      "district": "Chamberí",
+      "m2": 37,
+      "published": 850,
+      "estimated": 1683,
+      "score": 0.89
+    },
+    {
+      "url_id": "99410525",
+      "barrio": "Goya",
+      "district": "Salamanca",
+      "m2": 90,
+      "published": 1400,
+      "estimated": 3362,
+      "score": 1.0
+    }
+  ]
+}

@@ -1,5 +1,5 @@
 /**
- * RentIA service worker — v2
+ * RentIA service worker — v4 (debe coincidir con la constante CACHE de abajo)
  * - Cache-first para assets, network-first para navegaciones.
  * - Auto-update: cuando hay un nuevo SW listo, el client recibe un postMessage
  *   y muestra un banner que permite recargar para activar la nueva versión.

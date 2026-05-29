@@ -79,40 +79,40 @@ const DISTRICTS_22 = [
 // ============================================================
 const OPPORTUNITIES = {
   mixed: [
-    {rank:1,  barrio:"Centro",                          district:"Meco",                m2:230, published:1200, estimated:6053, score:1.16, url:"99170119"},
-    {rank:2,  barrio:"Chueca-Justicia",                 district:"Centro",              m2: 88, published:1200, estimated:3066, score:1.11, url:"98971974"},
-    {rank:3,  barrio:"Trafalgar",                       district:"Chamberí",            m2: 55, published: 900, estimated:2087, score:1.00, url:"36951938"},
-    {rank:4,  barrio:"Goya",                            district:"Salamanca",           m2: 90, published:1400, estimated:3362, score:1.00, url:"99410525"},
-    {rank:5,  barrio:"Centro",                          district:"Moralzarzal",         m2: 80, published: 825, estimated:2495, score:1.08, url:"99381086"},
-    {rank:6,  barrio:"Trafalgar",                       district:"Chamberí",            m2: 45, published: 800, estimated:1899, score:0.87, url:"98829876"},
-    {rank:7,  barrio:"Nuevos Ministerios-Ríos Rosas",   district:"Chamberí",            m2: 37, published: 850, estimated:1683, score:0.89, url:"99427117"},
-    {rank:8,  barrio:"Pacífico",                        district:"Retiro",              m2: 96, published:1100, estimated:2587, score:1.25, url:"99402050"},
-    {rank:9,  barrio:"Malasaña-Universidad",            district:"Centro",              m2:115, published:1500, estimated:3778, score:0.96, url:"96823743"},
-    {rank:10, barrio:"Lista",                           district:"Salamanca",           m2: 30, published: 800, estimated:2029, score:0.79, url:"40216813"}
+    {rank:1, barrio:"Goya", district:"Salamanca", m2:90, published:1400, estimated:3362, score:1.00, url:"99410525"},
+    {rank:2, barrio:"Chueca-Justicia", district:"Centro", m2:88, published:1200, estimated:3066, score:1.11, url:"98971974"},
+    {rank:3, barrio:"Trafalgar", district:"Chamberí", m2:55, published:900, estimated:2087, score:1.00, url:"36951938"},
+    {rank:4, barrio:"Trafalgar", district:"Chamberí", m2:45, published:800, estimated:1899, score:0.87, url:"98829876"},
+    {rank:5, barrio:"Pacífico", district:"Retiro", m2:96, published:1100, estimated:2587, score:1.25, url:"99402050"},
+    {rank:6, barrio:"Nuevos Ministerios-Ríos Rosas", district:"Chamberí", m2:37, published:850, estimated:1683, score:0.89, url:"99427117"},
+    {rank:7, barrio:"Malasaña-Universidad", district:"Centro", m2:115, published:1500, estimated:3778, score:0.96, url:"96823743"},
+    {rank:8, barrio:"Ibiza", district:"Retiro", m2:40, published:750, estimated:1664, score:0.72, url:"37685759"},
+    {rank:9, barrio:"Recoletos", district:"Salamanca", m2:52, published:850, estimated:1898, score:0.74, url:"99346252"},
+    {rank:10, barrio:"Virgen del Cortijo - Manoteras", district:"Hortaleza", m2:65, published:900, estimated:1584, score:1.20, url:"31818434"}
   ],
   score: [
-    {rank:1,  barrio:"Ventilla-Almenara",               district:"Tetuán",              m2:132, published:1500, estimated:2816, score:1.76, url:"93465238"},
-    {rank:2,  barrio:"Las Tablas",                      district:"Fuencarral",          m2:150, published:1350, estimated:2420, score:1.47, url:"98590106"},
-    {rank:3,  barrio:"Sector B",                        district:"Boadilla del Monte",  m2: 86, published:1200, estimated:2031, score:1.29, url:"99351788"},
-    {rank:4,  barrio:"Vista Alegre",                    district:"Carabanchel",         m2: 85, published: 750, estimated:1057, score:1.28, url:"99166138"},
-    {rank:5,  barrio:"Pacífico",                        district:"Retiro",              m2: 96, published:1100, estimated:2587, score:1.25, url:"99402050"},
-    {rank:6,  barrio:"Virgen del Cortijo - Manoteras",  district:"Hortaleza",           m2: 65, published: 900, estimated:1584, score:1.20, url:"31818434"},
-    {rank:7,  barrio:"Centro",                          district:"Meco",                m2:230, published:1200, estimated:6053, score:1.16, url:"99170119"},
-    {rank:8,  barrio:"Chueca-Justicia",                 district:"Centro",              m2: 88, published:1200, estimated:3066, score:1.11, url:"98971974"},
-    {rank:9,  barrio:"Centro",                          district:"Moralzarzal",         m2: 80, published: 825, estimated:2495, score:1.08, url:"99381086"},
-    {rank:10, barrio:"Guindalera",                      district:"Salamanca",           m2:190, published:2100, estimated:3449, score:1.04, url:"99389955"}
+    {rank:1, barrio:"Ventilla-Almenara", district:"Tetuán", m2:132, published:1500, estimated:2816, score:1.76, url:"93465238"},
+    {rank:2, barrio:"Las Tablas", district:"Fuencarral", m2:150, published:1350, estimated:2420, score:1.47, url:"98590106"},
+    {rank:3, barrio:"Vista Alegre", district:"Carabanchel", m2:85, published:750, estimated:1057, score:1.28, url:"99166138"},
+    {rank:4, barrio:"Pacífico", district:"Retiro", m2:96, published:1100, estimated:2587, score:1.25, url:"99402050"},
+    {rank:5, barrio:"Virgen del Cortijo - Manoteras", district:"Hortaleza", m2:65, published:900, estimated:1584, score:1.20, url:"31818434"},
+    {rank:6, barrio:"Chueca-Justicia", district:"Centro", m2:88, published:1200, estimated:3066, score:1.11, url:"98971974"},
+    {rank:7, barrio:"Guindalera", district:"Salamanca", m2:190, published:2100, estimated:3449, score:1.04, url:"99389955"},
+    {rank:8, barrio:"Trafalgar", district:"Chamberí", m2:55, published:900, estimated:2087, score:1.00, url:"36951938"},
+    {rank:9, barrio:"Goya", district:"Salamanca", m2:90, published:1400, estimated:3362, score:1.00, url:"99410525"},
+    {rank:10, barrio:"Malasaña-Universidad", district:"Centro", m2:115, published:1500, estimated:3778, score:0.96, url:"96823743"}
   ],
   score_m2: [
-    {rank:1,  barrio:"Sol",                             district:"Centro",              m2: 33, published:1290, estimated:5126, score:0.55, url:"99264012"},
-    {rank:2,  barrio:"Lista",                           district:"Salamanca",           m2: 30, published: 800, estimated:2029, score:0.79, url:"40216813"},
-    {rank:3,  barrio:"El Viso",                         district:"Chamartín",           m2: 30, published: 700, estimated:1609, score:0.58, url:"99408105"},
-    {rank:4,  barrio:"Sol",                             district:"Centro",              m2: 25, published: 600, estimated:1290, score:0.44, url:"666696"},
-    {rank:5,  barrio:"Chueca-Justicia",                 district:"Centro",              m2: 30, published: 750, estimated:1577, score:0.66, url:"99360208"},
-    {rank:6,  barrio:"Trafalgar",                       district:"Chamberí",            m2: 45, published: 800, estimated:1899, score:0.87, url:"98829876"},
-    {rank:7,  barrio:"Berruguete",                      district:"Tetuán",              m2: 33, published: 600, estimated:1361, score:0.68, url:"27377142"},
-    {rank:8,  barrio:"Ibiza",                           district:"Retiro",              m2: 40, published: 750, estimated:1664, score:0.73, url:"37685759"},
-    {rank:9,  barrio:"Nuevos Ministerios-Ríos Rosas",   district:"Chamberí",            m2: 37, published: 850, estimated:1683, score:0.89, url:"99427117"},
-    {rank:10, barrio:"Goya",                            district:"Salamanca",           m2: 90, published:1400, estimated:3362, score:1.00, url:"99410525"}
+    {rank:1, barrio:"El Viso", district:"Chamartín", m2:30, published:700, estimated:1609, score:0.58, url:"99408105"},
+    {rank:2, barrio:"Chueca-Justicia", district:"Centro", m2:30, published:750, estimated:1577, score:0.66, url:"99360208"},
+    {rank:3, barrio:"Trafalgar", district:"Chamberí", m2:45, published:800, estimated:1899, score:0.87, url:"98829876"},
+    {rank:4, barrio:"Berruguete", district:"Tetuán", m2:33, published:600, estimated:1361, score:0.69, url:"27377142"},
+    {rank:5, barrio:"Ibiza", district:"Retiro", m2:40, published:750, estimated:1664, score:0.72, url:"37685759"},
+    {rank:6, barrio:"Nuevos Ministerios-Ríos Rosas", district:"Chamberí", m2:37, published:850, estimated:1683, score:0.89, url:"99427117"},
+    {rank:7, barrio:"Goya", district:"Salamanca", m2:90, published:1400, estimated:3362, score:1.00, url:"99410525"},
+    {rank:8, barrio:"Trafalgar", district:"Chamberí", m2:55, published:900, estimated:2087, score:1.00, url:"36951938"},
+    {rank:9, barrio:"Lavapiés-Embajadores", district:"Centro", m2:37, published:750, estimated:1538, score:0.70, url:"99384455"},
+    {rank:10, barrio:"Chueca-Justicia", district:"Centro", m2:88, published:1200, estimated:3066, score:1.11, url:"98971974"}
   ]
 };
 

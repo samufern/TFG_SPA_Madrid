@@ -1,0 +1,42 @@
+LICENCIA PROPIETARIA — TODOS LOS DERECHOS RESERVADOS
+====================================================
+
+Copyright (c) 2026 Samuel Fernández Fernández.
+
+Proyecto: RentIA Madrid — Trabajo Fin de Grado.
+Universidad Carlos III de Madrid · Curso 2025–2026.
+Tutores: Miguel Ángel Patricio y Antonio Berlanga.
+
+
+1. TITULARIDAD
+   Todo el contenido de este repositorio —código fuente, notebooks, modelos
+   entrenados, artefactos, figuras, documentación y datos derivados— es
+   propiedad intelectual del autor arriba indicado y queda protegido por la
+   legislación de propiedad intelectual aplicable.
+
+2. USO PERMITIDO
+   Se concede acceso a este repositorio EXCLUSIVAMENTE con fines de evaluación
+   académica del Trabajo Fin de Grado y de consulta personal. No se otorga
+   ninguna otra licencia, expresa o implícita.
+
+3. RESTRICCIONES
+   Queda PROHIBIDO, sin autorización previa y por escrito del autor:
+     a) usar, copiar, modificar o redistribuir el código o los datos;
+     b) crear obras derivadas;
+     c) emplear el proyecto, total o parcialmente, con fines comerciales;
+     d) sublicenciar o transferir cualquier derecho sobre el mismo.
+
+   Cualquier uso, distribución o derivado de este código y de sus datos debe
+   acordarse previamente con el autor (samufernandezf@gmail.com).
+
+4. DATOS DE TERCEROS
+   El proyecto integra datos abiertos de terceros (Idealista, INE, Ayuntamiento
+   de Madrid, OpenStreetMap, MITMA, entre otros), sujetos a sus respectivas
+   licencias y condiciones de uso. Esta licencia no altera ni sustituye dichas
+   condiciones, que el usuario debe respetar de forma independiente.
+
+5. EXENCIÓN DE RESPONSABILIDAD
+   EL SOFTWARE Y LOS DATOS SE PROPORCIONAN "TAL CUAL", SIN GARANTÍA DE NINGÚN
+   TIPO. Las predicciones tienen carácter orientativo y NO constituyen una
+   tasación oficial (Orden ECO/805/2003). El autor no se hace responsable de
+   decisiones tomadas a partir de los resultados de este proyecto.

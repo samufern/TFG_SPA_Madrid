@@ -1,2 +1,28 @@
-# Ignore generated artifacts by default.
-artifacts/**
+# --- Python ---
+__pycache__/
+*.pyc
+*.pyo
+
+# --- Entornos virtuales ---
+.venv/
+venv/
+env/
+
+# --- Jupyter ---
+.ipynb_checkpoints/
+
+# --- Logs de entrenamiento de CatBoost (regenerables, no versionar) ---
+catboost_info/
+
+# --- Temporales ---
+*.tmp
+
+# NOTA: artifacts/ SI se versiona (decision de auditoria). Solo se excluyen los
+# logs de CatBoost que puedan quedar dentro de artifacts/.
+artifacts/catboost_info/
+artifacts/notebooks_catboost_info/
+
+# Versiones .csv.gz heredadas y redundantes: ya existen como .parquet canonico.
+artifacts/features_core.csv.gz
+artifacts/processed_rent.csv.gz
+artifacts/snapshot_example.csv.gz

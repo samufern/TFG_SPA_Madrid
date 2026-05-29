@@ -72,7 +72,7 @@ Este proyecto constituye el **Trabajo Fin de Grado** desarrollado en la **Univer
 
 - **Modelado dual-target** con CatBoost optimizado por Optuna (4.997 trials, profundidad 8, lr 0.299).
 - **Enriquecimiento masivo** con 16 features externas procedentes de 12 fuentes abiertas: distancias y densidades a Metro, BiciMAD y EMT; renta INE, edad media y tamaño del hogar; ruido (dB) y NO₂; viviendas turísticas (VUT); zonas verdes, terrazas y licencias comerciales.
-- **5 esquemas de validación cruzada**: hold-out temporal con purga de 1 día, K-Fold estratificado, Time-blocked CV, Spatial CV por geohash-6 y Grouped CV por distrito.
+- **5 esquemas de validación cruzada**: hold-out temporal con purga de 1 día, K-Fold estratificado, Time-blocked CV, Spatial CV por **celda H3 (resolución 7)** y Grouped CV por distrito.
 - **Intervalos calibrados** mediante *Conformal Quantile Regression* con corrección de *quantile crossing* y dos modos (raw y log).
 - **Explicabilidad** con SHAP `TreeExplainer` global y local, con fallback a *permutation importance*.
 - **Clustering K-Means** (k=5, Silhouette 0,188, ARI 0,999) sobre features comportamentales del mercado.
@@ -119,7 +119,7 @@ TFG_SPA_Madrid/
 │
 ├── notebooks/                                     # 11 notebooks numerados (ejecutar en orden)
 │   ├── 01_data_quality.ipynb                      # Ingesta, deduplicación, validación y split hold-out temporal
-│   ├── 02_eda.ipynb                               # Análisis exploratorio: distribuciones, correlaciones, geohash
+│   ├── 02_eda.ipynb                               # Análisis exploratorio: distribuciones, correlaciones, celdas H3
 │   ├── 03_features_core.ipynb                     # Ingeniería de features core + enrichment + VUT espacial
 │   ├── 04_baselines.ipynb                         # Modelos baseline (media, OLS, ElasticNet, Random Forest)
 │   ├── 05_boosting.ipynb                          # CatBoost dual-target con CV temporal/espacial y Optuna
@@ -131,7 +131,9 @@ TFG_SPA_Madrid/
 │   └── 11_dashboard_mvp.ipynb                     # Dashboard interactivo con ipywidgets y mapas multicapa
 │
 ├── src/
-│   └── utils.py                                   # 47 funciones compartidas (download, geo, CV, eval...)
+│   ├── utils.py                                   # Funciones compartidas (download, geo, CV, eval...)
+│   ├── build_data_dictionary.py                   # Genera artifacts/data_dictionary.csv desde features_master
+│   └── restrict_opportunities_to_city.py          # Restringe las oportunidades de la web a los 21 distritos
 │
 ├── artifacts/                                     # Outputs reutilizables (gestionados con Git LFS)
 │   ├── processed_rent.parquet                     # Dataset limpio (8.797 filas, 38 columnas)
@@ -141,6 +143,7 @@ TFG_SPA_Madrid/
 │   ├── features_temporal.csv.gz                   # Features temporales empalmadas con series INE
 │   ├── clusters.csv                               # Asignación de cluster (K=5) por anuncio
 │   ├── selected_features.json                     # Features finales por consenso SelectKBest + SHAP + Permutation
+│   ├── data_dictionary.csv                        # Diccionario de datos (70 columnas: dtype, cobertura, descripción, fuente)
 │   ├── barriosMadrid.json                         # 146 barrios con coordenadas, medianas y metadatos
 │   └── splits/                                    # Índices inmutables del hold-out (npz + csv + config)
 │
@@ -167,8 +170,12 @@ TFG_SPA_Madrid/
 │   ├── data/opportunities_pool.json               # Top-100 oportunidades servidas a la web
 │   └── README.md                                  # Guía para lanzar el servidor local
 │
-├── .gitattributes                                 # Configuración Git LFS (csv, parquet, zip, tif)
-├── .gitignore                                     # Excluye artifacts/** (gestionados por LFS)
+├── tests/
+│   └── test_utils.py                              # Tests unitarios (pytest) de las funciones puras de utils.py
+├── .gitattributes                                 # Git LFS (csv, parquet, zip, tif, xlsx, pdf, gz, db, shapefiles)
+├── .gitignore                                     # Excluye cachés/logs (__pycache__, catboost_info...); artifacts/ SÍ se versiona
+├── requirements.txt                               # Dependencias directas (instalación reproducible)
+├── LICENSE                                        # Licencia propietaria
 └── README.md                                      # Archivo explicativo del proyecto
 ```
 
@@ -212,7 +219,7 @@ Los 11 notebooks forman una secuencia ejecutable: cada uno consume artefactos de
 | # | Notebook | Propósito | Output principal |
 | :---: | :--- | :--- | :--- |
 | 01 | [`01_data_quality.ipynb`](notebooks/01_data_quality.ipynb) | Ingesta, deduplicación, validación de precio y superficie, filtrado geográfico, split hold-out temporal | `processed_rent.parquet`, `splits/` |
-| 02 | [`02_eda.ipynb`](notebooks/02_eda.ipynb) | Análisis exploratorio: distribuciones, correlaciones, patrones espaciales por geohash | Figuras `hist_*`, `mapa_*`, `boxplot_*` |
+| 02 | [`02_eda.ipynb`](notebooks/02_eda.ipynb) | Análisis exploratorio: distribuciones, correlaciones, patrones espaciales por celda H3 | Figuras `hist_*`, `mapa_*`, `boxplot_*` |
 | 03 | [`03_features_core.ipynb`](notebooks/03_features_core.ipynb) | Ingeniería de features core + enrichment + VUT espacial con BallTree | `features_master.parquet` (70 cols) |
 | 04 | [`04_baselines.ipynb`](notebooks/04_baselines.ipynb) | Modelos baseline: media por zona, OLS, ElasticNet, Random Forest | `baselines_metrics.csv` |
 | 05 | [`05_boosting.ipynb`](notebooks/05_boosting.ipynb) | CatBoost dual-target con CV temporal/espacial y Optuna | `best_models.joblib`, `best_hyperparams.json` |
@@ -254,6 +261,8 @@ Todas las descargas quedan registradas en [`reports/download_log.jsonl`](reports
 | Random Forest | 200 árboles | 332,18 € | 0,811 | −34,8 % |
 | **CatBoost (final)** | **Boosting + Optuna** | **301,31 €** | **0,804** | **−40,9 %** |
 
+> **Lectura honesta de la comparativa.** CatBoost se entrena con `loss=MAE`, por lo que **minimiza el error mediano** y gana claramente en MAE (301,31 € vs. 332,18 € del Random Forest, −9,4 %). A cambio, su R² es marginalmente inferior (0,804 vs. 0,811): el R²/RMSE penalizan más los errores grandes (cola de precios altos), donde RF acierta algo mejor. Se prioriza el MAE como métrica de selección por ser **más interpretable para el usuario final** (error en €/mes) y más robusto a outliers, que es el objetivo del producto.
+
 ### Métricas finales en hold-out
 
 | Target | MAE CV | MAE hold-out | R² hold-out | Cobertura CQR | Anchura media P5–P95 |
@@ -262,6 +271,10 @@ Todas las descargas quedan registradas en [`reports/download_log.jsonl`](reports
 | `price_m2` (€/m²) | 3,87 €/m² | **3,17 €/m²** | **0,589** | **87,1 %** | 14,71 €/m² |
 
 > Cobertura nominal objetivo: 85 %. Ambos targets la superan ligeramente, evidenciando que CQR está bien calibrado.
+
+> **MAE CV (391 €) > MAE hold-out (301 €).** No es un error: los folds de CV temporal entrenan con tramos más cortos y antiguos (menos datos, condiciones más heterogéneas), mientras que el hold-out es el tramo más reciente y se predice con el modelo entrenado sobre **toda** la historia previa. Es habitual que la CV sea una cota superior conservadora del error real en producción.
+
+> **Sobre los hiperparámetros (`learning_rate=0,299`, `iterations=4997`, `l2_leaf_reg≈0,015`).** Pueden *parecer* agresivos, pero son el **óptimo hallado por Optuna** minimizando el error de validación cruzada, y el **hold-out temporal independiente** (fuera de toda la búsqueda) confirma que el modelo generaliza (MAE 301 €, R² 0,80) → no hay sobreajuste. Sobre el número de árboles (comprobado en [`models/best_models.joblib`](models/best_models.joblib)): el target `price` empleó los **4997 árboles** —el early-stopping (`od_wait=73`, `od_type=Iter`) no llegó a dispararse porque el modelo siguió mejorando en validación hasta el techo—, mientras que `price_m2` se detuvo antes, en **4465**. La garantía real frente al sobreajuste no es el recuento de árboles sino el **hold-out temporal independiente**, que confirma la generalización en ambos targets; y el único riesgo teórico de optimizar mucho con Optuna —el sesgo de optimización sobre los folds— queda acotado precisamente por ese hold-out reservado.
 
 ### Impacto del enriquecimiento (auditoría NB09)
 
@@ -284,8 +297,10 @@ Cinco de las 15 features más importantes (33 %) provienen del enriquecimiento, 
 ### Importancia de features (SHAP) — target `price`
 ![SHAP importance price](reports/figures/shap_importance_price.png)
 
-### Mapa de precio mediano por geohash-6
-![Mapa de precio por geohash](reports/figures/mapa_precio_geohash.png)
+### Mapa de precio mediano por celda H3 (resolución 7)
+![Mapa de precio por celda H3](reports/figures/mapa_precio_geohash.png)
+
+> Nota: las agregaciones espaciales (mapas y *Spatial CV*) usan **celdas H3 de resolución 7**. La columna del dataset conserva por motivos históricos el nombre `geohash_6`, pero su contenido es H3 r7 (ver [`src/utils.py`](src/utils.py) → `make_geohash`/`spatial_group`). Los nombres de fichero `*_geohash.png` se mantienen por compatibilidad.
 
 ### Clustering de mercado proyectado en PCA
 ![Clusters PCA](reports/figures/clusters_pca.png)
@@ -352,7 +367,9 @@ python -m venv .venv
 # source .venv/bin/activate       # macOS / Linux
 
 # 3. Instalar dependencias
-#    (no existe requirements.txt — se usa el snapshot de environment.txt)
+#    Opción A (recomendada): dependencias directas pineadas
+pip install -r requirements.txt
+#    Opción B: reproducir el entorno EXACTO con todas las transitivas (155 paquetes)
 pip install -r reports/environment.txt
 ```
 
@@ -381,7 +398,7 @@ python -m http.server 8000 --directory web
 | **Semilla aleatoria** | `SEED = 100432070` aplicada de forma global en todos los notebooks (NumPy, sklearn, CatBoost, splits) |
 | **Splits inmutables** | Índices del hold-out persistidos en [`artifacts/splits/holdout_indices.npz`](artifacts/splits/) |
 | **Hiperparámetros** | Estudios Optuna persistidos en [`models/optuna_studies.db`](models/optuna_studies.db) y best-trial en [`reports/best_hyperparams.json`](reports/best_hyperparams.json) |
-| **Versionado de datos pesados** | Git LFS aplicado a `*.csv`, `*.parquet`, `*.zip`, `*.tif` (ver [`.gitattributes`](.gitattributes)) |
+| **Versionado de datos pesados** | Git LFS aplicado a `*.csv`, `*.parquet`, `*.zip`, `*.tif`, `*.xlsx`, `*.pdf`, `*.gz`, `*.db` y shapefiles (ver [`.gitattributes`](.gitattributes)) |
 | **Trazabilidad de descargas** | Logs en [`reports/download_log.jsonl`](reports/download_log.jsonl) + checksums SHA-256 en [`reports/download_checksums.csv`](reports/download_checksums.csv) |
 | **Esquemas de CV** | Documentados en [`reports/cv_schemes.md`](reports/cv_schemes.md) |
 | **Diccionario de datos** | [`artifacts/data_dictionary.csv`](artifacts/data_dictionary.csv) |
@@ -411,6 +428,7 @@ La carpeta [`reports/`](reports/) contiene la documentación técnica estructura
 
 - **Snapshot temporal acotado.** El dataset cubre un período corto (principalmente finales de 2025) y el microdato crudo solo contiene día/mes, no año, por lo que las features temporales (NB10) están **reservadas para un futuro análisis y no se incorporan al modelo principal**.
 - **Cobertura parcial en algunas fuentes**: INE censal (68,5 %), ruido (65 %), VUT espacial (67,5 %) requieren imputación o se restringen a subconjuntos.
+- **Alcance geográfico y dominio de aplicabilidad.** El microdato crudo abarca el **área metropolitana** (filtrado a ≈60 km del centro; 88 valores distintos de `district`), pero el enriquecimiento externo y el mapeo oficial de distritos (`distrito_join`) solo cubren los **21 distritos del municipio de Madrid**. El modelo se entrena con todas las filas (con imputación en la periferia); la **detección de oportunidades se sanea en dos pasos** —vía [`src/restrict_opportunities_to_city.py`](src/restrict_opportunities_to_city.py)—: (1) se restringe a los **21 distritos del municipio**, y (2) se descartan las estimaciones cuyo €/m² implícito supera el **P99 del `price_m2` real** (≈54 €/m²), por ser extrapolaciones fuera del soporte de los datos (p. ej. un estudio de 33 m² en Sol estimado a 155 €/m²). Así el ranking solo expone oportunidades dentro del rango de mercado observado.
 - **`price_m2` más difícil de predecir** (R² = 0,589) debido a factores cualitativos no observados (estado real del inmueble, vistas, orientación, marketing del anuncio...).
 - **CQR en `price`**: cobertura 87,0 % frente a un objetivo de 85 %.
 

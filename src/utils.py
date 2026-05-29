@@ -48,6 +48,11 @@ DEFAULT_HEADERS: Dict[str, str] = {
     "Accept": "*/*",
 }
 
+# Semilla global del proyecto (NIU del autor). Centralizada aqui para evitar
+# numeros magicos repetidos en las firmas de funciones. Garantiza que todos
+# los procesos estocasticos (splits, KFold, sampling, CatBoost) sean reproducibles.
+SEED: int = 100432070
+
 
 # ---------------------------------------------------------------------------
 #  Gestion de rutas del proyecto
@@ -504,8 +509,8 @@ def parse_js_barrios(js_text: str) -> List[Dict[str, Any]]:
         if not raw_array:
             continue
         normalized = _quote_keys(raw_array)
-        normalized = re.sub(r",\\s*}", "}", normalized)
-        normalized = re.sub(r",\\s*]", "]", normalized)
+        normalized = re.sub(r",\s*}", "}", normalized)
+        normalized = re.sub(r",\s*]", "]", normalized)
         try:
             import ast
             normalized = _replace_js_literals(normalized)
@@ -559,26 +564,35 @@ def haversine(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
 
 
 def make_geohash(lat: float, lon: float, precision: int = 6) -> str:
-    """Genera un identificador geoespacial (geohash) para una coordenada.
+    """Genera un identificador de celda espacial para una coordenada.
 
-    Un geohash es un codigo alfanumerico que representa una zona geografica.
-    Coordenadas cercanas comparten prefijo, lo que permite agrupar puntos
-    por proximidad. Se usa para crear features espaciales (por ejemplo,
-    precio medio por zona).
+    IMPORTANTE sobre la nomenclatura: el nombre historico es ``make_geohash``,
+    pero la celda devuelta depende de la libreria disponible (orden de prioridad
+    H3 > geohash2 > texto):
 
-    Prioridad de librerias: H3 > geohash2 > formato texto simple.
+      - **H3** (preferida): devuelve una celda H3 de resolucion ``precision + 1``
+        (con ``precision=6`` => H3 r7). NO es un geohash clasico; es un indice
+        hexagonal jerarquico. Ejemplo: ``'87388a0acbfffff'``.
+      - **geohash2** (fallback): devuelve un geohash clasico (Base32) de longitud
+        ``precision`` (geohash-6). Ejemplo: ``'ezjmgt'``.
+      - **texto** (ultimo recurso): ``"{lat}_{lon}"`` redondeado a ``precision``.
+
+    Coordenadas cercanas comparten celda/prefijo, lo que permite agrupar puntos
+    por proximidad para features espaciales (p. ej. precio medio por zona) o
+    para validacion cruzada espacial.
 
     Args:
         lat: Latitud en grados decimales.
         lon: Longitud en grados decimales.
-        precision: Nivel de detalle (mas alto = zona mas pequena).
+        precision: Nivel de detalle (mas alto = zona mas pequena). Con H3 se mapea
+            a resolucion ``precision + 1``; con geohash2 a longitud ``precision``.
 
     Returns:
-        Codigo geohash como string.
+        Identificador de celda como string (celda H3 r(precision+1) o geohash-precision).
 
     Ejemplo:
-        >>> make_geohash(40.4168, -3.7038, 6)
-        '87388a0acbfffff'  # Zona centro de Madrid
+        >>> make_geohash(40.4168, -3.7038, 6)  # con h3 instalado
+        '87388a0acbfffff'  # celda H3 r7 de la zona centro de Madrid
     """
     import importlib.util
 
@@ -594,20 +608,27 @@ def make_geohash(lat: float, lon: float, precision: int = 6) -> str:
 
 
 def spatial_group(df, lat_col: str, lon_col: str, precision: int = 6) -> List[str]:
-    """Asigna cada fila a una celda espacial (geohash) segun sus coordenadas.
+    """Asigna cada fila a una celda espacial segun sus coordenadas.
+
+    Delega en ``make_geohash``, por lo que el tipo de celda depende de la
+    libreria disponible: con ``h3`` instalado (caso del entorno del proyecto)
+    devuelve **celdas H3 de resolucion ``precision + 1``** (con ``precision=6``
+    => H3 r7); como fallback usa geohash2 (geohash clasico de longitud
+    ``precision``). NOTA: en el dataset la columna resultante se llama
+    historicamente ``geohash_6``, pero su contenido real es H3 r7.
 
     Las filas con coordenadas invalidas (NaN) reciben el grupo "missing".
-    Se usa para crear agrupaciones espaciales en feature engineering
-    (por ejemplo, estadisticas por zona geografica).
+    Se usa para agrupaciones espaciales en feature engineering y para la
+    validacion cruzada espacial (GroupKFold por celda).
 
     Args:
         df: DataFrame con columnas de latitud y longitud.
         lat_col: Nombre de la columna de latitud.
         lon_col: Nombre de la columna de longitud.
-        precision: Nivel de detalle del geohash (por defecto 6).
+        precision: Nivel de detalle (por defecto 6; con H3 => resolucion 7).
 
     Returns:
-        Lista de strings con el geohash de cada fila.
+        Lista de strings con el identificador de celda de cada fila.
     """
     import pandas as pd
 
@@ -707,7 +728,7 @@ def oof_aggregations(
     group_col: str,
     value_col: str,
     n_splits: int = 5,
-    seed: int = 100432070,
+    seed: int = SEED,
 ) -> np.ndarray:
     """Calcula promedios por grupo usando solo datos del fold de entrenamiento.
 
@@ -789,7 +810,7 @@ def plot_maps(
         cluster = MarkerCluster()
 
         # Limitar a 2000 puntos para rendimiento
-        sample = df.sample(min(len(df), 2000), random_state=100432070) if len(df) > 2000 else df
+        sample = df.sample(min(len(df), 2000), random_state=SEED) if len(df) > 2000 else df
         for _, row in sample.iterrows():
             popup = f"{value_col}: {row.get(value_col, '')}" if value_col else ""
             folium.CircleMarker(
@@ -916,7 +937,7 @@ def make_time_splits(
     df,
     date_col: str,
     test_size: float = 0.2,
-    seed: int = 100432070,
+    seed: int = SEED,
     gap_days: int = 0,
     n_cv_splits: int = 0,
 ):
@@ -1204,7 +1225,7 @@ try:
         """
 
         def __init__(self, iterations=300, depth=6, learning_rate=0.1,
-                     l2_leaf_reg=3, random_seed=100432070, loss_function="MAE",
+                     l2_leaf_reg=3, random_seed=SEED, loss_function="MAE",
                      verbose=False,
                      # Hiperparametros adicionales explorados por Optuna en NB05.
                      # Se exponen como atributos para que sklearn.set_params los acepte.
@@ -1314,7 +1335,7 @@ except ImportError:
 #  Construccion del pipeline de boosting
 # ---------------------------------------------------------------------------
 
-def make_boosting_pipeline(seed: int = 100432070):
+def make_boosting_pipeline(seed: int = SEED):
     """Construye el mejor pipeline de gradient boosting disponible.
 
     Intenta usar las librerias en este orden de prioridad:
@@ -1327,7 +1348,7 @@ def make_boosting_pipeline(seed: int = 100432070):
     manejar valores faltantes automaticamente.
 
     Args:
-        seed: Semilla para reproducibilidad (por defecto 42).
+        seed: Semilla para reproducibilidad (por defecto ``SEED`` = 100432070).
 
     Returns:
         Tupla con tres elementos:
@@ -1337,7 +1358,7 @@ def make_boosting_pipeline(seed: int = 100432070):
         - ``engine_name``: Nombre del motor seleccionado (str).
 
     Ejemplo:
-        >>> build_fn, params, engine = make_boosting_pipeline(seed=42)
+        >>> build_fn, params, engine = make_boosting_pipeline(seed=SEED)
         >>> print(f"Motor: {engine}")
         Motor: catboost
         >>> pipeline = build_fn()
