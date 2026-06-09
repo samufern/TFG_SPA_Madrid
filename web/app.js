@@ -1935,9 +1935,21 @@ function buildMapDetailExtras(d){
   }
 
   function personalScore(item){
-    let s = rankPct(item.score, baseScoreValues);  // base infraprecio (peso fijo 1)
-    FACTORS.forEach(({field, direction}) => {
-      const w = customWeights[field] || 0;
+    // Combinación convexa (MAUT/SAW clásico): w_0 + Σ w_j = 1, U_i ∈ [0, 1]
+    //
+    //   U_i = w_0 · rank_pct(S_i) + Σⱼ w_j · f̃_{i,j}
+    //
+    // Los pesos crudos w̃_j ∈ {0,1,2,4} que el usuario elige en los chips se
+    // normalizan internamente para que la suma total (incluido el peso base
+    // w_0 fijo en 1) sea 1. Esto es equivalente, en términos de ranking, a
+    // la suma no normalizada — pero hace U_i interpretable como utilidad
+    // ponderada en [0,1] (Keeney-Raiffa 1976, MacCrimmon 1968).
+    const rawWeights = FACTORS.map(({field}) => customWeights[field] || 0);
+    const total = 1 + rawWeights.reduce((acc, w) => acc + w, 0);
+    const w0 = 1 / total;
+    let s = w0 * rankPct(item.score, baseScoreValues);  // término base, peso normalizado
+    FACTORS.forEach(({field, direction}, idx) => {
+      const w = rawWeights[idx] / total;
       if(w === 0) return;
       let norm = rankPct(item[field], factorValues[field]);
       if(direction === 'less') norm = 1 - norm;

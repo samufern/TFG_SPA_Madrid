@@ -225,15 +225,20 @@
 
   <h3>Capa de personalización por usuario (pestaña "A medida")</h3>
   <p>El score CQR es <strong>objetivo</strong> — mide infravaloración estadística sin imponer una preferencia de vida. Pero cada usuario tiene prioridades distintas (una familia quiere superficie, alguien sensible al asma busca calidad del aire, etc.).</p>
-  <p>Para respetar ambos objetivos, la pestaña <em>A medida</em> aplica una <strong>capa post-modelo</strong>: parte del pool de los 100 inmuebles que pasan el filtro CQR al 95 % y los reordena según pesos que el propio usuario asigna a 6 criterios (cercanía al centro, cercanía al metro, superficie, calidad del aire, tranquilidad, equipamiento).</p>
-  <pre style="background:var(--surface-2);padding:1rem;border-radius:8px;font-family:var(--mono);font-size:.84rem;overflow-x:auto">personal_score_i = rank_pct(opportunity_score_i) + Σⱼ wⱼ · rank_pct(factorⱼ_i)
-  con wⱼ ∈ {0, 1, 2, 4} (Nada · Poco · Bastante · Mucho)</pre>
+  <p>Para respetar ambos objetivos, la pestaña <em>A medida</em> aplica una <strong>capa post-modelo</strong> bajo el marco clásico de <strong>Multi-Attribute Utility Theory</strong> (Keeney &amp; Raiffa, 1976) en su forma <em>Simple Additive Weighting</em> (MacCrimmon, 1968). Sobre el pool de los 100 inmuebles que pasan el filtro CQR al 95 %, calcula una <strong>combinación convexa</strong> entre la valoración objetiva del modelo y las preferencias subjetivas del usuario:</p>
+  <pre style="background:var(--surface-2);padding:1rem;border-radius:8px;font-family:var(--mono);font-size:.84rem;overflow-x:auto">U_i(w) = w₀ · rank_pct(S_i)  +  Σⱼ wⱼ · f̃ⱼ,ᵢ          j = 1 … 6
+
+con   w₀ + Σⱼ wⱼ = 1,    U_i(w) ∈ [0, 1]
+
+donde   wⱼ = w̃ⱼ / (1 + Σₖ w̃ₖ)      w̃ⱼ ∈ {0, 1, 2, 4}
+        w₀ = 1   / (1 + Σₖ w̃ₖ)      chips Nada · Poco · Bastante · Mucho</pre>
   <p>Notas clave:</p>
   <ul>
-    <li>La normalización por <em>rank percentile</em> es invariante a escala y robusta a outliers.</li>
+    <li>Los pesos crudos <code>w̃ⱼ</code> que el usuario elige en los chips se <strong>normalizan internamente</strong> para que la suma total incluido el peso base sea 1. La utilidad resultante <code>U_i ∈ [0, 1]</code> admite lectura formal como ponderación convexa.</li>
+    <li>El término base (peso <code>w₀</code>) es la valoración objetiva del modelo: <code>rank_pct(S_i)</code> con <code>S_i</code> = z-score CQR del descuento. Si todos los pesos de criterios están a "Nada" (<code>w̃ⱼ = 0</code>), entonces <code>w₀ = 1</code> y <code>U_i = rank_pct(S_i)</code> — el ranking coincide con el del modelo.</li>
+    <li>La normalización por <em>rank percentile</em> de cada criterio <code>f̃ⱼ,ᵢ ∈ [0, 1]</code> es invariante a escala y robusta a outliers. Para criterios donde "menos es mejor" (distancia al centro, ruido, NO₂) se aplica <code>1 − rank_pct</code>.</li>
     <li>El filtro CQR <strong>nunca se relaja</strong>: la personalización solo reordena entre oportunidades estadísticamente significativas. Un usuario no puede pedir "más inmuebles" forzando el algoritmo a mostrar casos no infravalorados.</li>
-    <li>Si todos los pesos están a "Nada", el orden coincide con el ranking absoluto del modelo (peso fijo 1 sobre el opportunity_score).</li>
-    <li>Las preferencias se guardan en <code>localStorage</code> para que persistan entre visitas.</li>
+    <li>Las preferencias <code>w̃ⱼ</code> se guardan en <code>localStorage</code> para que persistan entre visitas.</li>
   </ul>
 
   <h2 id="limites">8. Limitaciones conocidas</h2>
